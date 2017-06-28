@@ -1,0 +1,27 @@
+{
+  "name": "serverless-aliyun-function-compute",
+  "version": "1.0.0",
+  "description": "Provider plugin for the Serverless Framework v1.x which adds support for Aliyun Function Compute",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jest"
+  },
+  "keywords": [
+    "serverless",
+    "serverless",
+    "framework",
+    "function",
+    "compute"
+  ],
+  "author": "Joyee Cheung <joyeec9h3@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@alicloud/fc": "^1.1.0",
+    "bluebird": "^3.5.0",
+    "fs-extra": "^3.0.1"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4",
+    "sinon": "^2.3.6"
+  }
+}
