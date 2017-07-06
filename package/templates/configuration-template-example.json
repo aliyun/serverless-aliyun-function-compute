@@ -2,46 +2,48 @@
   "resources": {
     "sls-storage-bucket": {
       "type": "ALIYUN::OSS:Bucket",
-      "name": "node-hello"
+      "name": "sls-node-hello"
     },
     "sls-storage-object": {
       "type": "ALIYUN::OSS:Object",
-      "bucket": "node-hello",
-      "object": "serverless/node-hello/dev/1498638463280/node-hello.zip"
+      "bucket": "sls-node-hello",
+      "object": "serverless/node-hello/dev/1499335291215-2017-07-06T10:01:31.215Z/node-hello.zip"
     },
     "sls-function-service": {
       "type": "ALIYUN::FC::Service",
-      "name": "node-hello-dev"
+      "name": "node-hello-dev",
+      "region": "cn-hangzhou"
     },
     "sls-api-group": {
       "type": "ALIYUN::API::APIGroup",
       "name": "node-hello-dev-api",
+      "region": "cn-hangzhou",
       "id": "04e792616aa128b069b1413415abe",
       "domain": "04e792616aa128b069b1413415abe-cn-hangzhou.alicloudapi.com"
     },
     "sls-node-hello-dev-currentTime": {
       "type": "ALIYUN::FC::Function",
-      "name": "currentTime",
+      "name": "node-hello-dev-currentTime",
       "service": "node-hello-dev",
-      "handler": "index.handler",
+      "handler": "index.ping",
       "memorySize": 128,
       "timeout": 30,
       "runtime": "nodejs4.4",
       "code": {
-        "ossBucketName": "node-hello",
-        "ossObjectName": "serverless/node-hello/dev/1498638463280/node-hello.zip"
+        "ossBucketName": "sls-node-hello",
+        "ossObjectName": "serverless/node-hello/dev/1499335291215-2017-07-06T10:01:31.215Z/node-hello.zip"
       }
     },
     "sls-http-node-hello-dev-currentTime": {
       "type": "ALIYUN::API::HTTP",
       "groupName": "node-hello-dev-api",
       "groupId": "04e792616aa128b069b1413415abe",
-      "apiName": "sls-api-http-currentTime",
+      "apiName": "sls-http-node-hello-dev-currentTime",
       "protocol": "http",
       "method": "GET",
-      "path": "/ping",
+      "path": "ping",
       "service": {
-        "ref": "sls-function-currentTime"
+        "ref": "sls-node-hello-dev-currentTime"
       }
     }
   }
