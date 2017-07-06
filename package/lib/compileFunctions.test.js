@@ -34,7 +34,7 @@ describe('CompileFunctions', () => {
     serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
-      region: 'cn-shanghai',
+      region: 'cn-hangzhou',
     };
     aliyunPackage = new AliyunPackage(serverless, options);
     consoleLogStub = sinon.stub(aliyunPackage.serverless.cli, 'log').returns();
@@ -279,13 +279,13 @@ describe('CompileFunctions', () => {
         "sls-function-service": {
           "type": "ALIYUN::FC::Service",
           "name": "my-service-dev",
-          "region": "cn-shanghai",
+          "region": "cn-hangzhou",
           "id": undefined
         },
         "sls-api-group": {
           "type": "ALIYUN::API::APIGroup",
           "name": "my-service-dev-api",
-          "region": "cn-shanghai",
+          "region": "cn-hangzhou",
           "id": undefined,
           "domain": undefined
         },

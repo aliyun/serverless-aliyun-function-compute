@@ -17,7 +17,7 @@
       "type": "ALIYUN::API::APIGroup",
       "name": "node-hello-dev-api",
       "id": "04e792616aa128b069b1413415abe",
-      "domain": "04e792616aa128b069b1413415abe-cn-shanghai.alicloudapi.com"
+      "domain": "04e792616aa128b069b1413415abe-cn-hangzhou.alicloudapi.com"
     },
     "sls-node-hello-dev-currentTime": {
       "type": "ALIYUN::FC::Function",

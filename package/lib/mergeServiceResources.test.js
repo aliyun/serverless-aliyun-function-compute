@@ -17,7 +17,7 @@ describe('MergeServiceResources', () => {
     serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
-      region: 'cn-shanghai',
+      region: 'cn-hangzhou',
     };
     aliyunPackage = new AliyunPackage(serverless, options);
   });
