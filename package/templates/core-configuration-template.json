@@ -1,17 +1,18 @@
 {
-  "resources": {
+  "Resources": {
     "sls-storage-bucket": {
-      "type": "ALIYUN::OSS:Bucket",
-      "name": "to-be-replaced-by-serverless"
-    },
-    "sls-storage-object": {
-      "type": "ALIYUN::OSS:Object",
-      "bucket": "to-be-replaced-by-serverless",
-      "object": "to-be-replaced-by-serverless"
+      "Type": "ALIYUN::OSS:Bucket",
+      "Properties": {
+        "BucketName": "to-be-replaced-by-serverless",
+        "Region": "to-be-replaced-by-serverless"
+      }
     },
     "sls-function-service": {
-      "type": "ALIYUN::FC::Service",
-      "name": "to-be-replaced-by-serverless"
+      "Type": "ALIYUN::FC::Service",
+      "Properties": {
+        "name": "to-be-replaced-by-serverless",
+        "region": "to-be-replaced-by-serverless"
+      }
     }
   }
 }

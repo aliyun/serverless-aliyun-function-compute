@@ -14,8 +14,6 @@ class AliyunIndex {
     this.serverless = serverless;
     this.options = options;
 
-    // this.serverless.setProvider(
-    //   AliyunProvider.getProviderName(), new AliyunProvider(serverless));
     this.serverless.pluginManager.addPlugin(AliyunProvider);
     this.serverless.pluginManager.addPlugin(AliyunPackage);
     this.serverless.pluginManager.addPlugin(AliyunDeploy);

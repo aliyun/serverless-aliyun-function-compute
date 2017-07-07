@@ -14,11 +14,11 @@ describe('MergeServiceResources', () => {
     serverless.service.provider = {
       compiledConfigurationTemplate: {},
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
   });
 
@@ -39,7 +39,7 @@ describe('MergeServiceResources', () => {
 
   it('should merge all the resources if provided', () => {
     serverless.service.provider.compiledConfigurationTemplate = {
-      resources: [
+      "Resources": [
         {
           name: 'resource1',
           type: 'type1',
@@ -59,17 +59,11 @@ describe('MergeServiceResources', () => {
             property1: 'value1',
           },
         },
-      ],
-      imports: [
-        {
-          path: 'path/to/template.jinja',
-          name: 'my-template',
-        },
-      ],
+      ]
     };
 
     const expectedResult = {
-      resources: [
+      "Resources": [
         {
           name: 'resource1',
           type: 'type1',
@@ -84,13 +78,7 @@ describe('MergeServiceResources', () => {
             property1: 'value1',
           },
         },
-      ],
-      imports: [
-        {
-          path: 'path/to/template.jinja',
-          name: 'my-template',
-        },
-      ],
+      ]
     };
 
     return aliyunPackage.mergeServiceResources().then(() => {

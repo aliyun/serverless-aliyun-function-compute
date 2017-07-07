@@ -13,19 +13,20 @@ describe('PrepareDeployment', () => {
 
   beforeEach(() => {
     coreResources = {
-      "resources": {
+      "Resources": {
         "sls-storage-bucket": {
-          "type": "ALIYUN::OSS:Bucket",
-          "name": "to-be-replaced-by-serverless"
-        },
-        "sls-storage-object": {
-          "type": "ALIYUN::OSS:Object",
-          "bucket": "to-be-replaced-by-serverless",
-          "object": "to-be-replaced-by-serverless"
+          "Type": "ALIYUN::OSS:Bucket",
+          "Properties": {
+            "BucketName": "to-be-replaced-by-serverless",
+            "Region": "to-be-replaced-by-serverless"
+          }
         },
         "sls-function-service": {
-          "type": "ALIYUN::FC::Service",
-          "name": "to-be-replaced-by-serverless"
+          "Type": "ALIYUN::FC::Service",
+          "Properties": {
+            "name": "my-service-dev",
+            "region": "to-be-replaced-by-serverless"
+          }
         }
       }
     };
@@ -35,11 +36,11 @@ describe('PrepareDeployment', () => {
       compiledConfigurationTemplate: coreResources,
       deploymentBucketName: 'my-service'
     }
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
   });
 
@@ -56,22 +57,23 @@ describe('PrepareDeployment', () => {
 
     it('should load the core configuration template into the serverless instance', () => {
       const expectedCompiledConfiguration = {
-        resources: {
-        "sls-storage-bucket": {
-          "type": "ALIYUN::OSS:Bucket",
-          "name": "my-service"
-        },
-        "sls-storage-object": {
-          "type": "ALIYUN::OSS:Object",
-          "bucket": "my-service",
-          "object": "to-be-replaced-by-serverless"
-        },
-        "sls-function-service": {
-          "type": "ALIYUN::FC::Service",
-          "name": "to-be-replaced-by-serverless"
+        "Resources": {
+          "sls-storage-bucket": {
+            "Type": "ALIYUN::OSS:Bucket",
+            "Properties": {
+              "BucketName": "my-service",
+              "Region": "cn-hangzhou"
+            }
+          },
+          "sls-function-service": {
+            "Type": "ALIYUN::FC::Service",
+            "Properties": {
+              "name": "my-service-dev",
+              "region": "cn-hangzhou"
+            }
+          }
         }
-      }
-    };
+      };
 
       return aliyunPackage.prepareDeployment().then(() => {
         expect(readFileSyncStub.calledOnce).toEqual(true);

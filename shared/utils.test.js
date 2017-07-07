@@ -11,7 +11,7 @@ describe('Utils', () => {
 
   beforeEach(() => {
     serverless = new Serverless();
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, {}));
     aliyunCommand = new AliyunCommand(serverless, {}, setDefaults);
   });
 

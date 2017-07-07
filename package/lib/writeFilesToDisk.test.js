@@ -15,6 +15,7 @@ describe('WriteFilesToDisk', () => {
 
   beforeEach(() => {
     serverless = new Serverless();
+    serverless.service.package = {};
     serverless.service.service = 'my-service';
     serverless.service.provider = {
       compiledConfigurationTemplate: {
@@ -24,11 +25,11 @@ describe('WriteFilesToDisk', () => {
     serverless.config = {
       servicePath: 'foo/my-service',
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
     writeFileSyncStub = sinon.stub(aliyunPackage.serverless.utils, 'writeFileSync');
   });

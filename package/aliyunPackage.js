@@ -54,6 +54,8 @@ class AliyunPackage {
       'package:finalize': () => BbPromise.bind(this)
         .then(this.mergeServiceResources)
         .then(this.saveUpdateTemplateFile)
+        // TODO(joyeecheung): move the artifact to the path
+        // specified by --package
         .then(function finishPackaging() {
           this.serverless.cli.log('Finished Packaging.')
         }),

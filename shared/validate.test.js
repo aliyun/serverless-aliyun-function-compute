@@ -20,7 +20,7 @@ describe('Validate', () => {
     serverless.service = {
       service: 'some-default-service',
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, {}));
     aliyunCommand = new AliyunCommand(serverless, {}, validate);
   });
 

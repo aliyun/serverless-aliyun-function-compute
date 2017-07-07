@@ -13,7 +13,7 @@ module.exports = {
 
     _.mergeWith(
       this.serverless.service.provider.compiledConfigurationTemplate,
-      resources,
+      { Resources: resources && resources.resources },
       mergeCustomizer);
 
     return BbPromise.resolve();

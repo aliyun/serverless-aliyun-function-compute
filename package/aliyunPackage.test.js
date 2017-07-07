@@ -18,7 +18,7 @@ describe('AliyunPackage', () => {
       stage: 'my-stage',
       region: 'my-region',
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
   });
 

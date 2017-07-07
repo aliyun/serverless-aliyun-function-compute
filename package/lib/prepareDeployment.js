@@ -18,11 +18,13 @@ module.exports = {
         'templates',
         'core-configuration-template.json'));
 
-    const name = this.serverless.service.provider.deploymentBucketName;
+    const bucketName = this.serverless.service.provider.deploymentBucketName;
     const bucketId = this.provider.getStorageBucketId();
-    deploymentTemplate.resources[bucketId].name = name;
-    const objectId = this.provider.getStorageObjectId();
-    deploymentTemplate.resources[objectId].bucket = name;
+    deploymentTemplate.Resources[bucketId].Properties.BucketName = bucketName;
+    deploymentTemplate.Resources[bucketId].Properties.Region = `${this.options.region}`;
+
+    const serviceId = this.provider.getServiceId();
+    deploymentTemplate.Resources[serviceId].Properties.region = this.options.region;
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
 

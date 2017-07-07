@@ -21,11 +21,11 @@ describe('CleanupServerlessDir', () => {
     serverless.config = {
       servicePath: false,
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
     pathExistsSyncStub = sinon.stub(fse, 'pathExistsSync');
     removeSyncStub = sinon.stub(fse, 'removeSync').returns();

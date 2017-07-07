@@ -1,6 +1,7 @@
 'use strict';
 
 const sinon = require('sinon');
+const path = require('path');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunPackage = require('../aliyunPackage');
@@ -15,27 +16,48 @@ describe('CompileFunctions', () => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
     serverless.service.package = {
-      artifact: 'artifact.zip',
+      artifact: '/tmp/artifact.zip',
       artifactDirectoryName: 'serverless/my-service/dev/1498638463280',
+    };
+    serverless.config = {
+      servicePath: 'my-service'
     };
     serverless.service.stage = 'dev';
     serverless.service.provider = {
       compiledConfigurationTemplate: {
-        resources: {
+        Resources: {
+          "sls-storage-bucket": {
+            "Type": "ALIYUN::OSS:Bucket",
+            "Properties": {
+              "BucketName": "my-service",
+              "Region": "cn-hangzhou"
+            }
+          },
           "sls-storage-object": {
-            "type": "ALIYUN::OSS:Object",
-            "bucket": "my-service",
-            "object": ""
+            "Type": "ALIYUN::OSS:Object",
+            "Properties": {
+              "BucketName": "my-service",
+              "ObjectName": "to-be-replaced-by-serverless",
+              "LocalPath": "to-be-replaced-by-serverless"
+            }
+          },
+          "sls-function-service": {
+            "Type": "ALIYUN::FC::Service",
+            "Properties": {
+              "name": "my-service-dev",
+              "region": "cn-hangzhou"
+            }
           }
         }
       },
       deploymentBucketName: 'my-service'
     }
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+
     aliyunPackage = new AliyunPackage(serverless, options);
     consoleLogStub = sinon.stub(aliyunPackage.serverless.cli, 'log').returns();
   });
@@ -123,16 +145,18 @@ describe('CompileFunctions', () => {
 
       const compiledResources = {
         "sls-my-service-dev-func1": {
-          "type": "ALIYUN::FC::Function",
-          "name": "my-service-dev-func1",
-          "service": "my-service-dev",
-          "handler": "index.func1",
-          "memorySize": 1024,
-          "timeout": 30,
-          "runtime": "nodejs4.4",
-          "code": {
-            "ossBucketName": "my-service",
-            "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+          "Type": "ALIYUN::FC::Function",
+          "Properties": {
+            "name": "my-service-dev-func1",
+            "service": "my-service-dev",
+            "handler": "index.func1",
+            "memorySize": 1024,
+            "timeout": 30,
+            "runtime": "nodejs4.4",
+            "code": {
+              "ossBucketName": "my-service",
+              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+            }
           }
         }
       };
@@ -142,7 +166,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         for (const key in compiledResources) {
-          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.resources[key]).toEqual(compiledResources[key]);
+          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
         }
       });
     });
@@ -163,16 +187,18 @@ describe('CompileFunctions', () => {
 
       const compiledResources = {
         "sls-my-service-dev-func1": {
-          "type": "ALIYUN::FC::Function",
-          "name": "my-service-dev-func1",
-          "service": "my-service-dev",
-          "handler": "index.func1",
-          "memorySize": 1024,
-          "timeout": 30,
-          "runtime": "nodejs4.4",
-          "code": {
-            "ossBucketName": "my-service",
-            "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+          "Type": "ALIYUN::FC::Function",
+          "Properties": {
+            "name": "my-service-dev-func1",
+            "service": "my-service-dev",
+            "handler": "index.func1",
+            "memorySize": 1024,
+            "timeout": 30,
+            "runtime": "nodejs4.4",
+            "code": {
+              "ossBucketName": "my-service",
+              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+            }
           }
         }
       };
@@ -180,7 +206,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         for (const key in compiledResources) {
-          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.resources[key]).toEqual(compiledResources[key]);
+          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
         }
       });
     });
@@ -201,16 +227,18 @@ describe('CompileFunctions', () => {
 
       const compiledResources = {
         "sls-my-service-dev-func1": {
-          "type": "ALIYUN::FC::Function",
-          "name": "my-service-dev-func1",
-          "service": "my-service-dev",
-          "handler": "index.func1",
-          "memorySize": 128,
-          "timeout": 120,
-          "runtime": "nodejs4.4",
-          "code": {
-            "ossBucketName": "my-service",
-            "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+          "Type": "ALIYUN::FC::Function",
+          "Properties": {
+            "name": "my-service-dev-func1",
+            "service": "my-service-dev",
+            "handler": "index.func1",
+            "memorySize": 128,
+            "timeout": 120,
+            "runtime": "nodejs4.4",
+            "code": {
+              "ossBucketName": "my-service",
+              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+            }
           }
         }
       };
@@ -218,7 +246,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         for (const key in compiledResources) {
-          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.resources[key]).toEqual(compiledResources[key]);
+          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
         }
       });
     });
@@ -239,16 +267,18 @@ describe('CompileFunctions', () => {
 
       const compiledResources = {
         "sls-my-service-dev-func1": {
-          "type": "ALIYUN::FC::Function",
-          "name": "my-service-dev-func1",
-          "service": "my-service-dev",
-          "handler": "index.func1",
-          "memorySize": 128,
-          "timeout": 120,
-          "runtime": "nodejs4.4",
-          "code": {
-            "ossBucketName": "my-service",
-            "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+          "Type": "ALIYUN::FC::Function",
+          "Properties": {
+            "name": "my-service-dev-func1",
+            "service": "my-service-dev",
+            "handler": "index.func1",
+            "memorySize": 128,
+            "timeout": 120,
+            "runtime": "nodejs4.4",
+            "code": {
+              "ossBucketName": "my-service",
+              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+            }
           }
         }
       };
@@ -256,7 +286,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         for (const key in compiledResources) {
-          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.resources[key]).toEqual(compiledResources[key]);
+          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
         }
       });
 
@@ -274,53 +304,81 @@ describe('CompileFunctions', () => {
           ],
         },
       };
+      const serverlessDirPath = path.join('my-service', '.serverless');
 
       const compiledResources = {
+        "sls-storage-bucket": {
+          "Type": "ALIYUN::OSS:Bucket",
+          "Properties": {
+            "BucketName": "my-service",
+            "Region": "cn-hangzhou"
+            
+          }
+        },
+        "sls-storage-object": {
+          "Type": "ALIYUN::OSS:Object",
+          "Properties": {
+            "BucketName": "my-service",
+            "ObjectName": "serverless/my-service/dev/1498638463280/artifact.zip",
+            "LocalPath": `${serverlessDirPath}/artifact.zip`
+          }
+        },
         "sls-function-service": {
-          "type": "ALIYUN::FC::Service",
-          "name": "my-service-dev",
-          "region": "cn-hangzhou",
-          "id": undefined
+          "Type": "ALIYUN::FC::Service",
+          "Properties": {
+            "name": "my-service-dev",
+            "region": "cn-hangzhou",
+            "id": undefined
+          }
         },
         "sls-api-group": {
-          "type": "ALIYUN::API::APIGroup",
-          "name": "my-service-dev-api",
-          "region": "cn-hangzhou",
-          "id": undefined,
-          "domain": undefined
+          "Type": "ALIYUN::API::APIGroup",
+          "Properties": {
+            "GroupName": "my-service-dev-api",
+            "Description": "API group for Function Compute service my-service-dev, generated by the Serverless framework.",
+            "Region": "cn-hangzhou",
+            "GroupId": undefined,
+            "SubDomain": undefined
+          }
         },
         "sls-my-service-dev-func1": {
-          "type": "ALIYUN::FC::Function",
-          "name": "my-service-dev-func1",
-          "service": "my-service-dev",
-          "handler": "index.func1",
-          "memorySize": 128,
-          "timeout": 30,
-          "runtime": "nodejs4.4",
-          "code": {
-            "ossBucketName": "my-service",
-            "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+          "Type": "ALIYUN::FC::Function",
+          "Properties": {
+            "name": "my-service-dev-func1",
+            "service": "my-service-dev",
+            "handler": "index.func1",
+            "memorySize": 128,
+            "timeout": 30,
+            "runtime": "nodejs4.4",
+            "code": {
+              "ossBucketName": "my-service",
+              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+            }
           }
         },
         "sls-http-my-service-dev-func1": {
-          "type": "ALIYUN::API::HTTP",
-          "groupName": "my-service-dev-api",
-          "groupId": undefined,
-          "apiName": "sls-http-my-service-dev-func1",
-          "protocol": "http",
-          "method": "GET",
-          "path": "/test",
-          "service": {
-            "ref": "sls-my-service-dev-func1"
+          "Type": "ALIYUN::API::HTTP",
+          "Properties": {
+            "GroupName": "my-service-dev-api",
+            "GroupId": undefined,
+            "ApiName": "sls-http-my-service-dev-func1",
+            "Visibility": "PUBLIC",
+            "Description": "API for Function Compute function my-service-dev-func1 of service my-service-dev, triggered by http event, generated by the Serverless framework.",
+            "AuthType": "ANONYMOUS",
+            "RequestProtocol": "HTTP",
+            "RequestHttpMethod": "GET",
+            "RequestPath": "/test",
+            "RequestParameters": [],
+            "ServiceConfig": {
+              "Ref": "sls-my-service-dev-func1"
+            }
           }
         }
       };
 
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in compiledResources) {
-          expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.resources[key]).toEqual(compiledResources[key]);
-        }
+        expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources).toEqual(compiledResources);
       });
     });
   });

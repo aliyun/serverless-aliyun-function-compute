@@ -14,11 +14,11 @@ describe('GenerateArtifactDirectoryName', () => {
     serverless.service.package = {
       artifactDirectoryName: null,
     };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless));
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
+    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
   });
 
