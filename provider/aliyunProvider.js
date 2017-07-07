@@ -94,6 +94,16 @@ class AliyunProvider {
     return this[ossClientSym];
   }
 
+  resetOssClient(bucketName) {
+    this[ossClientSym] = oss({
+      accessKeyId: key.addcess_key_id,
+      accessKeySecret: key.access_key_secret,
+      bucket: bucketName,
+      region: `oss-${this.options.region}`
+    });
+    return this[ossClientSym];
+  }
+
   getStorageBucketId() {
     return "sls-storage-bucket";
   }
@@ -104,6 +114,10 @@ class AliyunProvider {
 
   getServiceId() {
     return "sls-function-service";
+  }
+
+  getFunctionType() {
+    return "ALIYUN::FC::Function";
   }
 
   getServiceName(stage) {
@@ -133,6 +147,12 @@ class AliyunProvider {
   createBucket(bucketName, region) {
     return co(function *() {
       return yield this.ossClient.putBucket(bucketName, `oss-${region}`)
+    });
+  }
+
+  uploadObject(objectName, filePath) {
+    return co(function *() {
+      return yield this.ossClient.put(objectName, filePath)
     });
   }
 
@@ -287,15 +307,16 @@ class AliyunProvider {
   }
 
   /**
-   * @param {string} stage
-   * @return {{name: string, id: string, domain: string}}
+   * @param {string} groupName
+   * @param {string} desc
+   * @return {APIGroupResponse}
    * https://help.aliyun.com/document_detail/43611.html
    */
-  createAPIGroup(stage) {
+  createApiGroup(groupName, desc) {
     return this.agClient.createAPIGroup({
-      GroupName: this.getApiGroupName(stage),
-      Description: this.getApiGroupDesc(stage)
-    }).then(toGroup);
+      GroupName: props.GroupName,
+      Description: props.Description
+    });
   }
 
   /**
@@ -305,8 +326,7 @@ class AliyunProvider {
    */
   getApiGroup(groupName) {
     return this.agClient.describeAPIGroups({
-      GroupName: groupName,
-      Description: this.getApiGroupDesc(groupName)
+      GroupName: groupName
     }).then((res) => {
       if (res.TotalCount === 0) {
         return undefined;
@@ -314,8 +334,7 @@ class AliyunProvider {
       const groups = res.ApiGroupAttributes.ApiGroupAttribute;
       const group = groups.find(
         (item) => item.GroupName === groupName);
-      if (!group) return group;
-      return toGroup(group);
+      return group;
     });
   }
 
@@ -334,6 +353,10 @@ class AliyunProvider {
       };
     }
     throw new Error(`unknown event type ${eventType}`);
+  }
+
+  isApiType(type) {
+    return type === "ALIYUN::API::HTTP";
   }
 
   /**
@@ -362,14 +385,5 @@ class AliyunProvider {
   }
 
 }
-
-function toGroup(obj) {
-  return {
-    name: obj.GroupName,
-    id: obj.GroupId,
-    domain: obj.SubDomain
-  }
-}
-
 
 module.exports = AliyunProvider;
