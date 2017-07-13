@@ -24,7 +24,7 @@ describe('PrepareDeployment', () => {
         "sls-function-service": {
           "Type": "ALIYUN::FC::Service",
           "Properties": {
-            "name": "my-service-dev",
+            "name": "to-be-replaced-by-serverless",
             "region": "to-be-replaced-by-serverless"
           }
         }

@@ -25,6 +25,7 @@ module.exports = {
 
     const serviceId = this.provider.getServiceId();
     deploymentTemplate.Resources[serviceId].Properties.region = this.options.region;
+    deploymentTemplate.Resources[serviceId].Properties.name = this.provider.getServiceName(this.options.stage);
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
 
