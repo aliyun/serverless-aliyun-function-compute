@@ -10,20 +10,43 @@ const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
 
-describe('UpdateDeployment', () => {
+describe('setupFunctions', () => {
   let serverless;
   let aliyunDeploy;
-  let requestStub;
-  let configurationTemplateUpdateFilePath;
+
+  const functions = [{
+    "name": "my-service-dev-currentTime",
+    "service": "my-service-dev",
+    "handler": "index.ping",
+    "memorySize": 128,
+    "timeout": 30,
+    "runtime": "nodejs4.4",
+    "code": {
+      "ossBucketName": "sls-my-service",
+      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+    }
+  }, {
+    "name": "my-service-dev-currentTime2",
+    "service": "my-service-dev",
+    "handler": "index.ping",
+    "memorySize": 128,
+    "timeout": 30,
+    "runtime": "nodejs4.4",
+    "code": {
+      "ossBucketName": "sls-my-service",
+      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+    }
+  }];
 
   beforeEach(() => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
     serverless.service.provider = {
-      project: 'my-project',
+      name: 'aliyun',
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
     };
     serverless.config = {
-      servicePath: 'tmp',
+      servicePath: path.join(__dirname, '..', '..', 'test')
     };
     const options = {
       stage: 'dev',
@@ -31,134 +54,148 @@ describe('UpdateDeployment', () => {
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunDeploy = new AliyunDeploy(serverless, options);
-    requestStub = sinon.stub(aliyunDeploy.provider, 'request');
-    configurationTemplateUpdateFilePath = path.join(
-      serverless.config.servicePath,
-      '.serverless',
-      'configuration-template-update.json');
   });
 
-  afterEach(() => {
-    aliyunDeploy.provider.request.restore();
-  });
-
-  describe('#updateDeployment()', () => {
-    let getDeploymentStub;
-    let updateStub;
+  describe('#setupFunctions()', () => {
+    let checkExistingFunctionsStub;
+    let createOrUpdateFunctionsStub;
 
     beforeEach(() => {
-      getDeploymentStub = sinon.stub(aliyunDeploy, 'getDeployment')
+      checkExistingFunctionsStub = sinon.stub(aliyunDeploy, 'checkExistingFunctions')
         .returns(BbPromise.resolve());
-      updateStub = sinon.stub(aliyunDeploy, 'update')
+      createOrUpdateFunctionsStub = sinon.stub(aliyunDeploy, 'createOrUpdateFunctions')
         .returns(BbPromise.resolve());
     });
 
     afterEach(() => {
-      aliyunDeploy.getDeployment.restore();
-      aliyunDeploy.update.restore();
+      aliyunDeploy.checkExistingFunctions.restore();
+      aliyunDeploy.createOrUpdateFunctions.restore();
     });
 
-    it('should run promise chain', () => aliyunDeploy
-      .updateDeployment().then(() => {
-        expect(getDeploymentStub.calledOnce).toEqual(true);
-        expect(updateStub.calledAfter(getDeploymentStub));
+    it('should run promise chain and set up functions to create', () => aliyunDeploy
+      .setupFunctions().then(() => {
+        expect(checkExistingFunctionsStub.calledOnce).toEqual(true);
+        expect(createOrUpdateFunctionsStub.calledAfter(checkExistingFunctionsStub));
+        expect(aliyunDeploy.functions).toEqual(functions);
+        expect(aliyunDeploy.functionMap).toBeInstanceOf(Map);
       }),
     );
   });
 
-  describe('#getDeployment()', () => {
-    it('should return undefined if no deployments are found', () => {
-      const response = {
-        deployments: [
-          { name: 'some-other-deployment' },
-        ],
-      };
-      requestStub.returns(BbPromise.resolve(response));
-
-      return aliyunDeploy.getDeployment().then((foundDeployment) => {
-        expect(foundDeployment).toEqual(undefined);
-        expect(requestStub.calledWithExactly(
-          'deploymentmanager',
-          'deployments',
-          'list',
-          { project: 'my-project' },
-        )).toEqual(true);
-      });
-    });
-
-    it('should return the deployment if found', () => {
-      const response = {
-        deployments: [
-          { name: 'sls-my-service-dev' },
-          { name: 'some-other-deployment' },
-        ],
-      };
-      requestStub.returns(BbPromise.resolve(response));
-
-      return aliyunDeploy.getDeployment().then((foundDeployment) => {
-        expect(foundDeployment).toEqual(response.deployments[0]);
-        expect(requestStub.calledWithExactly(
-          'deploymentmanager',
-          'deployments',
-          'list',
-          { project: 'my-project' },
-        )).toEqual(true);
-      });
-    });
-  });
-
-  describe('#update()', () => {
+  describe('#setupFunctions()', () => {
+    let getFunctionStub;
+    let updateFunctionStub;
+    let createFunctionStub;
     let consoleLogStub;
-    let readFileSyncStub;
-    let monitorDeploymentStub;
 
     beforeEach(() => {
+      getFunctionStub = sinon.stub(aliyunDeploy.provider, 'getFunction');
+      updateFunctionStub = sinon.stub(aliyunDeploy.provider, 'updateFunction');
+      createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-      readFileSyncStub = sinon.stub(fs, 'readFileSync').returns('some content');
-      monitorDeploymentStub = sinon.stub(aliyunDeploy, 'monitorDeployment')
-        .returns(BbPromise.resolve());
+    });
+
+    afterEach(() => {      
+      aliyunDeploy.provider.getFunction.restore();
+      aliyunDeploy.provider.updateFunction.restore();
+      aliyunDeploy.provider.createFunction.restore();
+      aliyunDeploy.serverless.cli.log.restore();
+    });
+
+    it('should create and update functions according to the templates', () =>  {
+        const err = new Error();
+        err.code = 404;
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-currentTime')
+          .returns(BbPromise.resolve());
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-currentTime2')
+          .returns(BbPromise.reject(err));
+        updateFunctionStub.returns(BbPromise.resolve());
+        createFunctionStub.returns(BbPromise.resolve());
+        return aliyunDeploy.setupFunctions().then(() => {
+          expect(getFunctionStub.calledTwice).toEqual(true);
+        });
+      }
+    );
+  });
+
+  describe('#checkExistingFunctions()', () => {
+    let getFunctionStub;
+
+    beforeEach(() => {
+      // TODO(joyeecheung): mock to restore later
+      aliyunDeploy.functions = functions;
+      aliyunDeploy.functionMap = new Map();
+      getFunctionStub = sinon.stub(aliyunDeploy.provider, 'getFunction');
     });
 
     afterEach(() => {
-      aliyunDeploy.serverless.cli.log.restore();
-      fs.readFileSync.restore();
-      aliyunDeploy.monitorDeployment.restore();
+      aliyunDeploy.provider.getFunction.restore();
     });
 
-    it('should update and hand over to monitor the deployment if it exists', () => {
-      const deployment = {
-        name: 'sls-my-service-dev',
-        fingerprint: '12345678',
-      };
-      const params = {
-        project: 'my-project',
-        deployment: 'sls-my-service-dev',
-        resource: {
-          name: 'sls-my-service-dev',
-          fingerprint: deployment.fingerprint,
-          target: {
-            config: {
-              content: fs.readFileSync(configurationTemplateUpdateFilePath).toString(),
-            },
-          },
-        },
-      };
-      requestStub.returns(BbPromise.resolve());
+    it('should fill in function map with existing functions', () =>  {
+      const err = new Error();
+      err.code = 404;
+      const expectedMap = new Map([
+        ['my-service-dev-currentTime', true],
+        ['my-service-dev-currentTime2', false]
+      ]);
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-currentTime')
+          .returns(BbPromise.resolve());
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-currentTime2')
+          .returns(BbPromise.reject(err));
+        return aliyunDeploy.checkExistingFunctions().then(() => {
+          expect(getFunctionStub.calledTwice).toEqual(true);
+          expect(aliyunDeploy.functionMap).toEqual(expectedMap);
+        });
+      }
+    );
+  });
 
-      return aliyunDeploy.update(deployment).then(() => {
-        expect(consoleLogStub.calledOnce).toEqual(true);
-        expect(readFileSyncStub.called).toEqual(true);
-        expect(requestStub.calledWithExactly(
-          'deploymentmanager',
-          'deployments',
-          'update',
-          params,
+  describe('#createOrUpdateFunctions()', () => {
+    let updateFunctionStub;
+    let createFunctionStub;
+    let consoleLogStub;
+
+    beforeEach(() => {
+      aliyunDeploy.functions = functions;
+      aliyunDeploy.functionMap = new Map([
+        ['my-service-dev-currentTime', true],
+        ['my-service-dev-currentTime2', false]
+      ]);
+      updateFunctionStub = sinon.stub(aliyunDeploy.provider, 'updateFunction');
+      createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');
+      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+    });
+
+    afterEach(() => {
+      aliyunDeploy.provider.updateFunction.restore();
+      aliyunDeploy.provider.createFunction.restore();
+      aliyunDeploy.serverless.cli.log.restore();
+    });
+
+    it('should create and update functions according to the map', () => {
+      updateFunctionStub.returns(BbPromise.resolve());
+      createFunctionStub.returns(BbPromise.resolve());
+
+      return aliyunDeploy.createOrUpdateFunctions().then(() => {
+        expect(updateFunctionStub.calledOnce).toEqual(true);
+        expect(updateFunctionStub.calledWithExactly(
+          'my-service-dev',
+          'my-service-dev-currentTime',
+          functions[0]
         )).toEqual(true);
-        expect(monitorDeploymentStub.calledWithExactly(
-          'sls-my-service-dev',
-          'update',
-          5000,
+        expect(createFunctionStub.calledOnce).toEqual(true);
+        expect(createFunctionStub.calledWithExactly(
+          'my-service-dev',
+          'my-service-dev-currentTime2',
+          functions[1]
         )).toEqual(true);
+        expect(consoleLogStub.calledTwice).toEqual(true);
+        expect(createFunctionStub.calledAfter(updateFunctionStub)).toEqual(true);
       });
     });
   });

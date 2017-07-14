@@ -39,7 +39,7 @@ class AliyunProvider {
     if (this[keySym]) {
       return this[keySym];
     }
-    let credentials = this.serverless.provider.credentials;
+    let credentials = this.serverless.service.provider.credentials;
     const credParts = credentials.split(path.sep);
 
     if (credParts[0] === '~') {
@@ -59,8 +59,8 @@ class AliyunProvider {
 
     const key = this.key;
     this[fcClientSym] = new FCClient(key.account_id, {
-      accessKeyID: key.addcess_key_id,
-      accessKeySecret: key.access_key_secret,
+      accessKeyID: key.aliyun_access_key_id,
+      accessKeySecret: key.aliyun_access_key_secret,
       region: this.options.region
     });
     return this[fcClientSym];
@@ -73,8 +73,8 @@ class AliyunProvider {
 
     const key = this.key;
     this[agClientSym] = new AGClient(key.account_id, {
-      accessKeyID: key.addcess_key_id,
-      accessKeySecret: key.access_key_secret,
+      accessKeyID: key.aliyun_access_key_id,
+      accessKeySecret: key.aliyun_access_key_secret,
       region: this.options.region
     });
     return this[agClientSym];
@@ -87,17 +87,18 @@ class AliyunProvider {
 
     const key = this.key;
     this[ossClientSym] = oss({
-      accessKeyId: key.addcess_key_id,
-      accessKeySecret: key.access_key_secret,
+      accessKeyId: key.aliyun_access_key_id,
+      accessKeySecret: key.aliyun_access_key_secret,
       region: `oss-${this.options.region}`
     });
     return this[ossClientSym];
   }
 
   resetOssClient(bucketName) {
+    const key = this.key;
     this[ossClientSym] = oss({
-      accessKeyId: key.addcess_key_id,
-      accessKeySecret: key.access_key_secret,
+      accessKeyId: key.aliyun_access_key_id,
+      accessKeySecret: key.aliyun_access_key_secret,
       bucket: bucketName,
       region: `oss-${this.options.region}`
     });
@@ -114,10 +115,6 @@ class AliyunProvider {
 
   getServiceId() {
     return "sls-function-service";
-  }
-
-  getFunctionType() {
-    return "ALIYUN::FC::Function";
   }
 
   getServiceName(stage) {
@@ -313,7 +310,7 @@ class AliyunProvider {
    * https://help.aliyun.com/document_detail/43611.html
    */
   createApiGroup(groupName, desc) {
-    return this.agClient.createAPIGroup({
+    return this.agClient.createApiGroup({
       GroupName: props.GroupName,
       Description: props.Description
     });
@@ -359,29 +356,24 @@ class AliyunProvider {
     return type === "ALIYUN::API::HTTP";
   }
 
-  /**
-   * 
-   * @param {string} groupId 
-   * @param {string} eventType 
-   * @param {string} funcName 
-   * @param {object} event 
-   * @param {string} stage 
-   * https://help.aliyun.com/document_detail/43623.html
-   */
-  createAPI(groupId, eventType, funcName, event, stage) {
-    return this.agClient.createAPI({
-      GroupId: groupId,
-      ApiName: this.getApiName(eventType, funcName, stage),
-      Visibility: event.Visibility || 'PUBLIC',
-      Description: this.getApiDesc(eventType, funcName, stage),
-      AuthType: event.AuthType || 'ANONYMOUS',
-      RequestParameters: event.RequestParameters || [],
-      RequestConfig: this.getRequestConfig(eventType, event)
-    });
+  isFunctionType(type) {
+    return type === "ALIYUN::FC::Function";
   }
 
-  getAPI(groupId, eventType, funcName) {
+  /**
+   * @param {object} props
+   * https://help.aliyun.com/document_detail/43623.html
+   */
+  createApi(props) {
+    return this.agClient.createApi(props);
+  }
 
+  /**
+   * @param {object} props
+   * https://help.aliyun.com/document_detail/43623.html
+   */
+  updateApi(props) {
+    return this.agClient.modifyApi(props);
   }
 
 }

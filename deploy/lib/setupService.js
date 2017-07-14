@@ -13,6 +13,14 @@ module.exports = {
       .then(this.createBucketIfNotExists);
   },
 
+  updateTemplates(id) {
+    const serviceKey = this.provider.getServiceId();
+    const createService = this.templates.create.Resources[serviceKey].Properties;
+    const updateService = this.templates.update.Resources[serviceKey].Properties;
+    updateService.id = id;
+    createService.id = id;
+  },
+
   checkForExistingService() {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
@@ -25,36 +33,27 @@ module.exports = {
       });
   },
 
-  updateServiceId(id) {
-    const serviceKey = this.provider.getServiceId();
-    const createService = this.templates.create.Resources[serviceKey].Properties;
-    const updateService = this.templates.update.Resources[serviceKey].Properties;
-    updateService.id = id;
-    createService.id = id;
-  },
-
   createServiceIfNotExists(foundService) {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
     if (foundService) {
-      this.updateServiceId(foundService.serviceId);
+      this.updateTemplates(foundService.serviceId);
       this.serverless.cli.log(`Service ${service.name} already exists.`);
       return BbPromise.resolve();
     }
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
-    return this.provider.createService(serviceName)
+    return this.provider.createService(service.name)
       .then((service) => {
         // Update existing service id
-      this.updateServiceId(service.serviceId);
+        this.updateTemplates(service.serviceId);
         this.serverless.cli.log(`Created service ${service.name}.`);
       });
   },
 
-  createBucketIfNotExists(foundService) {
+  createBucketIfNotExists() {
     const bucket = this.templates.create.Resources[this.provider.getStorageBucketId()].Properties;
 
-    this.serverless.cli.log(`Creating bucket ${bucket.BucketName}...`);
     return this.provider.createBucket(bucket.BucketName, bucket.Region)
       .then(() => {
         this.provider.resetOssClient(bucket.BucketName);
@@ -67,5 +66,5 @@ module.exports = {
         }
         throw err;
       });
-  },
+  }
 };

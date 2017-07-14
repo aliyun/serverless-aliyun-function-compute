@@ -28,52 +28,38 @@ module.exports = {
       });
   },
 
-  checkExistingApis(group) {
+  createOrUpdateApis(group) {
     const apis = _.filter(
       this.templates.update,
       (item) => this.provider.isApiType(item.Type));
     
     if (!apis.length) {
-      return { group, apis };
-    }
-
-    return BbPromise.all(this.functions.map((func) => {
-      return this.provider.getFunction(func.service, func.name)
-      .then(
-        (res) => ({name: func.name, exists: true}),
-        (err) => {
-          if (err.code === 404) {
-            return {name: func.name, exists: false}
-          }
-          throw err;
-        });
-    }));
-  },
-
-  createOrUpdateApis({group, apis}) {
-    if (!apis.length) {
       return;
     }
 
     // FIXME(joyeecheung): mapSeries?
-    return BbPromise.all(apis, (api, index) => {
-      if (exists[index].exists) {
-        return this.provider.updateFunction(func.service, func.name, func)
-          .then(() => {
-            this.serverless.cli.log(`Updated ${func.name}.`);
-          }, (err) => {
-            this.serverless.cli.log(`Failed to update ${func.name}!`);
-            throw err;
-          });
-      } else {
-        return this.provider.createFunction(func.service, func.name, func)
-          .then(() => {
-            this.serverless.cli.log(`Created ${func.name}.`);
-          }, (err) => {
-            this.serverless.cli.log(`Failed to create ${func.name}!`);
-            throw err;
-          });
-      }
-    });
+    return BbPromise.all(apis,
+      (api) => BbPromise.bind(this, api).then(this.createOrUpdateApi));
   },
+
+  createOrUpdateApi(api) {
+    return this.provider.createApi(api.Properties)
+      .then(() => {
+        this.serverless.cli.log(`Created API${api.ApiName}.`);
+      }, (err) => {
+        // TODO(joyeecheung) Not sure about what code this should be
+        if (err.code !== 400) {
+          this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
+          throw err;
+        }
+
+        return this.provider.updateApi(api.Properties)
+          .then(() => {
+            this.serverless.cli.log(`Updated API ${api.ApiName}...`);
+          }, () => {
+            this.serverless.cli.log(`Failed to create API ${api.ApiName}...`);
+            throw err;
+          });
+      });
+  }
 };

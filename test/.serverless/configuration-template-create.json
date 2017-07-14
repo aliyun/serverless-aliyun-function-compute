@@ -1,0 +1,18 @@
+{
+  "Resources": {
+    "sls-storage-bucket": {
+      "Type": "ALIYUN::OSS:Bucket",
+      "Properties": {
+        "BucketName": "sls-my-service",
+        "Region": "cn-hangzhou"
+      }
+    },
+    "sls-function-service": {
+      "Type": "ALIYUN::FC::Service",
+      "Properties": {
+        "name": "my-service-dev",
+        "region": "cn-hangzhou"
+      }
+    }
+  }
+}

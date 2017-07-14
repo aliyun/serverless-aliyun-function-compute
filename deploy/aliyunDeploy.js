@@ -6,7 +6,6 @@ const path = require('path');
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const setupService = require('./lib/setupService');
-const setDeploymentBucketName = require('../shared/setDeploymentBucketName');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
 const setupTriggers = require('./lib/setupTriggers');
@@ -21,6 +20,7 @@ class AliyunDeploy {
       '.serverless', 'configuration-template-create.json');
     const updateFilePath = path.join(this.serverless.config.servicePath,
       '.serverless', 'configuration-template-update.json');
+
     this.templates = {
       create: this.serverless.utils.readFileSync(createFilePath),
       update: this.serverless.utils.readFileSync(updateFilePath)
@@ -31,7 +31,6 @@ class AliyunDeploy {
       validate,
       utils,
       setupService,
-      setDeploymentBucketName,
       uploadArtifacts,
       setupFunctions,
       setupTriggers);
@@ -43,7 +42,6 @@ class AliyunDeploy {
 
       'deploy:deploy': () => BbPromise.bind(this)
         .then(this.setupService)
-        .then(this.setDeploymentBucketName)
         .then(this.uploadArtifacts)
         .then(this.setupFunctions)
         .then(this.setupTriggers)

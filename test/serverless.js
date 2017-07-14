@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+
 // mock of the serverless instance
 class Serverless {
   constructor() {
@@ -17,7 +19,9 @@ class Serverless {
     };
     this.utils = {
       writeFileSync() {},
-      readFileSync() {},
+      readFileSync(path) {
+        return JSON.parse(fs.readFileSync(path, 'utf8'));
+      },
     };
 
     this.cli = {

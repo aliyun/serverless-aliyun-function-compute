@@ -2,6 +2,8 @@
 
 const sinon = require('sinon');
 const BbPromise = require('bluebird');
+const path = require('path');
+const fs = require('fs');
 
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunDeploy = require('./aliyunDeploy');
@@ -11,9 +13,12 @@ describe('AliyunDeploy', () => {
   let serverless;
   let options;
   let aliyunDeploy;
-
+  const servicePath = path.join(__dirname, '..', 'test');
   beforeEach(() => {
     serverless = new Serverless();
+    serverless.config = {
+      servicePath: servicePath
+    };
     options = {
       stage: 'my-stage',
       region: 'my-region',
@@ -35,36 +40,48 @@ describe('AliyunDeploy', () => {
       expect(aliyunDeploy.provider).toBeInstanceOf(AliyunProvider);
     });
 
+    it('should make the templates accessible', () => {
+      const create = fs.readFileSync(
+            path.join(servicePath, '.serverless', 'configuration-template-create.json'), 'utf8');
+      const update = fs.readFileSync(
+            path.join(servicePath, '.serverless', 'configuration-template-update.json'), 'utf8');
+      const templates = {
+        create: JSON.parse(create),
+        update: JSON.parse(update)
+      }
+      expect(aliyunDeploy.templates).toEqual(templates);
+    });
+
     describe('hooks', () => {
       let validateStub;
       let setDefaultsStub;
-      let createOrUpdateServiceStub;
-      let setDeploymentBucketNameStub;
+      let setupServiceStub;
       let uploadArtifactsStub;
-      let createOrUpdateFunctionsStub;
+      let setupFunctionsStub;
+      let setupTriggersStub;
 
       beforeEach(() => {
         validateStub = sinon.stub(aliyunDeploy, 'validate')
           .returns(BbPromise.resolve());
         setDefaultsStub = sinon.stub(aliyunDeploy, 'setDefaults')
           .returns(BbPromise.resolve());
-        createOrUpdateServiceStub = sinon.stub(aliyunDeploy, 'createOrUpdateService')
-          .returns(BbPromise.resolve());
-        setDeploymentBucketNameStub = sinon.stub(aliyunDeploy, 'setDeploymentBucketName')
+        setupServiceStub = sinon.stub(aliyunDeploy, 'setupService')
           .returns(BbPromise.resolve());
         uploadArtifactsStub = sinon.stub(aliyunDeploy, 'uploadArtifacts')
           .returns(BbPromise.resolve());
-        createOrUpdateFunctionsStub = sinon.stub(aliyunDeploy, 'createOrUpdateFunctions')
+        setupFunctionsStub = sinon.stub(aliyunDeploy, 'setupFunctions')
+          .returns(BbPromise.resolve());
+        setupTriggersStub = sinon.stub(aliyunDeploy, 'setupTriggers')
           .returns(BbPromise.resolve());
       });
 
       afterEach(() => {
         aliyunDeploy.validate.restore();
         aliyunDeploy.setDefaults.restore();
-        aliyunDeploy.createOrUpdateService.restore();
-        aliyunDeploy.setDeploymentBucketName.restore();
+        aliyunDeploy.setupService.restore();
         aliyunDeploy.uploadArtifacts.restore();
-        aliyunDeploy.createOrUpdateFunctions.restore();
+        aliyunDeploy.setupFunctions.restore();
+        aliyunDeploy.setupTriggers.restore();
       });
 
       it('should run "before:deploy:deploy" promise chain', () => aliyunDeploy
@@ -75,10 +92,10 @@ describe('AliyunDeploy', () => {
 
       it('should run "deploy:deploy" promise chain', () => aliyunDeploy
         .hooks['deploy:deploy']().then(() => {
-          expect(createOrUpdateServiceStub.calledOnce).toEqual(true);
-          expect(setDeploymentBucketNameStub.calledAfter(createOrUpdateServiceStub)).toEqual(true);
-          expect(uploadArtifactsStub.calledAfter(createOrUpdateServiceStub)).toEqual(true);
-          expect(createOrUpdateFunctionsStub.calledAfter(uploadArtifactsStub)).toEqual(true);
+          expect(setupServiceStub.calledOnce).toEqual(true);
+          expect(uploadArtifactsStub.calledAfter(setupServiceStub)).toEqual(true);
+          expect(setupFunctionsStub.calledAfter(uploadArtifactsStub)).toEqual(true);
+          expect(setupTriggersStub.calledAfter(setupFunctionsStub)).toEqual(true);
         }));
     });
   });
