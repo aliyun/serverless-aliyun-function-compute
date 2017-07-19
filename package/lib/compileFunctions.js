@@ -93,7 +93,7 @@ module.exports = {
       if (eventType === 'http') {
         // TODO: ROS does not support API gateway and FC at the moment
         // So this is fake config
-        const apiResource = getHttpApiResource(event.http, funcObject, this.provider, this.options.stage);
+        const apiResource = getHttpApiResource(event.http, funcObject, this.provider, this.options.stage, this.options.region);
         const apiName = apiResource.Properties.ApiName;
         _.merge(resources, { [apiName]: apiResource });
       }
@@ -171,7 +171,33 @@ function getFunctionResource(funcObject, service, serviceName) {
   }
 }
 
-function getHttpApiResource(event, funcObject, provider, stage) {
+function getRequestConfig(eventType, event) {
+  return {
+    "RequestProtocol": eventType.toUpperCase(),
+    "RequestHttpMethod": (event.RequestHttpMethod || event.method || "GET").toUpperCase(),
+    "RequestPath": event.RequestPath || event.path,
+    "RequestParameters": event.RequestParameters || [],
+    "BodyFormat": event.BodyFormat || '',
+    "PostBodyDescription": ""
+  };
+}
+
+function getServiceConfig(event, funcObject, provider, stage, region) {
+  return {
+    "ServiceProtocol": "FunctionCompute",
+    "Mock": "FALSE",
+    "ServiceTimeout": 3000,  // TODO(joyeecheung): use config?
+    "FunctionComputeConfig": {
+      "FcRegionId": region,
+      "ServiceName": provider.getServiceName(stage),
+      "FunctionName": funcObject.name,
+      "RoleArn": undefined
+    },
+    "ContentTypeValue": event.ContentTypeValue || "application/json; charset=UTF-8"
+  };
+}
+
+function getHttpApiResource(event, funcObject, provider, stage, region) {
   const eventType = 'http';
   return {
     "Type": "ALIYUN::API::HTTP",
@@ -180,15 +206,12 @@ function getHttpApiResource(event, funcObject, provider, stage) {
       "GroupId": undefined,
       "ApiName": provider.getApiName(eventType, funcObject.name),
       "Visibility": event.Visibility || "PUBLIC",
-      "Description": provider.getApiDesc('http', funcObject.name, stage),
+      "Description": provider.getApiDesc(eventType, funcObject.name, stage),
       "AuthType": event.AuthType || "ANONYMOUS",
-      "RequestProtocol": eventType.toUpperCase(),
-      "RequestHttpMethod": (event.RequestHttpMethod || event.method || "GET").toUpperCase(),
-      "RequestPath": event.RequestPath || event.path,
-      "RequestParameters": event.RequestParameters || [],
-      "ServiceConfig": {
-        "Ref": provider.getFunctionLogicalId(funcObject.name)
-      }
+      "RequestConfig": getRequestConfig(eventType, event),
+      "ServiceConfig": getServiceConfig(event, funcObject, provider, stage, region),
+      "ResultType": event.ResultType || "JSON",
+      "ResultSample": event.ResultSample || "{}"
     }
   };
 }
