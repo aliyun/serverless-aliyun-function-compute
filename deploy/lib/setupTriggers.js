@@ -141,6 +141,8 @@ module.exports = {
   },
 
   createOrUpdateApi(api) {
+    const group = this.apiGroup;
+    const role = this.apiRole;
     if (this.apiMap.get(api.ApiName)) {
       return this.provider.updateApi(api)
         .then(() => {

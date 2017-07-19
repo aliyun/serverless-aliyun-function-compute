@@ -356,24 +356,32 @@ class AliyunProvider {
 
   /**
    * @param {string} roleName
-   * @return {APIGroupResponse}
-   * https://help.aliyun.com/document_detail/43611.html
+   * @return {{RoleId: string, RoleName: string, Arn: string}}
+   * https://help.aliyun.com/document_detail/28711.html
    */
   getApiRole(roleName) {
     return this.ramClient.getRole({
       roleName: roleName
-    }).catch((err) => {
-      if (err.name === 'EntityNotExist.RoleError') return undefined;
-      throw err;
-    });
+    }).then(
+      (res) => res.Role,
+      (err) => {
+        if (err.name === 'EntityNotExist.RoleError') return undefined;
+        throw err;
+      }
+    );
   }
 
+  /**
+   * @param {object} role
+   * @return {{RoleId: string, RoleName: string, Arn: string}}
+   * https://help.aliyun.com/document_detail/28710.html 
+   */
   createApiRole(role) {
     return this.ramClient.createRole({
       RoleName: role.RoleName,
       Description: role.Description,
       AssumeRolePolicyDocument: JSON.stringify(role.AssumeRolePolicyDocument)
-    });
+    }).then((res) => res.Role);
   }
 
   getPolicies(role) {
@@ -389,7 +397,7 @@ class AliyunProvider {
 
   /**
    * @param {{GroupName: string, Description: string}} props
-   * @return {APIGroupResponse}
+   * @return {{GroupId: string, GroupName: string, SubDomain: string}}
    * https://help.aliyun.com/document_detail/43611.html
    */
   createApiGroup(props) {
@@ -398,7 +406,7 @@ class AliyunProvider {
 
   /**
    * @param {string} groupName
-   * @return {{name: string, id: string, domain: string}}
+   * @return {{GroupId: string, GroupName: string, SubDomain: string}}
    * https://help.aliyun.com/document_detail/43616.html
    */
   getApiGroup(groupName) {
@@ -439,11 +447,25 @@ class AliyunProvider {
       });
   }
 
+  getApiProps(group, role, api) {
+    const props = Object.assign(
+      { "GroupId": group.GroupId },
+      _.omit(api, ['RequestConfig', 'ServiceConfig'])
+    );
+    props.RequestConfig = JSON.stringify(api.RequestConfig);
+    props.ServiceConfig = JSON.stringify(Object.assign(
+      { RoleArn: role.Arn },
+      api.ServiceConfig
+    ));
+    return props;
+  }
+
   /**
    * @param {object} props
    * https://help.aliyun.com/document_detail/43623.html
    */
-  createApi(props) {
+  createApi(group, role, api) {
+    const props = this.getApiProps(group, role, api);
     return this.agClient.createApi(props);
   }
 
@@ -451,10 +473,10 @@ class AliyunProvider {
    * @param {object} props
    * https://help.aliyun.com/document_detail/43623.html
    */
-  updateApi(props) {
+  updateApi(group, role, api) {
+    const props = this.getApiProps(group, role, api);
     return this.agClient.modifyApi(props);
   }
-
 }
 
 module.exports = AliyunProvider;
