@@ -115,6 +115,14 @@ describe('setupTriggers', () => {
     "Arn": "acs:ram::1234567890123456:role/SLSFCInvocationFromAPIGateway"
   }
 
+  const fullApis = [{
+    "ApiName": "sls-http-my-service-dev-currentTime",
+    "ApiId": '4134134134141'
+  }, {
+    "ApiName": "sls-http-my-service-dev-currentTime2",
+    "ApiId": '413243280141'
+  }];
+
   beforeEach(() => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
@@ -361,19 +369,107 @@ describe('setupTriggers', () => {
 
     it('should fill in api map properly', () => {
       const expectedMap = new Map([
-        ['sls-http-my-service-dev-currentTime', true],
+        ['sls-http-my-service-dev-currentTime', fullApis[0]],
         ['sls-http-my-service-dev-currentTime2', false]
       ]);
       getApisStub
-        .returns(BbPromise.resolve([{
-          ApiName: 'sls-http-my-service-dev-currentTime'
-        }]));
+        .returns(BbPromise.resolve([fullApis[0]]));
       return aliyunDeploy.checkExistingApis().then(() => {
         expect(getApisStub.calledOnce).toEqual(true);
         expect(getApisStub.calledWithExactly({
           GroupId: fullGroup.GroupId
         })).toEqual(true);
         expect(aliyunDeploy.apiMap).toEqual(expectedMap);
+      });
+    });
+  });
+
+  describe('#createOrUpdateApi()', () => {
+    let updateApiStub;
+    let createApiStub;
+    let consoleLogStub;
+
+    beforeEach(() => {
+      aliyunDeploy.apis = apis;
+      aliyunDeploy.apiGroup = fullGroup;
+      aliyunDeploy.apiRole = fullRole;
+      aliyunDeploy.apiMap = new Map([
+        ['sls-http-my-service-dev-currentTime', fullApis[0]],
+        ['sls-http-my-service-dev-currentTime2', false]
+      ]);
+      updateApiStub = sinon.stub(aliyunDeploy.provider, 'updateApi');
+      createApiStub = sinon.stub(aliyunDeploy.provider, 'createApi');
+      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+    });
+
+    afterEach(() => {
+      aliyunDeploy.provider.updateApi.restore();
+      aliyunDeploy.provider.createApi.restore();
+      aliyunDeploy.serverless.cli.log.restore();
+    });
+
+    it('should create and update apis according to the map', () => {
+      updateApiStub.returns(BbPromise.resolve());
+      createApiStub.returns(BbPromise.resolve(fullApis[1]));
+      const expectedMap = new Map([
+        ['sls-http-my-service-dev-currentTime', fullApis[0]],
+        ['sls-http-my-service-dev-currentTime2', fullApis[1]]
+      ]);
+      return aliyunDeploy.createOrUpdateApis().then(() => {
+        expect(updateApiStub.calledOnce).toEqual(true);
+        expect(updateApiStub.calledWithExactly(
+          fullGroup,
+          fullRole,
+          Object.assign({ApiId: fullApis[0].ApiId}, apis[0])
+        )).toEqual(true);
+        expect(createApiStub.calledOnce).toEqual(true);
+        expect(createApiStub.calledWithExactly(
+          fullGroup,
+          fullRole,
+          apis[1]
+        )).toEqual(true);
+        expect(consoleLogStub.calledTwice).toEqual(true);
+        expect(createApiStub.calledAfter(updateApiStub)).toEqual(true);
+        expect(aliyunDeploy.apiMap).toEqual(expectedMap);
+      });
+    });
+  });
+
+  describe('#deployApis()', () => {
+    let deployApiStub;
+    let consoleLogStub;
+
+    beforeEach(() => {
+      aliyunDeploy.apis = apis;
+      aliyunDeploy.apiGroup = fullGroup;
+      aliyunDeploy.apiRole = fullRole;
+      aliyunDeploy.apiMap = new Map([
+        ['sls-http-my-service-dev-currentTime', fullApis[0]],
+        ['sls-http-my-service-dev-currentTime2', fullApis[1]]
+      ]);
+      deployApiStub = sinon.stub(aliyunDeploy.provider, 'deployApi');
+      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+    });
+
+    afterEach(() => {
+      aliyunDeploy.provider.deployApi.restore();
+      aliyunDeploy.serverless.cli.log.restore();
+    });
+
+    it('should deploy apis', () => {
+      deployApiStub.returns(BbPromise.resolve());
+
+      return aliyunDeploy.deployApis().then(() => {
+        expect(deployApiStub.calledTwice).toEqual(true);
+        expect(deployApiStub.calledWithExactly(
+          fullGroup,
+          fullApis[0]
+        )).toEqual(true);
+        expect(deployApiStub.calledWithExactly(
+          fullGroup,
+          fullApis[0]
+        )).toEqual(true);
+        expect(consoleLogStub.calledTwice).toEqual(true);
       });
     });
   });

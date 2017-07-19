@@ -434,6 +434,7 @@ class AliyunProvider {
 
   /**
    * @param {{GroupId: string}} props 
+   * @returns {{GroupId: string, ApiName: string, ApiId: string}[]} 
    */
   getApis(props) {
     const query = Object.assign({}, props, { PageSize: 50 });
@@ -476,6 +477,16 @@ class AliyunProvider {
   updateApi(group, role, api) {
     const props = this.getApiProps(group, role, api);
     return this.agClient.modifyApi(props);
+  }
+
+  deployApi(group, api) {
+    const props = {
+      GroupId: group.GroupId,
+      ApiId: api.ApiId,
+      StageName: "RELEASE",  // TODO(joyeecheung): should be based on this.options.stage?
+      Description: "Release by the Serverless framework"
+    };
+    return this.agClient.deployApi(props);
   }
 }
 

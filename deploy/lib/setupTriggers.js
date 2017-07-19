@@ -122,7 +122,7 @@ module.exports = {
     return this.provider.getApis({
       GroupId: this.apiGroup.GroupId
     }).then((apis) => {
-      this.apiMap = new Map(apis.map((api) => [api.ApiName, true]));
+      this.apiMap = new Map(apis.map((api) => [api.ApiName, api]));
       this.apis.forEach((api) => {
         if (!this.apiMap.get(api.ApiName)) {
           this.apiMap.set(api.ApiName, false);
@@ -143,18 +143,21 @@ module.exports = {
   createOrUpdateApi(api) {
     const group = this.apiGroup;
     const role = this.apiRole;
-    if (this.apiMap.get(api.ApiName)) {
-      return this.provider.updateApi(api)
-        .then(() => {
+    const apiInMap = this.apiMap.get(api.ApiName);
+    if (apiInMap) {
+      const apiProps = Object.assign({ApiId: apiInMap.ApiId}, api);
+      return this.provider.updateApi(group, role, apiProps)
+        .then((newApi) => {
           this.serverless.cli.log(`Updated API ${api.ApiName}.`);
         }, (err) => {
           this.serverless.cli.log(`Failed to update API ${api.ApiName}!`);
           throw err;
         });
     } else {
-      return this.provider.createApi(api)
-        .then(() => {
+      return this.provider.createApi(group, role, api)
+        .then((newApi) => {
           this.serverless.cli.log(`Created API ${api.ApiName}.`);
+          this.apiMap.set(api.ApiName, newApi);
         }, (err) => {
           this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
           throw err;
@@ -163,16 +166,18 @@ module.exports = {
   },
 
   deployApis() {
-    return BbPromise.mapSeries(this.apis,
-      (api) => this.provider.deployApi(api).then(
-        () => {
-          this.serverless.cli.log(`Deployed API ${api.ApiName}...`);
-        },
-        (err) => {
-          this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);
-          throw err;
-        },
-      ));
+    const group = this.apiGroup;
+    return BbPromise.mapSeries(this.apis, (api) => {
+      const apiProps = this.apiMap.get(api.ApiName);
+      return this.provider.deployApi(group, apiProps).then(
+      () => {
+        this.serverless.cli.log(`Deployed API ${api.ApiName}...`);
+      },
+      (err) => {
+        this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);
+        throw err;
+      });
+    });
   },
 
   createTriggerRoleIfNotExists() {
