@@ -125,6 +125,10 @@ class AliyunProvider {
     return "sls-api-group";
   }
 
+  getApiRoleLogicalId() {
+    return "sls-api-fc-invocation-role";
+  }
+
   getApiGroupName(stage) {
     return `${this.getServiceName(stage)}-api`;
   }
