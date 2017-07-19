@@ -368,27 +368,23 @@ class AliyunProvider {
     });
   }
 
-  createApiRole(props) {
+  createApiRole(role) {
     return this.ramClient.createRole({
-      RoleName: props.RoleName,
-      Description: props.Description,
-      AssumeRolePolicyDocument: JSON.stringify(props.AssumeRolePolicyDocument)
-    }).then(() => this.createApiPolicies(props));
+      RoleName: role.RoleName,
+      Description: role.Description,
+      AssumeRolePolicyDocument: JSON.stringify(role.AssumeRolePolicyDocument)
+    });
   }
 
-  createApiPolicies(props) {
-    const roleName = props.RoleName;
+  getPolicies(role) {
+    const roleName = role.RoleName;
     return this.ramClient.listPoliciesForRole({
       RoleName: roleName
-    }).then((existingPolicies) => {
-      return BbPromise.map(props.Policies, (policyProps) => {
-        const policy = existingPolicies.Policies.Policy.find(
-          (item) => item.PolicyName === policyProps.PolicyName
-        );
-        if (policy) return policy;
-        return this.ramClient.attachPolicyToRole(policyProps);
-      });
-    });
+    }).then((res) => res.Policies.Policy);
+  }
+
+  createPolicy(policy) {
+    return this.ramClient.attachPolicyToRole(policy);
   }
 
   /**
@@ -406,6 +402,7 @@ class AliyunProvider {
    * https://help.aliyun.com/document_detail/43616.html
    */
   getApiGroup(groupName) {
+    // TODO(joyeecheung): pagination
     return this.agClient.describeAPIGroups({
       GroupName: groupName
     }).then((res) => {
@@ -425,6 +422,21 @@ class AliyunProvider {
 
   isFunctionType(type) {
     return type === "ALIYUN::FC::Function";
+  }
+
+  /**
+   * @param {{GroupId: string}} props 
+   */
+  getApis(props) {
+    const query = Object.assign({}, props, { PageSize: 50 });
+    return this.agClient.describeApis(query)
+      .then((res) => {
+        const apis = res.ApiSummarys.ApiSummary;
+        if (res.TotalCount > apis.length) {
+          // TODO(joyeecheung): pagination
+        }
+        return apis;
+      });
   }
 
   /**

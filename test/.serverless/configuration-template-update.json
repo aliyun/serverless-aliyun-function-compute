@@ -130,7 +130,7 @@
         "RequestConfig": {
           "RequestProtocol": "HTTP",
           "RequestHttpMethod": "GET",
-          "RequestPath": "/ping",
+          "RequestPath": "/ping2",
           "RequestParameters": [],
           "BodyFormat": "",
           "PostBodyDescription": ""

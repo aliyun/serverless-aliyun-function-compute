@@ -2,64 +2,182 @@
 
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
 
 const BbPromise = require('bluebird');
 
 module.exports = {
   setupTriggers() {
+    this.apis = _.filter(
+      this.templates.update.Resources,
+      (item) => this.provider.isApiType(item.Type))
+      .map((item) => item.Properties);
+    this.triggers = [];
+    // TODO(joyeecheung): OSS triggers
+    // this.triggers = ...?
+
+    return BbPromise.bind(this)
+      .then(this.createApisIfNeeded)
+      .then(this.createTriggersIfNeeded);
+  },
+
+  createApisIfNeeded() {
+    if (!this.apis.length) {
+      return BbPromise.resolve();
+    }
     return BbPromise.bind(this)
       .then(this.createApiGroupIfNotExists)
+      .then(this.createApiRoleIfNotExists)
+      .then(this.createApiPolicyIfNotExists)
       .then(this.checkExistingApis)
-      .then(this.createOrUpdateApis);
-      // .then(this.createOrUpdateTriggers); // OSS, .etc
+      .then(this.createOrUpdateApis)
+      .then(this.deployApis);
+  },
+
+  createTriggersIfNeeded() {
+    if (!this.triggers.length) {
+      return BbPromise.resolve();
+    }
+    return BbPromise.bind(this)
+      .then(this.createTriggerRoleIfNotExists)
+      .then(this.createOrUpdateTriggers);
   },
 
   createApiGroupIfNotExists() {
-    const group = this.templates.update.Resources[this.provider.getApiGroupName(this.options.stage)];
+    const groupResource = this.templates.update.Resources[this.provider.getApiGroupLogicalId()];
 
-    if (!group) {
+    if (!groupResource) {
+      return BbPromise.resolve();  // No API needed
+    }
+    const group = groupResource.Properties;
+
+    const groupName = group.GroupName;
+    const groupDesc = group.Description;
+
+    return this.provider.getApiGroup(groupName)
+      .then((foundGroup) => {
+        if (foundGroup) {
+          this.apiGroup = foundGroup;
+          return foundGroup;
+        }
+        return this.createApiGroup(group);
+      });
+  },
+
+  createApiGroup(group) {
+    return this.provider.createApiGroup(group)
+      .then((createdGroup) => {
+        this.apiGroup = createdGroup;
+        return createdGroup;
+      });
+  },
+
+  createApiRoleIfNotExists() {
+    const roleResource = this.templates.update.Resources[this.provider.getApiRoleLogicalId()];
+
+    if (!roleResource) {
       return BbPromise.resolve();  // No API needed
     }
 
-    this.provider.getApiGroup(group.Properties.GroupName)
-      .then(function(group) {
-        if (group) { return group; }
-        return this.provider.createApiGroup(group.Properties.GroupName, group.Properties.Description);
+    const role = roleResource.Properties;
+    return this.provider.getApiRole(role.RoleName)
+      .then((foundRole) => {
+        if (foundRole) {
+          this.apiRole = foundRole;
+          return foundRole;
+        }
+        return this.provider.createApiRole(role)
+          .then((createdRole) => {
+            this.apiRole = createdRole;
+            return createdRole;
+          });
       });
   },
 
-  createOrUpdateApis(group) {
-    const apis = _.filter(
-      this.templates.update,
-      (item) => this.provider.isApiType(item.Type));
-    
-    if (!apis.length) {
+  createApiPolicyIfNotExists() {
+    const roleResource = this.templates.update.Resources[this.provider.getApiRoleLogicalId()];
+
+    if (!roleResource) {
+      return BbPromise.resolve();  // No API needed
+    }
+
+    const role = roleResource.Properties;
+
+    return this.provider.getPolicies(role).then((policies) => {
+      return BbPromise.map(role.Policies, (policyProps) => {
+        const policy = policies.find(
+          (item) => item.PolicyName === policyProps.PolicyName
+        );
+        if (policy) return policy;
+        return this.provider.createPolicy(policyProps);
+      })
+    });
+  },
+
+  checkExistingApis() {
+    if (!this.apis.length) {
       return;
     }
 
-    // FIXME(joyeecheung): mapSeries?
-    return BbPromise.all(apis,
-      (api) => BbPromise.bind(this, api).then(this.createOrUpdateApi));
+    return this.provider.getApis({
+      GroupId: this.apiGroup.GroupId
+    }).then((apis) => {
+      this.apiMap = new Map(apis.map((api) => [api.ApiName, true]));
+      this.apis.forEach((api) => {
+        if (!this.apiMap.get(api.ApiName)) {
+          this.apiMap.set(api.ApiName, false);
+        }
+      });
+    });
+  },
+
+  createOrUpdateApis(group) {
+    if (!this.apis.length) {
+      return;
+    }
+
+    return BbPromise.mapSeries(this.apis,
+      (api) => this.createOrUpdateApi(api));
   },
 
   createOrUpdateApi(api) {
-    return this.provider.createApi(api.Properties)
-      .then(() => {
-        this.serverless.cli.log(`Created API${api.ApiName}.`);
-      }, (err) => {
-        // TODO(joyeecheung) Not sure about what code this should be
-        if (err.code !== 400) {
+    if (this.apiMap.get(api.ApiName)) {
+      return this.provider.updateApi(api)
+        .then(() => {
+          this.serverless.cli.log(`Updated API ${api.ApiName}.`);
+        }, (err) => {
+          this.serverless.cli.log(`Failed to update API ${api.ApiName}!`);
+          throw err;
+        });
+    } else {
+      return this.provider.createApi(api)
+        .then(() => {
+          this.serverless.cli.log(`Created API ${api.ApiName}.`);
+        }, (err) => {
           this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
           throw err;
-        }
+        });
+    }
+  },
 
-        return this.provider.updateApi(api.Properties)
-          .then(() => {
-            this.serverless.cli.log(`Updated API ${api.ApiName}...`);
-          }, () => {
-            this.serverless.cli.log(`Failed to create API ${api.ApiName}...`);
-            throw err;
-          });
-      });
+  deployApis() {
+    return BbPromise.mapSeries(this.apis,
+      (api) => this.provider.deployApi(api).then(
+        () => {
+          this.serverless.cli.log(`Deployed API ${api.ApiName}...`);
+        },
+        (err) => {
+          this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);
+          throw err;
+        },
+      ));
+  },
+
+  createTriggerRoleIfNotExists() {
+    return BbPromise.reject('Not implemented');
+  },
+
+  createOrUpdateTriggers() {
+    return BbPromise.reject('Not implemented');
   }
 };
