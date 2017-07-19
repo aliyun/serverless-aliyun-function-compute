@@ -77,9 +77,7 @@ describe('setupServices', () => {
     });
 
     it('should return "undefined" if no existing services are found', () => {
-      const err = new Error();
-      err.code = 404;
-      getServiceStub.returns(BbPromise.reject(err));
+      getServiceStub.returns(BbPromise.resolve(undefined));
 
       return aliyunDeploy.checkForExistingService().then((foundService) => {
         expect(foundService).toEqual(undefined);

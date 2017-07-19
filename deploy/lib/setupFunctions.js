@@ -22,13 +22,7 @@ module.exports = {
     return BbPromise.all(this.functions.map((func) => {
       return this.provider.getFunction(func.service, func.name)
       .then(
-        (res) => this.functionMap.set(func.name, true),
-        (err) => {
-          if (err.code === 404) {
-            return this.functionMap.set(func.name, false);
-          }
-          throw err;
-        });
+        (foundFunction) => this.functionMap.set(func.name, !!foundFunction));
     }));
   },
 

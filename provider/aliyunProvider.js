@@ -8,9 +8,14 @@ const co = require('co');
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
+
 const FCClient = require('@alicloud/fc');
-const oss = require('ali-oss');
-const AGClient = function(){}; //require('@alicloud/fc');
+const OSS = require('ali-oss');
+const CloudAPI = function() {};
+const RAM = function() {};
+// const CloudAPI = require('@alicloud/cloudapi');
+// const RAM = require('@alicloud/ram');
+
 const utils = require('../shared/utils');
 
 const constants = {
@@ -21,6 +26,7 @@ const keySym = Symbol('key');
 const fcClientSym = Symbol('fc-client');
 const agClientSym = Symbol('ag-client');
 const ossClientSym = Symbol('oss-client');
+const ramClientSym = Symbol('ram-client');
 
 class AliyunProvider {
   static getProviderName() {
@@ -49,6 +55,17 @@ class AliyunProvider {
     const keyFileContent = fs.readFileSync(credentials, 'utf-8').toString();
     // TODO(joyeecheung) support profiles other than [default]
     this[keySym] = ini.parse(keyFileContent).default;
+
+    [
+      'aliyun_account_id',
+      'aliyun_access_key_id',
+      'aliyun_access_key_secret'
+    ].forEach((field) => {
+      if (!this[keySym][field]) {
+        throw new Error(`Credentials in ${credentials} does not contain ${field}`);
+      }
+    });
+
     return this[keySym];
   }
 
@@ -58,7 +75,7 @@ class AliyunProvider {
     }
 
     const key = this.key;
-    this[fcClientSym] = new FCClient(key.account_id, {
+    this[fcClientSym] = new FCClient(key.aliyun_account_id, {
       accessKeyID: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
       region: this.options.region
@@ -72,12 +89,26 @@ class AliyunProvider {
     }
 
     const key = this.key;
-    this[agClientSym] = new AGClient(key.account_id, {
-      accessKeyID: key.aliyun_access_key_id,
+    this[agClientSym] = new CloudAPI({
+      accessKeyId: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
-      region: this.options.region
+      endpoint: `http://apigateway.${this.options.region}.aliyuncs.com`
     });
     return this[agClientSym];
+  }
+
+  get ramClient() {
+    if (this[ramClientSym]) {
+      return this[ramClientSym];
+    }
+
+    const key = this.key;
+    this[ramClientSym] = new RAM({
+      accessKeyId: key.aliyun_access_key_id,
+      accessKeySecret: key.aliyun_access_key_secret,
+      endpoint: 'https://ram.aliyuncs.com'
+    });
+    return this[ramClientSym];
   }
 
   get ossClient() {
@@ -86,7 +117,7 @@ class AliyunProvider {
     }
 
     const key = this.key;
-    this[ossClientSym] = oss({
+    this[ossClientSym] = OSS({
       accessKeyId: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
       region: `oss-${this.options.region}`
@@ -96,7 +127,7 @@ class AliyunProvider {
 
   resetOssClient(bucketName) {
     const key = this.key;
-    this[ossClientSym] = oss({
+    this[ossClientSym] = OSS({
       accessKeyId: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
       bucket: bucketName,
@@ -179,7 +210,10 @@ class AliyunProvider {
       throw new Error(`The credentials are for region ${this.key.region}, ` +
         `but the service is specified to be deployed in region ${region}`);
     }
-    return this.fcClient.getService(serviceName, options);
+    return this.fcClient.getService(serviceName, options).catch((err) => {
+      if (err.code === 'ServiceNotFound') return undefined;
+      throw err;
+    });
   }
 
   /**
@@ -217,7 +251,11 @@ class AliyunProvider {
    * @return {FunctionResponse}
    */
   getFunction(serviceName, functionName) {
-    return this.fcClient.getFunction(serviceName, functionName);
+    return this.fcClient.getFunction(serviceName, functionName)
+      .catch((err) => {
+        if (err.code === 'FunctionNotFound') return undefined;
+        throw err;
+      });
   }
 
   /**
@@ -308,16 +346,58 @@ class AliyunProvider {
   }
 
   /**
-   * @param {string} groupName
-   * @param {string} desc
+   * @param {{GroupName: string, Description: string}} props
    * @return {APIGroupResponse}
    * https://help.aliyun.com/document_detail/43611.html
    */
-  createApiGroup(groupName, desc) {
-    return this.agClient.createApiGroup({
-      GroupName: props.GroupName,
-      Description: props.Description
+  createApiGroup(props) {
+    return this.agClient.createApiGroup(props);
+  }
+
+  /**
+   * @param {string} roleName
+   * @return {APIGroupResponse}
+   * https://help.aliyun.com/document_detail/43611.html
+   */
+  getApiRole(roleName) {
+    return this.ramClient.getRole({
+      roleName: roleName
+    }).catch((err) => {
+      if (err.name === 'EntityNotExist.RoleError') return undefined;
+      throw err;
     });
+  }
+
+  createApiRole(props) {
+    return this.ramClient.createRole({
+      RoleName: props.RoleName,
+      Description: props.Description,
+      AssumeRolePolicyDocument: JSON.stringify(props.AssumeRolePolicyDocument)
+    }).then(() => this.createApiPolicies(props));
+  }
+
+  createApiPolicies(props) {
+    const roleName = props.RoleName;
+    return this.ramClient.listPoliciesForRole({
+      RoleName: roleName
+    }).then((existingPolicies) => {
+      return BbPromise.map(props.Policies, (policyProps) => {
+        const policy = existingPolicies.Policies.Policy.find(
+          (item) => item.PolicyName === policyProps.PolicyName
+        );
+        if (policy) return policy;
+        return this.ramClient.attachPolicyToRole(policyProps);
+      });
+    });
+  }
+
+  /**
+   * @param {{GroupName: string, Description: string}} props
+   * @return {APIGroupResponse}
+   * https://help.aliyun.com/document_detail/43611.html
+   */
+  createApiGroup(props) {
+    return this.agClient.createApiGroup(props);
   }
 
   /**
@@ -337,23 +417,6 @@ class AliyunProvider {
         (item) => item.GroupName === groupName);
       return group;
     });
-  }
-
-  /**
-   * TODO(joyeecheung): validation
-   * @param {string} eventType 
-   * @param {object} event 
-   */
-  getRequestConfig(eventType, event) {
-    if (eventType === 'http') {
-      return {
-        RequestProtocol: 'HTTP',
-        RequestHttpMethod: event.RequestHttpMethod || event.method.toUpperCase(),
-        RequestPath: event.RequestPath || event.path,
-        BodyFormat: event.BodyFormat || 'JSON'
-      };
-    }
-    throw new Error(`unknown event type ${eventType}`);
   }
 
   isApiType(type) {

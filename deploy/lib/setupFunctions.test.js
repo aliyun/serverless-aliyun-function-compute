@@ -103,14 +103,12 @@ describe('setupFunctions', () => {
     });
 
     it('should create and update functions according to the templates', () =>  {
-        const err = new Error();
-        err.code = 404;
         getFunctionStub
           .withArgs('my-service-dev', 'my-service-dev-currentTime')
-          .returns(BbPromise.resolve());
+          .returns(BbPromise.resolve(functions[0]));
         getFunctionStub
           .withArgs('my-service-dev', 'my-service-dev-currentTime2')
-          .returns(BbPromise.reject(err));
+          .returns(BbPromise.resolve(undefined));
         updateFunctionStub.returns(BbPromise.resolve());
         createFunctionStub.returns(BbPromise.resolve());
         return aliyunDeploy.setupFunctions().then(() => {
@@ -135,18 +133,16 @@ describe('setupFunctions', () => {
     });
 
     it('should fill in function map with existing functions', () =>  {
-      const err = new Error();
-      err.code = 404;
       const expectedMap = new Map([
         ['my-service-dev-currentTime', true],
         ['my-service-dev-currentTime2', false]
       ]);
         getFunctionStub
           .withArgs('my-service-dev', 'my-service-dev-currentTime')
-          .returns(BbPromise.resolve());
+          .returns(BbPromise.resolve(functions[0]));
         getFunctionStub
           .withArgs('my-service-dev', 'my-service-dev-currentTime2')
-          .returns(BbPromise.reject(err));
+          .returns(BbPromise.resolve(undefined));
         return aliyunDeploy.checkExistingFunctions().then(() => {
           expect(getFunctionStub.calledTwice).toEqual(true);
           expect(aliyunDeploy.functionMap).toEqual(expectedMap);

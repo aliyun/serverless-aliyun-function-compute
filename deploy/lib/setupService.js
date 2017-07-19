@@ -24,13 +24,7 @@ module.exports = {
   checkForExistingService() {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
-    return this.provider.getService(service.name, service.region)
-      .catch((err) => {
-        if (err.code && err.code === 404) {  // not found
-          return undefined;
-        }
-        throw err;
-      });
+    return this.provider.getService(service.name, service.region);
   },
 
   createServiceIfNotExists(foundService) {
