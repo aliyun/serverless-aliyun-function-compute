@@ -13,8 +13,6 @@ const Serverless = require('../../test/serverless');
 describe('UploadArtifacts', () => {
   let serverless;
   let aliyunDeploy;
-  let consoleLogStub;
-  let uploadObjectStub;
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -36,21 +34,26 @@ describe('UploadArtifacts', () => {
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunDeploy = new AliyunDeploy(serverless, options);
-  });
-
-  afterEach(() => {
-    aliyunDeploy.serverless.cli.log.restore();
-    aliyunDeploy.provider.uploadObject.restore();
+    aliyunDeploy.provider.resetOssClient('test-bucket');
   });
 
   describe('#uploadArtifacts()', () => {
+    let consoleLogStub;
+    let uploadObjectStub;
+
     beforeEach(() => {
-      aliyunDeploy.provider.resetOssClient('test-bucket');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-      uploadObjectStub = sinon.stub(aliyunDeploy.provider, 'uploadObject').returns(BbPromise.resolve());
+      uploadObjectStub = sinon.stub(aliyunDeploy.provider, 'uploadObject');
     });
 
-    it('should upload corresponding objects to deployment bucket', () => aliyunDeploy
+    afterEach(() => {
+      aliyunDeploy.serverless.cli.log.restore();
+      aliyunDeploy.provider.uploadObject.restore();
+    });
+
+    it('should upload corresponding objects to deployment bucket', () => {
+      uploadObjectStub.returns(BbPromise.resolve());
+      return aliyunDeploy
       .uploadArtifacts().then(() => {
         expect(consoleLogStub.calledTwice).toEqual(true);
         expect(consoleLogStub.calledWithExactly('Uploaded serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip')).toEqual(true);
@@ -58,6 +61,7 @@ describe('UploadArtifacts', () => {
           'serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip',
           '/project/.serverless/my-service.zip'
           )).toEqual(true);
-      }));
+      });
+    });
   });
 });
