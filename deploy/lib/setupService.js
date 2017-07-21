@@ -37,6 +37,7 @@ module.exports = {
     }
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
+    // TODO(joyeecheung): generate description
     return this.provider.createService(service.name)
       .then((createdService) => {
         // Update existing service id

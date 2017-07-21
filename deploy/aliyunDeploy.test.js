@@ -222,6 +222,30 @@ describe('AliyunDeploy', () => {
     }];
 
 
+  const functions = [{
+    "name": "my-service-dev-currentTime",
+    "service": "my-service-dev",
+    "handler": "index.ping",
+    "memorySize": 128,
+    "timeout": 30,
+    "runtime": "nodejs4.4",
+    "code": {
+      "ossBucketName": "sls-my-service",
+      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+    }
+  }, {
+    "name": "my-service-dev-currentTime2",
+    "service": "my-service-dev",
+    "handler": "index.ping",
+    "memorySize": 128,
+    "timeout": 30,
+    "runtime": "nodejs4.4",
+    "code": {
+      "ossBucketName": "sls-my-service",
+      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+    }
+  }];
+
     let getServiceStub;
     let consoleLogStub;
     let createServiceStub;
@@ -344,37 +368,67 @@ describe('AliyunDeploy', () => {
         });
     });
 
-    // it('should handle existing service ', () => {
-    //   const serviceId = new Date().getTime().toString(16);
-    //   getServiceStub.returns(BbPromise.resolve({ serviceId }));
-    //   createServiceStub.returns(BbPromise.resolve({ serviceId }));
-    //   getBucketStub.returns(BbPromise.resolve({
-    //     name: 'sls-my-service',
-    //     region: 'cn-hangzhou'
-    //   }));
-    //   createBucketStub.returns(BbPromise.resolve());
-    //   resetOssClientStub.returns();
+    it('should handle existing service ', () => {
+      const serviceId = new Date().getTime().toString(16);
+      getServiceStub.returns(BbPromise.resolve({ serviceId }));
+      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getBucketStub.returns(BbPromise.resolve({
+        name: 'sls-my-service',
+        region: 'cn-hangzhou'
+      }));
+      createBucketStub.returns(BbPromise.resolve());
+      uploadObjectStub.returns(BbPromise.resolve());
+      getFunctionStub
+        .withArgs('my-service-dev', 'my-service-dev-currentTime')
+        .returns(BbPromise.resolve(functions[0]));
+      getFunctionStub
+        .withArgs('my-service-dev', 'my-service-dev-currentTime2')
+        .returns(BbPromise.resolve(functions[1]));
+      updateFunctionStub.returns(BbPromise.resolve());
+      createFunctionStub.returns(BbPromise.resolve());
 
-    //   return aliyunDeploy.setupService().then(() => {
-    //     expect(getServiceStub.calledOnce).toEqual(true);
-    //     expect(getServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
+      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
+      createApiGroupStub.returns(BbPromise.resolve());
+      getApiRoleStub.returns(BbPromise.resolve(fullRole));
+      createApiRoleStub.returns(BbPromise.resolve());
+      getPoliciesStub.returns(BbPromise.resolve(role.Policies));
+      createPolicyStub.returns(BbPromise.resolve());
+      getApisStub.returns(BbPromise.resolve(fullApis));
+      createApiStub.returns(BbPromise.resolve());
+      updateApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
+      updateApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
+      deployApiStub.returns(BbPromise.resolve());
 
-    //     expect(createServiceStub.called).toEqual(false);
-
-    //     expect(getBucketStub.calledAfter(getServiceStub)).toEqual(true);
-    //     expect(getBucketStub.calledOnce).toEqual(true);
-    //     expect(getBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
-
-    //     expect(createBucketStub.calledOnce).toEqual(false);
-
-    //     expect(resetOssClientStub.calledAfter(getBucketStub)).toEqual(true);
-    //     expect(resetOssClientStub.calledOnce).toEqual(true);
-    //     expect(resetOssClientStub.calledWithExactly('sls-my-service')).toEqual(true);
-
-    //     expect(consoleLogStub.calledTwice).toEqual(true);
-    //     expect(consoleLogStub.calledWithExactly('Service my-service-dev already exists.')).toEqual(true);
-    //     expect(consoleLogStub.calledWithExactly('Bucket sls-my-service already exists.')).toEqual(true);
-    //   });
-    // });
+      const logs = [
+        'Service my-service-dev already exists.',
+        'Bucket sls-my-service already exists.',
+        'Uploading serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip to OSS bucket sls-my-service...',
+        'Uploaded serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip to OSS bucket sls-my-service',
+        'Updating function my-service-dev-currentTime...',
+        'Updated function my-service-dev-currentTime',
+        'Updating function my-service-dev-currentTime2...',
+        'Updated function my-service-dev-currentTime2',
+        'API group my-service-dev-api exists.',
+        'RAM role SLSFCInvocationFromAPIGateway exists.',
+        'RAM policy AliyunFCInvocationAccess exists.',
+        'Updating API sls-http-my-service-dev-currentTime...',
+        'Updated API sls-http-my-service-dev-currentTime',
+        'Updating API sls-http-my-service-dev-currentTime2...',
+        'Updated API sls-http-my-service-dev-currentTime2',
+        'Deploying API sls-http-my-service-dev-currentTime...',
+        'Deployed API sls-http-my-service-dev-currentTime',
+        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
+        'Deploying API sls-http-my-service-dev-currentTime2...',
+        'Deployed API sls-http-my-service-dev-currentTime2',
+        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+      ];
+      return aliyunDeploy.hooks['before:deploy:deploy']()
+        .then(() => aliyunDeploy.hooks['deploy:deploy']())
+        .then(() => {
+          for (var i = 0; i < consoleLogStub.callCount; ++i) {
+            expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
+          }
+        });
+    });
   });
 });
