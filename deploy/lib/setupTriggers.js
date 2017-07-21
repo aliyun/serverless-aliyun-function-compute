@@ -58,6 +58,7 @@ module.exports = {
       .then((foundGroup) => {
         if (foundGroup) {
           this.apiGroup = foundGroup;
+          this.serverless.cli.log(`API group ${group.GroupName} exists.`);
           return foundGroup;
         }
         return this.createApiGroup(group);
@@ -65,9 +66,11 @@ module.exports = {
   },
 
   createApiGroup(group) {
+    this.serverless.cli.log(`Creating API group ${group.GroupName}...`);
     return this.provider.createApiGroup(group)
       .then((createdGroup) => {
         this.apiGroup = createdGroup;
+          this.serverless.cli.log(`Created API group ${group.GroupName}`);
         return createdGroup;
       });
   },
@@ -84,10 +87,14 @@ module.exports = {
       .then((foundRole) => {
         if (foundRole) {
           this.apiRole = foundRole;
+          this.serverless.cli.log(`RAM role ${role.RoleName} exists.`);
           return foundRole;
         }
+
+        this.serverless.cli.log(`Creating RAM role ${role.RoleName}...`);
         return this.provider.createApiRole(role)
           .then((createdRole) => {
+            this.serverless.cli.log(`Created RAM role ${role.RoleName}`);
             this.apiRole = createdRole;
             return createdRole;
           });
@@ -105,11 +112,20 @@ module.exports = {
 
     return this.provider.getPolicies(role).then((policies) => {
       return BbPromise.map(role.Policies, (policyProps) => {
+        const policyName = policyProps.PolicyName;
+        const roleName = policyProps.RoleName;
         const policy = policies.find(
-          (item) => item.PolicyName === policyProps.PolicyName
+          (item) => item.PolicyName === policyName
         );
-        if (policy) return policy;
-        return this.provider.createPolicy(policyProps);
+        if (policy) {
+          this.serverless.cli.log(`RAM policy ${policyName} exists.`);
+          return policy;
+        }
+        this.serverless.cli.log(`Attaching RAM policy ${policyName} to ${roleName}...`);
+        return this.provider.createPolicy(policyProps).then((createdPolicy) => {
+          this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
+          return createdPolicy;
+        });
       })
     });
   },
@@ -146,14 +162,16 @@ module.exports = {
     const apiInMap = this.apiMap.get(api.ApiName);
     if (apiInMap) {
       const apiProps = Object.assign({ApiId: apiInMap.ApiId}, api);
+      this.serverless.cli.log(`Updating API ${api.ApiName}...`);
       return this.provider.updateApi(group, role, apiProps)
         .then((newApi) => {
-          this.serverless.cli.log(`Updated API ${api.ApiName}.`);
+          this.serverless.cli.log(`Updated API ${api.ApiName}`);
         }, (err) => {
           this.serverless.cli.log(`Failed to update API ${api.ApiName}!`);
           throw err;
         });
     } else {
+      this.serverless.cli.log(`Creating API ${api.ApiName}...`);
       return this.provider.createApi(group, role, api)
         .then((newApi) => {
           this.serverless.cli.log(`Created API ${api.ApiName}`);
@@ -169,6 +187,7 @@ module.exports = {
     const group = this.apiGroup;
     return BbPromise.mapSeries(this.apis, (api) => {
       const apiProps = this.apiMap.get(api.ApiName);
+      this.serverless.cli.log(`Deploying API ${api.ApiName}...`);
       return this.provider.deployApi(group, apiProps).then(
       () => {
         this.serverless.cli.log(`Deployed API ${api.ApiName}`);

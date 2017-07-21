@@ -237,21 +237,27 @@ describe('setupTriggers', () => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my-service-dev-api')).toEqual(true);
 
+        expect(createApiGroupStub.calledAfter(getApiGroupStub)).toEqual(true);
         expect(createApiGroupStub.calledOnce).toEqual(true);
         expect(createApiGroupStub.calledWithExactly(apiGroup)).toEqual(true);
 
+        expect(getApiRoleStub.calledAfter(createApiGroupStub)).toEqual(true);
         expect(getApiRoleStub.calledOnce).toEqual(true);
         expect(getApiRoleStub.calledWithExactly('SLSFCInvocationFromAPIGateway')).toEqual(true);
 
+        expect(createApiRoleStub.calledAfter(getApiRoleStub)).toEqual(true);
         expect(createApiRoleStub.calledOnce).toEqual(true);
         expect(createApiRoleStub.calledWithExactly(role)).toEqual(true);
 
+        expect(getPoliciesStub.calledAfter(createApiRoleStub)).toEqual(true);
         expect(getPoliciesStub.calledOnce).toEqual(true);
         expect(getPoliciesStub.calledWithExactly(role)).toEqual(true);
 
+        expect(createPolicyStub.calledAfter(getPoliciesStub)).toEqual(true);
         expect(createPolicyStub.calledOnce).toEqual(true);
         expect(createPolicyStub.calledWithExactly(role.Policies[0])).toEqual(true);
 
+        expect(getApisStub.calledAfter(createPolicyStub)).toEqual(true);
         expect(getApisStub.calledOnce).toEqual(true);
         expect(getApisStub.calledWithExactly({
           GroupId: fullGroup.GroupId
@@ -259,6 +265,7 @@ describe('setupTriggers', () => {
 
         expect(updateApiStub.called).toEqual(false);
 
+        expect(createApiStub.calledAfter(getApisStub)).toEqual(true);
         expect(createApiStub.calledTwice).toEqual(true);
 
         expect(createApiStub.calledWithExactly(
@@ -272,6 +279,7 @@ describe('setupTriggers', () => {
           apis[1]
         )).toEqual(true);
 
+        expect(deployApiStub.calledAfter(createApiStub)).toEqual(true);
         expect(deployApiStub.calledTwice).toEqual(true);
         expect(deployApiStub.calledWithExactly(
           fullGroup,
@@ -281,16 +289,29 @@ describe('setupTriggers', () => {
           fullGroup,
           fullApis[0]
         )).toEqual(true);
-        expect(consoleLogStub.calledWithExactly(
-          `GET ` +
-          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> ` +
-          `my-service-dev.my-service-dev-currentTime`
-        ));
-        expect(consoleLogStub.calledWithExactly(
-          `GET ` +
-          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> ` +
-          `my-service-dev.my-service-dev-currentTime2`
-        ));
+
+        const logs = [
+          'Creating API group my-service-dev-api...',
+          'Created API group my-service-dev-api',
+          'Creating RAM role SLSFCInvocationFromAPIGateway...',
+          'Created RAM role SLSFCInvocationFromAPIGateway',
+          'Attaching RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway...',
+          'Attached RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway',
+          'Creating API sls-http-my-service-dev-currentTime...',
+          'Created API sls-http-my-service-dev-currentTime',
+          'Creating API sls-http-my-service-dev-currentTime2...',
+          'Created API sls-http-my-service-dev-currentTime2',
+          'Deploying API sls-http-my-service-dev-currentTime...',
+          'Deployed API sls-http-my-service-dev-currentTime',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
+          'Deploying API sls-http-my-service-dev-currentTime2...',
+          'Deployed API sls-http-my-service-dev-currentTime2',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
       });
     });
 
@@ -313,24 +334,28 @@ describe('setupTriggers', () => {
 
         expect(createApiGroupStub.called).toEqual(false);
 
+        expect(getApiRoleStub.calledAfter(getApiGroupStub)).toEqual(true);
         expect(getApiRoleStub.calledOnce).toEqual(true);
         expect(getApiRoleStub.calledWithExactly('SLSFCInvocationFromAPIGateway')).toEqual(true);
 
         expect(createApiRoleStub.called).toEqual(false);
 
+        expect(getPoliciesStub.calledAfter(getApiRoleStub)).toEqual(true);
         expect(getPoliciesStub.called).toEqual(true);
         expect(getPoliciesStub.calledWithExactly(role)).toEqual(true);
 
         expect(createPolicyStub.called).toEqual(false);
 
+        expect(getApisStub.calledAfter(getPoliciesStub)).toEqual(true);
         expect(getApisStub.calledOnce).toEqual(true);
         expect(getApisStub.calledWithExactly({
           GroupId: fullGroup.GroupId
         })).toEqual(true);
 
         expect(createApiStub.called).toEqual(false);
-        expect(updateApiStub.calledTwice).toEqual(true);
 
+        expect(updateApiStub.calledAfter(getApisStub)).toEqual(true);
+        expect(updateApiStub.calledTwice).toEqual(true);
         expect(updateApiStub.calledWithExactly(
           fullGroup,
           fullRole,
@@ -342,6 +367,7 @@ describe('setupTriggers', () => {
           Object.assign({ApiId: fullApis[1].ApiId}, apis[1])
         )).toEqual(true);
 
+        expect(deployApiStub.calledAfter(updateApiStub)).toEqual(true);
         expect(deployApiStub.calledTwice).toEqual(true);
         expect(deployApiStub.calledWithExactly(
           fullGroup,
@@ -351,318 +377,26 @@ describe('setupTriggers', () => {
           fullGroup,
           fullApis[0]
         )).toEqual(true);
-      });
-    });
-  });
 
-  describe('#createApisIfNeeded()', () => {
-    let createApiGroupIfNotExistsStub;
-    let createApiRoleIfNotExistsStub;
-    let createApiPolicyIfNotExistsStub;
-    let checkExistingApisStub;
-    let createOrUpdateApisStub;
-    let deployApisStub;
-
-    beforeEach(() => {
-      createApiGroupIfNotExistsStub = sinon.stub(aliyunDeploy, 'createApiGroupIfNotExists')
-        .returns(BbPromise.resolve());
-      createApiRoleIfNotExistsStub = sinon.stub(aliyunDeploy, 'createApiRoleIfNotExists')
-        .returns(BbPromise.resolve());
-      createApiPolicyIfNotExistsStub = sinon.stub(aliyunDeploy, 'createApiPolicyIfNotExists')
-        .returns(BbPromise.resolve());
-      checkExistingApisStub = sinon.stub(aliyunDeploy, 'checkExistingApis')
-        .returns(BbPromise.resolve());
-      createOrUpdateApisStub = sinon.stub(aliyunDeploy, 'createOrUpdateApis')
-        .returns(BbPromise.resolve());
-      deployApisStub = sinon.stub(aliyunDeploy, 'deployApis')
-        .returns(BbPromise.resolve());
-    });
-
-    afterEach(() => {
-      aliyunDeploy.createApiGroupIfNotExists.restore();
-      aliyunDeploy.createApiRoleIfNotExists.restore();
-      aliyunDeploy.createApiPolicyIfNotExists.restore();
-      aliyunDeploy.checkExistingApis.restore();
-      aliyunDeploy.createOrUpdateApis.restore();
-      aliyunDeploy.deployApis.restore();
-    });
-
-    it('should run promise chain when there are apis', () => {
-      aliyunDeploy.apis = apis;
-      return aliyunDeploy.createApisIfNeeded().then(() => {
-        expect(createApiGroupIfNotExistsStub.calledOnce).toEqual(true);
-        expect(createApiRoleIfNotExistsStub.calledAfter(createApiGroupIfNotExistsStub));
-        expect(createApiPolicyIfNotExistsStub.calledAfter(createApiRoleIfNotExistsStub));
-        expect(checkExistingApisStub.calledAfter(createApiPolicyIfNotExistsStub));
-        expect(createOrUpdateApisStub.calledAfter(checkExistingApisStub));
-        expect(deployApisStub.calledAfter(createOrUpdateApisStub));
-      });
-    });
-
-    it('should not run promise chain when there are no apis', () => {
-      aliyunDeploy.apis = [];
-      return aliyunDeploy.createApisIfNeeded().then(() => {
-        expect(createApiGroupIfNotExistsStub.called).toEqual(false);
-        expect(createApiRoleIfNotExistsStub.called).toEqual(false);
-        expect(createApiPolicyIfNotExistsStub.called).toEqual(false);
-        expect(checkExistingApisStub.called).toEqual(false);
-        expect(createOrUpdateApisStub.called).toEqual(false);
-        expect(deployApisStub.called).toEqual(false);
-      });
-    });
-  });
-
-  describe('#createApiGroupIfNotExists()', () => {
-    let getApiGroupStub;
-    let createApiGroupStub;
-
-    beforeEach(() => {
-      getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
-      createApiGroupStub = sinon.stub(aliyunDeploy.provider, 'createApiGroup');
-    });
-
-    afterEach(() => {      
-      aliyunDeploy.provider.getApiGroup.restore();
-      aliyunDeploy.provider.createApiGroup.restore();
-    });
-
-    it('should create api group if it does not exist', () =>  {
-        getApiGroupStub
-          .returns(BbPromise.resolve(undefined));
-        createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-        return aliyunDeploy.createApiGroupIfNotExists().then(() => {
-          expect(getApiGroupStub.calledOnce).toEqual(true);
-          expect(getApiGroupStub.calledWithExactly('my-service-dev-api')).toEqual(true);
-          expect(createApiGroupStub.calledOnce).toEqual(true);
-          expect(createApiGroupStub.calledWithExactly(apiGroup)).toEqual(true);
-          expect(aliyunDeploy.apiGroup).toEqual(fullGroup);
-        });
-      }
-    );
-
-    it('should not create api group if it exists', () =>  {
-        getApiGroupStub
-          .returns(BbPromise.resolve(fullGroup));
-        createApiGroupStub.returns(BbPromise.resolve());
-        return aliyunDeploy.createApiGroupIfNotExists().then(() => {
-          expect(getApiGroupStub.calledOnce).toEqual(true);
-          expect(getApiGroupStub.calledWithExactly('my-service-dev-api')).toEqual(true);
-          expect(createApiGroupStub.called).toEqual(false);
-          expect(aliyunDeploy.apiGroup).toEqual(fullGroup);
-        });
-      }
-    );
-  });
-
-  describe('#createApiRoleIfNotExists()', () => {
-    let getApiRoleStub;
-    let createApiRoleStub;
-
-    beforeEach(() => {
-      getApiRoleStub = sinon.stub(aliyunDeploy.provider, 'getApiRole');
-      createApiRoleStub = sinon.stub(aliyunDeploy.provider, 'createApiRole');
-    });
-
-    afterEach(() => {      
-      aliyunDeploy.provider.getApiRole.restore();
-      aliyunDeploy.provider.createApiRole.restore();
-    });
-
-    it('should create api role if it does not exist', () =>  {
-        getApiRoleStub
-          .returns(BbPromise.resolve(undefined));
-        createApiRoleStub.returns(BbPromise.resolve(fullRole));
-        return aliyunDeploy.createApiRoleIfNotExists().then(() => {
-          expect(getApiRoleStub.calledOnce).toEqual(true);
-          expect(getApiRoleStub.calledWithExactly('SLSFCInvocationFromAPIGateway')).toEqual(true);
-          expect(createApiRoleStub.calledOnce).toEqual(true);
-          expect(createApiRoleStub.calledWithExactly(role)).toEqual(true);
-          expect(aliyunDeploy.apiRole).toEqual(fullRole);
-        });
-      }
-    );
-
-    it('should not create api role if it exists', () =>  {
-        getApiRoleStub
-          .returns(BbPromise.resolve(fullRole));
-        createApiRoleStub.returns(BbPromise.resolve(fullRole));
-        return aliyunDeploy.createApiRoleIfNotExists().then(() => {
-          expect(getApiRoleStub.calledOnce).toEqual(true);
-          expect(getApiRoleStub.calledWithExactly('SLSFCInvocationFromAPIGateway')).toEqual(true);
-          expect(createApiRoleStub.called).toEqual(false);
-          expect(aliyunDeploy.apiRole).toEqual(fullRole);
-        });
-      }
-    );
-  });
-
-
-  describe('#createApiPolicyIfNotExists()', () => {
-    let getPoliciesStub;
-    let createPolicyStub;
-
-    beforeEach(() => {
-      getPoliciesStub = sinon.stub(aliyunDeploy.provider, 'getPolicies');
-      createPolicyStub = sinon.stub(aliyunDeploy.provider, 'createPolicy');
-    });
-
-    afterEach(() => {      
-      aliyunDeploy.provider.getPolicies.restore();
-      aliyunDeploy.provider.createPolicy.restore();
-    });
-
-    it('should create api policy if it does not exist', () =>  {
-        getPoliciesStub
-          .returns(BbPromise.resolve([]));
-        createPolicyStub.returns(BbPromise.resolve(role.Policies[0]));
-        return aliyunDeploy.createApiPolicyIfNotExists().then(() => {
-          expect(getPoliciesStub.calledOnce).toEqual(true);
-          expect(getPoliciesStub.calledWithExactly(role)).toEqual(true);
-          expect(createPolicyStub.calledOnce).toEqual(true);
-          expect(createPolicyStub.calledWithExactly(role.Policies[0])).toEqual(true);
-        });
-      }
-    );
-
-    it('should not create api role if it exists', () =>  {
-        getPoliciesStub
-          .returns(BbPromise.resolve(role.Policies));
-        createPolicyStub.returns(BbPromise.resolve(role.Policies[0]));
-        return aliyunDeploy.createApiPolicyIfNotExists().then(() => {
-          expect(getPoliciesStub.calledOnce).toEqual(true);
-          expect(getPoliciesStub.calledWithExactly(role)).toEqual(true);
-          expect(createPolicyStub.called).toEqual(false);
-        });
-      }
-    );
-  });
-
-  describe('#checkExistingApis()', () => {
-    let getApisStub;
-
-    beforeEach(() => {
-      aliyunDeploy.apis = apis;
-      aliyunDeploy.apiGroup = fullGroup;
-      getApisStub = sinon.stub(aliyunDeploy.provider, 'getApis');
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.getApis.restore();
-    });
-
-    it('should fill in api map properly', () => {
-      const expectedMap = new Map([
-        ['sls-http-my-service-dev-currentTime', fullApis[0]],
-        ['sls-http-my-service-dev-currentTime2', false]
-      ]);
-      getApisStub
-        .returns(BbPromise.resolve([fullApis[0]]));
-      return aliyunDeploy.checkExistingApis().then(() => {
-        expect(getApisStub.calledOnce).toEqual(true);
-        expect(getApisStub.calledWithExactly({
-          GroupId: fullGroup.GroupId
-        })).toEqual(true);
-        expect(aliyunDeploy.apiMap).toEqual(expectedMap);
-      });
-    });
-  });
-
-  describe('#createOrUpdateApi()', () => {
-    let updateApiStub;
-    let createApiStub;
-    let consoleLogStub;
-
-    beforeEach(() => {
-      aliyunDeploy.apis = apis;
-      aliyunDeploy.apiGroup = fullGroup;
-      aliyunDeploy.apiRole = fullRole;
-      aliyunDeploy.apiMap = new Map([
-        ['sls-http-my-service-dev-currentTime', fullApis[0]],
-        ['sls-http-my-service-dev-currentTime2', false]
-      ]);
-      updateApiStub = sinon.stub(aliyunDeploy.provider, 'updateApi');
-      createApiStub = sinon.stub(aliyunDeploy.provider, 'createApi');
-      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.updateApi.restore();
-      aliyunDeploy.provider.createApi.restore();
-      aliyunDeploy.serverless.cli.log.restore();
-    });
-
-    it('should create and update apis according to the map', () => {
-      updateApiStub.returns(BbPromise.resolve());
-      createApiStub.returns(BbPromise.resolve(fullApis[1]));
-      const expectedMap = new Map([
-        ['sls-http-my-service-dev-currentTime', fullApis[0]],
-        ['sls-http-my-service-dev-currentTime2', fullApis[1]]
-      ]);
-      return aliyunDeploy.createOrUpdateApis().then(() => {
-        expect(updateApiStub.calledOnce).toEqual(true);
-        expect(updateApiStub.calledWithExactly(
-          fullGroup,
-          fullRole,
-          Object.assign({ApiId: fullApis[0].ApiId}, apis[0])
-        )).toEqual(true);
-        expect(createApiStub.calledOnce).toEqual(true);
-        expect(createApiStub.calledWithExactly(
-          fullGroup,
-          fullRole,
-          apis[1]
-        )).toEqual(true);
-        expect(consoleLogStub.calledTwice).toEqual(true);
-        expect(createApiStub.calledAfter(updateApiStub)).toEqual(true);
-        expect(aliyunDeploy.apiMap).toEqual(expectedMap);
-      });
-    });
-  });
-
-  describe('#deployApis()', () => {
-    let deployApiStub;
-    let consoleLogStub;
-
-    beforeEach(() => {
-      aliyunDeploy.apis = apis;
-      aliyunDeploy.apiGroup = fullGroup;
-      aliyunDeploy.apiRole = fullRole;
-      aliyunDeploy.apiMap = new Map([
-        ['sls-http-my-service-dev-currentTime', fullApis[0]],
-        ['sls-http-my-service-dev-currentTime2', fullApis[1]]
-      ]);
-      deployApiStub = sinon.stub(aliyunDeploy.provider, 'deployApi');
-      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.deployApi.restore();
-      aliyunDeploy.serverless.cli.log.restore();
-    });
-
-    it('should deploy apis', () => {
-      deployApiStub.returns(BbPromise.resolve());
-
-      return aliyunDeploy.deployApis().then(() => {
-        expect(deployApiStub.calledTwice).toEqual(true);
-        expect(deployApiStub.calledWithExactly(
-          fullGroup,
-          fullApis[0]
-        )).toEqual(true);
-        expect(deployApiStub.calledWithExactly(
-          fullGroup,
-          fullApis[0]
-        )).toEqual(true);
-        expect(consoleLogStub.callCount).toEqual(4);
-        expect(consoleLogStub.calledWithExactly(
-          `GET ` +
-          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> ` +
-          `my-service-dev.my-service-dev-currentTime`
-        ));
-        expect(consoleLogStub.calledWithExactly(
-          `GET ` +
-          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> ` +
-          `my-service-dev.my-service-dev-currentTime2`
-        ));
+        const logs = [
+          'API group my-service-dev-api exists.',
+          'RAM role SLSFCInvocationFromAPIGateway exists.',
+          'RAM policy AliyunFCInvocationAccess exists.',
+          'Updating API sls-http-my-service-dev-currentTime...',
+          'Updated API sls-http-my-service-dev-currentTime',
+          'Updating API sls-http-my-service-dev-currentTime2...',
+          'Updated API sls-http-my-service-dev-currentTime2',
+          'Deploying API sls-http-my-service-dev-currentTime...',
+          'Deployed API sls-http-my-service-dev-currentTime',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
+          'Deploying API sls-http-my-service-dev-currentTime2...',
+          'Deployed API sls-http-my-service-dev-currentTime2',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
       });
     });
   });
