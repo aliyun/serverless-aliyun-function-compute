@@ -37,21 +37,6 @@
         }
       }
     },
-    "sls-my-service-dev-currentTime2": {
-      "Type": "ALIYUN::FC::Function",
-      "Properties": {
-        "name": "my-service-dev-currentTime2",
-        "service": "my-service-dev",
-        "handler": "index.ping",
-        "memorySize": 128,
-        "timeout": 30,
-        "runtime": "nodejs4.4",
-        "code": {
-          "ossBucketName": "sls-my-service",
-          "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
-        }
-      }
-    },
     "sls-api-group": {
       "Type": "ALIYUN::API::APIGroup",
       "Properties": {
@@ -117,6 +102,21 @@
         },
         "ResultType": "JSON",
         "ResultSample": "{}"
+      }
+    },
+    "sls-my-service-dev-currentTime2": {
+      "Type": "ALIYUN::FC::Function",
+      "Properties": {
+        "name": "my-service-dev-currentTime2",
+        "service": "my-service-dev",
+        "handler": "index.ping",
+        "memorySize": 128,
+        "timeout": 30,
+        "runtime": "nodejs4.4",
+        "code": {
+          "ossBucketName": "sls-my-service",
+          "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+        }
       }
     },
     "sls-http-my-service-dev-currentTime2": {

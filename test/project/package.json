@@ -1,0 +1,15 @@
+{
+  "name": "my-service",
+  "version": "0.1.0",
+  "description": "An example of making Aliyun http endpoints using Serverless Framework.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.18.1"
+  },
+  "devDependencies": {
+    "serverless-aliyun-function-compute": "*"
+  }
+}

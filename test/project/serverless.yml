@@ -1,0 +1,33 @@
+service: my-service
+
+provider:
+  name: aliyun
+  runtime: nodejs4.4
+  credentials: ~/.aliyuncli/credentials # path must be absolute
+
+plugins:
+  - serverless-aliyun-function-compute
+
+package:
+  exclude:
+    - package-lock.json
+    - .gitignore
+    - .git/**
+    - node_modules/** # exclude all node_modules....
+  include:
+    - node_modules/moment # except necessary ones
+
+functions:
+  currentTime:
+    handler: index.ping
+    events:
+      - http:
+          path: /ping
+          method: get
+
+  currentTime2:
+    handler: index.ping
+    events:
+      - http:
+          path: /ping2
+          method: get
