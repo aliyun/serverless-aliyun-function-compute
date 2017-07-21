@@ -52,7 +52,8 @@ describe('UploadArtifacts', () => {
 
     it('should upload corresponding objects to deployment bucket', () => aliyunDeploy
       .uploadArtifacts().then(() => {
-        expect(consoleLogStub.calledOnce).toEqual(true);
+        expect(consoleLogStub.calledTwice).toEqual(true);
+        expect(consoleLogStub.calledWithExactly('Uploaded serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip')).toEqual(true);
         expect(uploadObjectStub.calledWithExactly(
           'serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip',
           '/project/.serverless/my-service.zip'

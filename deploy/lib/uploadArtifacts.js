@@ -9,6 +9,8 @@ module.exports = {
     const object = this.templates.update.Resources[objectId].Properties;
 
     this.serverless.service.package.artifactFilePath;
-    return this.provider.uploadObject(object.ObjectName, object.LocalPath);
+    return this.provider.uploadObject(object.ObjectName, object.LocalPath).then(() => {
+      this.serverless.cli.log(`Uploaded ${object.ObjectName}`);
+    });
   }
 };
