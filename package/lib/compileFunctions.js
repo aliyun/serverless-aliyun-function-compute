@@ -154,6 +154,7 @@ function getFunctionResource(funcObject, service, serviceName) {
     || service.provider.timeout
     || 30;
 
+  // TODO(joyeecheung): description
   return {
     "Type": "ALIYUN::FC::Function",
     "Properties": {
@@ -234,6 +235,7 @@ function getApiGroupResource(provider, region, stage) {
 }
 
 function getServiceResource(serviceName, region) {
+  // TODO(joyeecheung): description
   return {
     "Type": "ALIYUN::FC::Service",
     "Properties": {

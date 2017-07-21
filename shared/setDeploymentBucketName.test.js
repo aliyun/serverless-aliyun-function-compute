@@ -22,7 +22,7 @@ describe('SetDeploymentBucketName', () => {
     };
     const options = {
       stage: 'dev',
-      region: 'cn-hangzhou',
+      region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunCommand = new AliyunCommand(serverless, options, setDeploymentBucketName);

@@ -19,7 +19,7 @@ describe('Utils', () => {
     it('should set default values for options if not provided', () => aliyunCommand
       .setDefaults().then(() => {
         expect(aliyunCommand.options.stage).toEqual('dev');
-        expect(aliyunCommand.options.region).toEqual('cn-hangzhou');
+        expect(aliyunCommand.options.region).toEqual('cn-shanghai');
       }));
 
     it('should set the options when they are provided', () => {

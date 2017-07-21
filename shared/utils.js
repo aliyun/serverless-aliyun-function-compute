@@ -8,7 +8,7 @@ module.exports = {
     this.options.stage = _.get(this, 'options.stage')
       || 'dev';
     this.options.region = _.get(this, 'options.region')
-      || 'cn-hangzhou';
+      || 'cn-shanghai';
 
     return BbPromise.resolve();
   },

@@ -4,14 +4,14 @@
       "Type": "ALIYUN::OSS:Bucket",
       "Properties": {
         "BucketName": "sls-my-service",
-        "Region": "cn-hangzhou"
+        "Region": "cn-shanghai"
       }
     },
     "sls-function-service": {
       "Type": "ALIYUN::FC::Service",
       "Properties": {
         "name": "my-service-dev",
-        "region": "cn-hangzhou"
+        "region": "cn-shanghai"
       }
     }
   }

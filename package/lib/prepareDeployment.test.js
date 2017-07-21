@@ -38,7 +38,7 @@ describe('PrepareDeployment', () => {
     }
     const options = {
       stage: 'dev',
-      region: 'cn-hangzhou',
+      region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunPackage = new AliyunPackage(serverless, options);
@@ -62,14 +62,14 @@ describe('PrepareDeployment', () => {
             "Type": "ALIYUN::OSS:Bucket",
             "Properties": {
               "BucketName": "my-service",
-              "Region": "cn-hangzhou"
+              "Region": "cn-shanghai"
             }
           },
           "sls-function-service": {
             "Type": "ALIYUN::FC::Service",
             "Properties": {
               "name": "my-service-dev",
-              "region": "cn-hangzhou"
+              "region": "cn-shanghai"
             }
           }
         }

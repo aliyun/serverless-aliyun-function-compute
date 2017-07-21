@@ -27,7 +27,7 @@ describe('setupServices', () => {
     };
     const options = {
       stage: 'dev',
-      region: 'cn-hangzhou',
+      region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunDeploy = new AliyunDeploy(serverless, options);    aliyunDeploy.templates = {
@@ -141,7 +141,7 @@ describe('setupServices', () => {
       createServiceStub.returns(BbPromise.resolve({ serviceId }));
       getBucketStub.returns(BbPromise.resolve({
         name: 'sls-my-service',
-        region: 'cn-hangzhou'
+        region: 'cn-shanghai'
       }));
       createBucketStub.returns(BbPromise.resolve());
       resetOssClientStub.returns();

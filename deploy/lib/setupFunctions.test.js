@@ -47,7 +47,7 @@ describe('setupFunctions', () => {
     };
     const options = {
       stage: 'dev',
-      region: 'cn-hangzhou',
+      region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunDeploy = new AliyunDeploy(serverless, options);
