@@ -156,7 +156,7 @@ module.exports = {
     } else {
       return this.provider.createApi(group, role, api)
         .then((newApi) => {
-          this.serverless.cli.log(`Created API ${api.ApiName}.`);
+          this.serverless.cli.log(`Created API ${api.ApiName}`);
           this.apiMap.set(api.ApiName, newApi);
         }, (err) => {
           this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
@@ -171,7 +171,12 @@ module.exports = {
       const apiProps = this.apiMap.get(api.ApiName);
       return this.provider.deployApi(group, apiProps).then(
       () => {
-        this.serverless.cli.log(`Deployed API ${api.ApiName}...`);
+        this.serverless.cli.log(`Deployed API ${api.ApiName}`);
+        const config = api.RequestConfig;
+        const func = api.ServiceConfig.FunctionComputeConfig;
+        this.serverless.cli.log(`${config.RequestHttpMethod} ` +
+          `http://${this.apiGroup.SubDomain}${config.RequestPath} -> ` +
+          `${func.ServiceName}.${func.FunctionName}`);
       },
       (err) => {
         this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);

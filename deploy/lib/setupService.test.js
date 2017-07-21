@@ -82,7 +82,7 @@ describe('setupServices', () => {
       return aliyunDeploy.checkForExistingService().then((foundService) => {
         expect(foundService).toEqual(undefined);
         expect(getServiceStub
-          .calledWithExactly('my-service-dev', 'cn-hangzhou')).toEqual(true);
+          .calledWithExactly('my-service-dev')).toEqual(true);
       });
     });
     
@@ -96,7 +96,7 @@ describe('setupServices', () => {
       return aliyunDeploy.checkForExistingService().then((foundService) => {
         expect(foundService).toEqual(service);
         expect(getServiceStub
-          .calledWithExactly('my-service-dev', 'cn-hangzhou')).toEqual(true);
+          .calledWithExactly('my-service-dev')).toEqual(true);
       });
     });
   });

@@ -11,10 +11,8 @@ const _ = require('lodash');
 
 const FCClient = require('@alicloud/fc');
 const OSS = require('ali-oss');
-const CloudAPI = function() {};
-const RAM = function() {};
-// const CloudAPI = require('@alicloud/cloudapi');
-// const RAM = require('@alicloud/ram');
+const CloudAPI = require('@alicloud/cloudapi');
+const RAM = require('@alicloud/ram');
 
 const utils = require('../shared/utils');
 
@@ -120,7 +118,7 @@ class AliyunProvider {
     this[ossClientSym] = OSS({
       accessKeyId: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
-      region: `oss-${this.options.region}`
+      region: this.getOssRegion()
     });
     return this[ossClientSym];
   }
@@ -131,13 +129,17 @@ class AliyunProvider {
       accessKeyId: key.aliyun_access_key_id,
       accessKeySecret: key.aliyun_access_key_secret,
       bucket: bucketName,
-      region: `oss-${this.options.region}`
+      region: this.getOssRegion()
     });
     return this[ossClientSym];
   }
 
   getStorageBucketId() {
     return "sls-storage-bucket";
+  }
+
+  getOssRegion(region) {
+    return `oss-${this.options.region}`;
   }
 
   getStorageObjectId() {
@@ -176,9 +178,9 @@ class AliyunProvider {
     return `sls-${eventType}-${funcName}`;
   }
 
-  createBucket(bucketName, region) {
+  createBucket(bucketName) {
     return co(function *() {
-      return yield this.ossClient.putBucket(bucketName, `oss-${region}`)
+      return yield this.ossClient.putBucket(bucketName, this.getOssRegion())
     });
   }
 
@@ -205,15 +207,12 @@ class AliyunProvider {
    * @param {string} serviceName
    * @return {ServiceResponse}
    */
-  getService(serviceName, region, options) {
-    if (region !== this.key.region) {
-      throw new Error(`The credentials are for region ${this.key.region}, ` +
-        `but the service is specified to be deployed in region ${region}`);
-    }
-    return this.fcClient.getService(serviceName, options).catch((err) => {
-      if (err.code === 'ServiceNotFound') return undefined;
-      throw err;
-    });
+  getService(serviceName, options) {
+    return this.fcClient.getService(serviceName, options)
+      .catch((err) => {
+        if (err.code === 'ServiceNotFound') return undefined;
+        throw err;
+      });
   }
 
   /**

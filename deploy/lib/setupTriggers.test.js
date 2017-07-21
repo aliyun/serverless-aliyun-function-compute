@@ -281,6 +281,16 @@ describe('setupTriggers', () => {
           fullGroup,
           fullApis[0]
         )).toEqual(true);
+        expect(consoleLogStub.calledWithExactly(
+          `GET ` +
+          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> ` +
+          `my-service-dev.my-service-dev-currentTime`
+        ));
+        expect(consoleLogStub.calledWithExactly(
+          `GET ` +
+          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> ` +
+          `my-service-dev.my-service-dev-currentTime2`
+        ));
       });
     });
 
@@ -642,7 +652,17 @@ describe('setupTriggers', () => {
           fullGroup,
           fullApis[0]
         )).toEqual(true);
-        expect(consoleLogStub.calledTwice).toEqual(true);
+        expect(consoleLogStub.callCount).toEqual(4);
+        expect(consoleLogStub.calledWithExactly(
+          `GET ` +
+          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping -> ` +
+          `my-service-dev.my-service-dev-currentTime`
+        ));
+        expect(consoleLogStub.calledWithExactly(
+          `GET ` +
+          `http://523e8dc7bbe04613b5b1d726c2a7889d-cn-hangzhou.alicloudapi.com/ping2 -> ` +
+          `my-service-dev.my-service-dev-currentTime2`
+        ));
       });
     });
   });

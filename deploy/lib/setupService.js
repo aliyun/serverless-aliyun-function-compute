@@ -24,7 +24,7 @@ module.exports = {
   checkForExistingService() {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
-    return this.provider.getService(service.name, service.region);
+    return this.provider.getService(service.name);
   },
 
   createServiceIfNotExists(foundService) {
@@ -48,7 +48,7 @@ module.exports = {
   createBucketIfNotExists() {
     const bucket = this.templates.create.Resources[this.provider.getStorageBucketId()].Properties;
 
-    return this.provider.createBucket(bucket.BucketName, bucket.Region)
+    return this.provider.createBucket(bucket.BucketName)
       .then(() => {
         this.provider.resetOssClient(bucket.BucketName);
         this.serverless.cli.log(`Created bucket ${bucket.BucketName}.`);

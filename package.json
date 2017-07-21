@@ -16,7 +16,9 @@
   "author": "Joyee Cheung <joyeec9h3@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@alicloud/cloudapi": "^1.0.0",
     "@alicloud/fc": "^1.1.0",
+    "@alicloud/ram": "^1.0.0",
     "ali-oss": "^4.8.0",
     "bluebird": "^3.5.0",
     "co": "^4.6.0",
