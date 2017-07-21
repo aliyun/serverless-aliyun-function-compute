@@ -23,7 +23,7 @@ describe('setupFunctions', () => {
     "runtime": "nodejs4.4",
     "code": {
       "ossBucketName": "sls-my-service",
-      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+      "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
     }
   }, {
     "name": "my-service-dev-currentTime2",
@@ -34,7 +34,7 @@ describe('setupFunctions', () => {
     "runtime": "nodejs4.4",
     "code": {
       "ossBucketName": "sls-my-service",
-      "ossObjectName": "serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip"
+      "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
     }
   }];
 

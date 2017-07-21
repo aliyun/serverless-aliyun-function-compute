@@ -163,7 +163,7 @@ class AliyunProvider {
   }
 
   getApiGroupName(stage) {
-    return `${this.getServiceName(stage)}-api`;
+    return `${this.getServiceName(stage)}-api`.replace(/-/g, '_');
   }
 
   // If a function is going to be reused by multiple endpoints,
@@ -171,7 +171,7 @@ class AliyunProvider {
   // So the API name is identified by just
   // eventType and funcName
   getApiName(eventType, funcName) {
-    return `sls-${eventType}-${funcName}`;
+    return `sls-${eventType}-${funcName}`.replace(/-/g, '_');
   }
 
   getFunctionLogicalId(name) {

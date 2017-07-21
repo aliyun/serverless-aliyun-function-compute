@@ -58,13 +58,14 @@ describe('UploadArtifacts', () => {
       uploadObjectStub.returns(BbPromise.resolve());
       return aliyunDeploy
       .uploadArtifacts().then(() => {
+        expect(uploadObjectStub.calledOnce).toEqual(true);
         expect(uploadObjectStub.calledWithExactly(
-          'serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip',
-          '/project/.serverless/my-service.zip'
-          )).toEqual(true);
+          'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip',
+          '/projects/my-service.zip'
+        )).toEqual(true);
         const logs = [
-          'Uploading serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip to OSS bucket sls-my-service...',
-          'Uploaded serverless/my-service/dev/1499930388523-2017-07-13T07:19:48.523Z/my-service.zip to OSS bucket sls-my-service'
+          'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
+          'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
