@@ -113,86 +113,30 @@ describe('setupFunctions', () => {
         createFunctionStub.returns(BbPromise.resolve());
         return aliyunDeploy.setupFunctions().then(() => {
           expect(getFunctionStub.calledTwice).toEqual(true);
+          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-currentTime')).toEqual(true);
+          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-currentTime2')).toEqual(true);
+
+          expect(updateFunctionStub.calledAfter(getFunctionStub)).toEqual(true);
+          expect(updateFunctionStub.calledOnce).toEqual(true);
+          expect(updateFunctionStub.calledWithExactly(
+            'my-service-dev',
+            'my-service-dev-currentTime',
+            functions[0]
+          )).toEqual(true);
+
+          expect(createFunctionStub.calledAfter(updateFunctionStub)).toEqual(true);
+          expect(createFunctionStub.calledOnce).toEqual(true);
+          expect(createFunctionStub.calledWithExactly(
+            'my-service-dev',
+            'my-service-dev-currentTime2',
+            functions[1]
+          )).toEqual(true);
+
+          expect(consoleLogStub.calledTwice).toEqual(true);
+          expect(consoleLogStub.calledWithExactly('Updated function my-service-dev-currentTime.')).toEqual(true);
+          expect(consoleLogStub.calledWithExactly('Created function my-service-dev-currentTime2.')).toEqual(true);
         });
       }
     );
-  });
-
-  describe('#checkExistingFunctions()', () => {
-    let getFunctionStub;
-
-    beforeEach(() => {
-      // TODO(joyeecheung): mock to restore later
-      aliyunDeploy.functions = functions;
-      aliyunDeploy.functionMap = new Map();
-      getFunctionStub = sinon.stub(aliyunDeploy.provider, 'getFunction');
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.getFunction.restore();
-    });
-
-    it('should fill in function map with existing functions', () =>  {
-      const expectedMap = new Map([
-        ['my-service-dev-currentTime', true],
-        ['my-service-dev-currentTime2', false]
-      ]);
-        getFunctionStub
-          .withArgs('my-service-dev', 'my-service-dev-currentTime')
-          .returns(BbPromise.resolve(functions[0]));
-        getFunctionStub
-          .withArgs('my-service-dev', 'my-service-dev-currentTime2')
-          .returns(BbPromise.resolve(undefined));
-        return aliyunDeploy.checkExistingFunctions().then(() => {
-          expect(getFunctionStub.calledTwice).toEqual(true);
-          expect(aliyunDeploy.functionMap).toEqual(expectedMap);
-        });
-      }
-    );
-  });
-
-  describe('#createOrUpdateFunctions()', () => {
-    let updateFunctionStub;
-    let createFunctionStub;
-    let consoleLogStub;
-
-    beforeEach(() => {
-      aliyunDeploy.functions = functions;
-      aliyunDeploy.functionMap = new Map([
-        ['my-service-dev-currentTime', true],
-        ['my-service-dev-currentTime2', false]
-      ]);
-      updateFunctionStub = sinon.stub(aliyunDeploy.provider, 'updateFunction');
-      createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');
-      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.updateFunction.restore();
-      aliyunDeploy.provider.createFunction.restore();
-      aliyunDeploy.serverless.cli.log.restore();
-    });
-
-    it('should create and update functions according to the map', () => {
-      updateFunctionStub.returns(BbPromise.resolve());
-      createFunctionStub.returns(BbPromise.resolve());
-
-      return aliyunDeploy.createOrUpdateFunctions().then(() => {
-        expect(updateFunctionStub.calledOnce).toEqual(true);
-        expect(updateFunctionStub.calledWithExactly(
-          'my-service-dev',
-          'my-service-dev-currentTime',
-          functions[0]
-        )).toEqual(true);
-        expect(createFunctionStub.calledOnce).toEqual(true);
-        expect(createFunctionStub.calledWithExactly(
-          'my-service-dev',
-          'my-service-dev-currentTime2',
-          functions[1]
-        )).toEqual(true);
-        expect(consoleLogStub.calledTwice).toEqual(true);
-        expect(createFunctionStub.calledAfter(updateFunctionStub)).toEqual(true);
-      });
-    });
   });
 });

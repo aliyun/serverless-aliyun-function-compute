@@ -35,17 +35,17 @@ module.exports = {
     if (this.functionMap.get(func.name)) {
       return this.provider.updateFunction(func.service, func.name, func)
         .then(() => {
-          this.serverless.cli.log(`Updated ${func.name}.`);
+          this.serverless.cli.log(`Updated function ${func.name}.`);
         }, (err) => {
-          this.serverless.cli.log(`Failed to update ${func.name}!`);
+          this.serverless.cli.log(`Failed to update function ${func.name}!`);
           throw err;
         });
     } else {
       return this.provider.createFunction(func.service, func.name, func)
         .then(() => {
-          this.serverless.cli.log(`Created ${func.name}.`);
+          this.serverless.cli.log(`Created function ${func.name}.`);
         }, (err) => {
-          this.serverless.cli.log(`Failed to create ${func.name}!`);
+          this.serverless.cli.log(`Failed to create function ${func.name}!`);
           throw err;
         });
     }
