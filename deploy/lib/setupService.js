@@ -41,7 +41,7 @@ module.exports = {
       .then((createdService) => {
         // Update existing service id
         this.updateTemplates(createdService.serviceId);
-        this.serverless.cli.log(`Created service ${service.name}.`);
+        this.serverless.cli.log(`Created service ${service.name}`);
       });
   },
 
@@ -54,9 +54,10 @@ module.exports = {
           this.serverless.cli.log(`Bucket ${bucket.BucketName} already exists.`);
           return foundBucket;
         }
+        this.serverless.cli.log(`Creating bucket ${bucket.BucketName}...`);
         return this.provider.createBucket(bucket.BucketName)
           .then(() => {
-            this.serverless.cli.log(`Created bucket ${bucket.BucketName}.`);
+            this.serverless.cli.log(`Created bucket ${bucket.BucketName}`);
           });
     }).then((foundBucket) => {
       this.provider.resetOssClient(bucket.BucketName);

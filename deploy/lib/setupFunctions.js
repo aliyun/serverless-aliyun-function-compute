@@ -33,17 +33,19 @@ module.exports = {
 
   createOrUpdateFunction(func) {
     if (this.functionMap.get(func.name)) {
+      this.serverless.cli.log(`Updating function ${func.name}...`);
       return this.provider.updateFunction(func.service, func.name, func)
         .then(() => {
-          this.serverless.cli.log(`Updated function ${func.name}.`);
+          this.serverless.cli.log(`Updated function ${func.name}`);
         }, (err) => {
           this.serverless.cli.log(`Failed to update function ${func.name}!`);
           throw err;
         });
     } else {
+      this.serverless.cli.log(`Creating function ${func.name}...`);
       return this.provider.createFunction(func.service, func.name, func)
         .then(() => {
-          this.serverless.cli.log(`Created function ${func.name}.`);
+          this.serverless.cli.log(`Created function ${func.name}`);
         }, (err) => {
           this.serverless.cli.log(`Failed to create function ${func.name}!`);
           throw err;

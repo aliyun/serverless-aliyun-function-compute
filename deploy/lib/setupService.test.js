@@ -119,9 +119,16 @@ describe('setupServices', () => {
         expect(resetOssClientStub.calledOnce).toEqual(true);
         expect(resetOssClientStub.calledWithExactly('sls-my-service')).toEqual(true);
 
-        expect(consoleLogStub.calledWithExactly('Creating service my-service-dev...')).toEqual(true);
-        expect(consoleLogStub.calledWithExactly('Created service my-service-dev.')).toEqual(true);
-        expect(consoleLogStub.calledWithExactly('Created bucket sls-my-service.')).toEqual(true);
+        const logs = [
+          'Creating service my-service-dev...',
+          'Created service my-service-dev',
+          'Creating bucket sls-my-service...',
+          'Created bucket sls-my-service'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
       });
     });
 
@@ -153,8 +160,14 @@ describe('setupServices', () => {
         expect(resetOssClientStub.calledWithExactly('sls-my-service')).toEqual(true);
 
         expect(consoleLogStub.calledTwice).toEqual(true);
-        expect(consoleLogStub.calledWithExactly('Service my-service-dev already exists.')).toEqual(true);
-        expect(consoleLogStub.calledWithExactly('Bucket sls-my-service already exists.')).toEqual(true);
+        const logs = [
+          'Service my-service-dev already exists.',
+          'Bucket sls-my-service already exists.'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
       });
     });
   });

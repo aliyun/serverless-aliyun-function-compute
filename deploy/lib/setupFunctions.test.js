@@ -132,9 +132,16 @@ describe('setupFunctions', () => {
             functions[1]
           )).toEqual(true);
 
-          expect(consoleLogStub.calledTwice).toEqual(true);
-          expect(consoleLogStub.calledWithExactly('Updated function my-service-dev-currentTime.')).toEqual(true);
-          expect(consoleLogStub.calledWithExactly('Created function my-service-dev-currentTime2.')).toEqual(true);
+          const logs = [
+            'Updating function my-service-dev-currentTime...',
+            'Updated function my-service-dev-currentTime',
+            'Creating function my-service-dev-currentTime2...',
+            'Created function my-service-dev-currentTime2'
+          ];
+          expect(consoleLogStub.callCount).toEqual(logs.length);
+          for (var i = 0; i < consoleLogStub.callCount; ++i) {
+            expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+          }
         });
       }
     );
