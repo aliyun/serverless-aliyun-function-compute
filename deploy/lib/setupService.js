@@ -38,9 +38,9 @@ module.exports = {
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
     return this.provider.createService(service.name)
-      .then((service) => {
+      .then((createdService) => {
         // Update existing service id
-        this.updateTemplates(service.serviceId);
+        this.updateTemplates(createdService.serviceId);
         this.serverless.cli.log(`Created service ${service.name}.`);
       });
   },
@@ -48,17 +48,18 @@ module.exports = {
   createBucketIfNotExists() {
     const bucket = this.templates.create.Resources[this.provider.getStorageBucketId()].Properties;
 
-    return this.provider.createBucket(bucket.BucketName)
-      .then(() => {
-        this.provider.resetOssClient(bucket.BucketName);
-        this.serverless.cli.log(`Created bucket ${bucket.BucketName}.`);
-      }, (err) => {
-        if (err.name === 'BucketAlreadyExistsError') {
-          this.provider.resetOssClient(bucket.BucketName);
+    return this.provider.getBucket(bucket.BucketName)
+      .then((foundBucket) => {
+        if (foundBucket) { 
           this.serverless.cli.log(`Bucket ${bucket.BucketName} already exists.`);
-          return undefined;
+          return foundBucket;
         }
-        throw err;
-      });
+        return this.provider.createBucket(bucket.BucketName)
+          .then(() => {
+            this.serverless.cli.log(`Created bucket ${bucket.BucketName}.`);
+          });
+    }).then((foundBucket) => {
+      this.provider.resetOssClient(bucket.BucketName);
+    });
   }
 };

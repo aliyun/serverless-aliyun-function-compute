@@ -65,115 +65,96 @@ describe('setupServices', () => {
     );
   });
 
-  describe('#checkForExistingService()', () => {
+  describe('#setupService()', () => {
     let getServiceStub;
-
-    beforeEach(() => {
-      getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
-    });
-
-    afterEach(() => {
-      aliyunDeploy.provider.getService.restore();
-    });
-
-    it('should return "undefined" if no existing services are found', () => {
-      getServiceStub.returns(BbPromise.resolve(undefined));
-
-      return aliyunDeploy.checkForExistingService().then((foundService) => {
-        expect(foundService).toEqual(undefined);
-        expect(getServiceStub
-          .calledWithExactly('my-service-dev')).toEqual(true);
-      });
-    });
-    
-    it('should return service if an existing service is found', () => {
-      const service = {
-        serviceId: new Date().getTime().toString(16)
-      };
-
-      getServiceStub.returns(BbPromise.resolve(service));
-
-      return aliyunDeploy.checkForExistingService().then((foundService) => {
-        expect(foundService).toEqual(service);
-        expect(getServiceStub
-          .calledWithExactly('my-service-dev')).toEqual(true);
-      });
-    });
-  });
-
-  describe('#createServiceIfNotExists()', () => {
     let consoleLogStub;
     let createServiceStub;
-
-    beforeEach(() => {
-      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-      createServiceStub = sinon.stub(aliyunDeploy.provider, 'createService');
-    });
-
-    afterEach(() => {
-      aliyunDeploy.serverless.cli.log.restore();
-      aliyunDeploy.provider.createService.restore();
-    });
-
-    it('should resolve if there is a existing service', () => {
-      const serviceId = new Date().getTime().toString(16);
-      createServiceStub.returns(BbPromise.resolve());
-
-      return aliyunDeploy.createServiceIfNotExists({
-        serviceId: serviceId
-      }).then(() => {
-        expect(consoleLogStub.calledOnce).toEqual(true);
-        expect(aliyunDeploy.templates.create.Resources['sls-function-service'].Properties.id).toEqual(serviceId);
-        expect(aliyunDeploy.templates.update.Resources['sls-function-service'].Properties.id).toEqual(serviceId);
-      });
-    });
-
-    it('should create a service if there are no existing services', () => {
-      const serviceId = new Date().getTime().toString(16);
-      createServiceStub.returns(BbPromise.resolve({
-        serviceId: serviceId
-      }));
-      return aliyunDeploy.createServiceIfNotExists(undefined).then(() => {
-        expect(consoleLogStub.calledTwice).toEqual(true);
-        expect(createServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
-        expect(aliyunDeploy.templates.create.Resources[aliyunDeploy.provider.getServiceId()].Properties.id).toEqual(serviceId);
-        expect(aliyunDeploy.templates.update.Resources[aliyunDeploy.provider.getServiceId()].Properties.id).toEqual(serviceId);
-      });
-    });
-  });
-
-  describe('#createBucketIfNotExists()', () => {
-    let consoleLogStub;
+    let getBucketStub;
     let createBucketStub;
     let resetOssClientStub;
 
     beforeEach(() => {
+      getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+      createServiceStub = sinon.stub(aliyunDeploy.provider, 'createService');
+      getBucketStub = sinon.stub(aliyunDeploy.provider, 'getBucket');
       createBucketStub = sinon.stub(aliyunDeploy.provider, 'createBucket');
       resetOssClientStub = sinon.stub(aliyunDeploy.provider, 'resetOssClient');
     });
 
     afterEach(() => {
+      aliyunDeploy.provider.getService.restore();
       aliyunDeploy.serverless.cli.log.restore();
+      aliyunDeploy.provider.createService.restore();
+      aliyunDeploy.provider.getBucket.restore();
       aliyunDeploy.provider.createBucket.restore();
       aliyunDeploy.provider.resetOssClient.restore();
     });
 
-    it('should resolve if there is a existing bucket', () => {
-      const err = new Error();
-      err.name = 'BucketAlreadyExistsError';
-      createBucketStub.returns(BbPromise.reject(err))
-      return aliyunDeploy.createBucketIfNotExists().then(() => {
-        expect(consoleLogStub.calledOnce).toEqual(true);
+    it('should set up service from scratch', () => {
+      const serviceId = new Date().getTime().toString(16);
+      getServiceStub.returns(BbPromise.resolve(undefined));
+      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getBucketStub.returns(BbPromise.resolve(undefined));
+      createBucketStub.returns(BbPromise.resolve());
+      resetOssClientStub.returns();
+
+      return aliyunDeploy.setupService().then(() => {
+        expect(getServiceStub.calledOnce).toEqual(true);
+        expect(getServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
+
+        expect(createServiceStub.calledAfter(getServiceStub)).toEqual(true);
+        expect(createServiceStub.calledOnce).toEqual(true);
+        expect(createServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
+
+        expect(getBucketStub.calledAfter(createServiceStub)).toEqual(true);
+        expect(getBucketStub.calledOnce).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+
+        expect(createBucketStub.calledAfter(getBucketStub)).toEqual(true);
+        expect(createBucketStub.calledOnce).toEqual(true);
+        expect(createBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+
+        expect(resetOssClientStub.calledAfter(createBucketStub)).toEqual(true);
+        expect(resetOssClientStub.calledOnce).toEqual(true);
         expect(resetOssClientStub.calledWithExactly('sls-my-service')).toEqual(true);
+
+        expect(consoleLogStub.calledWithExactly('Creating service my-service-dev...')).toEqual(true);
+        expect(consoleLogStub.calledWithExactly('Created service my-service-dev.')).toEqual(true);
+        expect(consoleLogStub.calledWithExactly('Created bucket sls-my-service.')).toEqual(true);
       });
     });
 
-    it('should create a bucket if there are no existing buckets', () => {
+    it('should handle existing service ', () => {
+      const serviceId = new Date().getTime().toString(16);
+      getServiceStub.returns(BbPromise.resolve({ serviceId }));
+      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getBucketStub.returns(BbPromise.resolve({
+        name: 'sls-my-service',
+        region: 'cn-hangzhou'
+      }));
       createBucketStub.returns(BbPromise.resolve());
-      return aliyunDeploy.createBucketIfNotExists().then(() => {
-        expect(consoleLogStub.calledOnce).toEqual(true);
+      resetOssClientStub.returns();
+
+      return aliyunDeploy.setupService().then(() => {
+        expect(getServiceStub.calledOnce).toEqual(true);
+        expect(getServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
+
+        expect(createServiceStub.called).toEqual(false);
+
+        expect(getBucketStub.calledAfter(getServiceStub)).toEqual(true);
+        expect(getBucketStub.calledOnce).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+
+        expect(createBucketStub.calledOnce).toEqual(false);
+
+        expect(resetOssClientStub.calledAfter(getBucketStub)).toEqual(true);
+        expect(resetOssClientStub.calledOnce).toEqual(true);
         expect(resetOssClientStub.calledWithExactly('sls-my-service')).toEqual(true);
+
+        expect(consoleLogStub.calledTwice).toEqual(true);
+        expect(consoleLogStub.calledWithExactly('Service my-service-dev already exists.')).toEqual(true);
+        expect(consoleLogStub.calledWithExactly('Bucket sls-my-service already exists.')).toEqual(true);
       });
     });
   });

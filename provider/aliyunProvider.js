@@ -178,6 +178,23 @@ class AliyunProvider {
     return `sls-${eventType}-${funcName}`;
   }
 
+  /**
+   * @param {string} bucketName
+   * @returns {{name: string, region: string, creationDate: string}}
+   */
+  getBucket(bucketName) {
+    // TODO(joyeecheung): handle buckets with the same name
+    // in a different region
+    return co(function *() {
+      const res = yield this.ossClient.listBuckets({ prefix: bucketName });
+      const bucket = res.buckets.find((b) => b.name === bucketName);
+      return bucket;
+    });
+  }
+
+  /**
+   * @param {string} bucketName 
+   */
   createBucket(bucketName) {
     return co(function *() {
       return yield this.ossClient.putBucket(bucketName, this.getOssRegion())
