@@ -403,7 +403,6 @@ class AliyunProvider {
    * https://help.aliyun.com/document_detail/43611.html
    */
   createApiGroup(props) {
-    console.log(props);
     return this.agClient.createApiGroup(props);
   }
 
@@ -464,6 +463,7 @@ class AliyunProvider {
     const query = Object.assign({}, props, { PageSize: 50 });
     return this.agClient.describeApis(query)
       .then((res) => {
+        if (!res.ApiSummarys) return [];
         const apis = res.ApiSummarys.ApiSummary;
         if (res.TotalCount > apis.length) {
           // TODO(joyeecheung): pagination

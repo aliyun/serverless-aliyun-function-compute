@@ -11,6 +11,18 @@ module.exports = {
       .then(this.validateHandlers);
   },
 
+  validateApiGroupName() {
+    // characters, digits, underscores
+  },
+
+  validateApiName() {
+    // characters, digits, underscores
+  },
+
+  validateBucketName() {
+    // characters, digits, dashes
+  },
+
   validateServicePath() {
     if (!this.serverless.config.servicePath) {
       throw new Error('This command can only be run inside a service directory');

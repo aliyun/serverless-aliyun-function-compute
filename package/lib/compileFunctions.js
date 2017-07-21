@@ -176,11 +176,15 @@ function getRequestConfig(eventType, event) {
   return {
     "RequestProtocol": eventType.toUpperCase(),
     "RequestHttpMethod": (event.RequestHttpMethod || event.method || "GET").toUpperCase(),
-    "RequestPath": event.RequestPath || event.path,
+    "RequestPath": fixPath(event.RequestPath || event.path),
     "RequestParameters": event.RequestParameters || [],
     "BodyFormat": event.BodyFormat || '',
     "PostBodyDescription": ""
   };
+}
+
+function fixPath(path) {
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 function getServiceConfig(event, funcObject, provider, stage, region) {
