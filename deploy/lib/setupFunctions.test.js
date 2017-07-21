@@ -45,15 +45,16 @@ describe('setupFunctions', () => {
       name: 'aliyun',
       credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
     };
-    serverless.config = {
-      servicePath: path.join(__dirname, '..', '..', 'test')
-    };
     const options = {
       stage: 'dev',
       region: 'cn-hangzhou',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     aliyunDeploy = new AliyunDeploy(serverless, options);
+    aliyunDeploy.templates = {
+      create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
+      update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
+    }
   });
 
   describe('#setupFunctions()', () => {

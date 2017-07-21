@@ -5,6 +5,7 @@ const path = require('path');
 
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
+const loadTemplates = require('./lib/loadTemplates');
 const setupService = require('./lib/setupService');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
@@ -16,20 +17,11 @@ class AliyunDeploy {
     this.options = options;
     this.provider = this.serverless.getProvider('aliyun');
 
-    const createFilePath = path.join(this.serverless.config.servicePath,
-      '.serverless', 'configuration-template-create.json');
-    const updateFilePath = path.join(this.serverless.config.servicePath,
-      '.serverless', 'configuration-template-update.json');
-
-    this.templates = {
-      create: this.serverless.utils.readFileSync(createFilePath),
-      update: this.serverless.utils.readFileSync(updateFilePath)
-    };
-
     Object.assign(
       this,
       validate,
       utils,
+      loadTemplates,
       setupService,
       uploadArtifacts,
       setupFunctions,
@@ -38,7 +30,8 @@ class AliyunDeploy {
     this.hooks = {
       'before:deploy:deploy': () => BbPromise.bind(this)
         .then(this.validate)
-        .then(this.setDefaults),
+        .then(this.setDefaults)
+        .then(this.loadTemplates),
 
       'deploy:deploy': () => BbPromise.bind(this)
         .then(this.setupService)

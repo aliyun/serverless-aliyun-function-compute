@@ -144,7 +144,10 @@ describe('setupTriggers', () => {
       region: 'cn-hangzhou',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
-    aliyunDeploy = new AliyunDeploy(serverless, options);
+    aliyunDeploy = new AliyunDeploy(serverless, options);    aliyunDeploy.templates = {
+      create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
+      update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
+    }
   });
 
   describe('#setupTriggers()', () => {
