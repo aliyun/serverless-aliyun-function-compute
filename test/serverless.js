@@ -13,6 +13,9 @@ class Serverless {
     };
     this.service.getFunction = function (functionName) { //eslint-disable-line
       // NOTE the stage is always 'dev'!
+      if (!this.functions[functionName]) {
+        throw new Error(`Function "${functionName}" doesn't exist in this Service`);
+      }
       this.functions[functionName]
         .name = `${this.service}-dev-${functionName}`;
       return this.functions[functionName];

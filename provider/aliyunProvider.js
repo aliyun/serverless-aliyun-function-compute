@@ -330,7 +330,7 @@ class AliyunProvider {
    * https://help.aliyun.com/document_detail/52877.html#invokeresponse
    */
   invokeFunction(serviceName, functionName, event) {
-    return this.fcClient.invokeFunction(serviceName, functionName);
+    return this.fcClient.invokeFunction(serviceName, functionName, event);
   }
 
   /**

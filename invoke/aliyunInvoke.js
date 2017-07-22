@@ -4,6 +4,7 @@ const BbPromise = require('bluebird');
 
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
+const invokeFunction = require('./lib/invokeFunction');
 
 class AliyunInvoke {
   constructor(serverless, options) {
@@ -15,15 +16,16 @@ class AliyunInvoke {
       this,
       validate,
       utils,
+      invokeFunction
     );
 
     this.hooks = {
-      // 'before:invoke:invoke': () => BbPromise.bind(this)
-      //   .then(this.validate)
-      //   .then(this.setDefaults),
+      'before:invoke:invoke': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.setDefaults),
 
-      // 'invoke:invoke': () => BbPromise.bind(this)
-      //   .then(this.invokeFunction),
+      'invoke:invoke': () => BbPromise.bind(this)
+        .then(this.invokeFunction),
     };
   }
 }
