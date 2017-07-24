@@ -11,7 +11,7 @@ const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
 const { apiGroup, apis, group, fullGroup, role, fullRole, fullApis, functions } = require('../../test/data');
 
-describe('setupTriggers', () => {
+describe('setupEvents', () => {
   let serverless;
   let aliyunDeploy;
 
@@ -36,7 +36,7 @@ describe('setupTriggers', () => {
     }
   });
 
-  describe('#setupTriggers()', () => {
+  describe('#setupEvents()', () => {
     let createApisIfNeededStub;
     let createTriggersIfNeededStub;
 
@@ -53,14 +53,14 @@ describe('setupTriggers', () => {
     });
 
     it('should run promise chain', () => aliyunDeploy
-      .setupTriggers().then(() => {
+      .setupEvents().then(() => {
         expect(createApisIfNeededStub.calledOnce).toEqual(true);
         expect(createTriggersIfNeededStub.calledAfter(createApisIfNeededStub));
       })
     );
 
     it('should set apis property', () => {
-      return aliyunDeploy.setupTriggers().then(() => {
+      return aliyunDeploy.setupEvents().then(() => {
           expect(aliyunDeploy.apis).toEqual(apis);
         });
       }
@@ -68,7 +68,7 @@ describe('setupTriggers', () => {
   });
 
 
-  describe('#setupTriggers()', () => {
+  describe('#setupEvents()', () => {
     let getApiGroupStub;
     let createApiGroupStub;
     let getApiRoleStub;
@@ -122,7 +122,7 @@ describe('setupTriggers', () => {
       createApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
 
-      return aliyunDeploy.setupTriggers().then(() => {
+      return aliyunDeploy.setupEvents().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
@@ -217,7 +217,7 @@ describe('setupTriggers', () => {
       updateApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
 
-      return aliyunDeploy.setupTriggers().then(() => {
+      return aliyunDeploy.setupEvents().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 

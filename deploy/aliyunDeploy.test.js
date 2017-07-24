@@ -60,7 +60,7 @@ describe('AliyunDeploy', () => {
       let setupServiceStub;
       let uploadArtifactsStub;
       let setupFunctionsStub;
-      let setupTriggersStub;
+      let setupEventsStub;
 
       beforeEach(() => {
         validateStub = sinon.stub(aliyunDeploy, 'validate')
@@ -75,7 +75,7 @@ describe('AliyunDeploy', () => {
           .returns(BbPromise.resolve());
         setupFunctionsStub = sinon.stub(aliyunDeploy, 'setupFunctions')
           .returns(BbPromise.resolve());
-        setupTriggersStub = sinon.stub(aliyunDeploy, 'setupTriggers')
+        setupEventsStub = sinon.stub(aliyunDeploy, 'setupEvents')
           .returns(BbPromise.resolve());
       });
 
@@ -86,7 +86,7 @@ describe('AliyunDeploy', () => {
         aliyunDeploy.setupService.restore();
         aliyunDeploy.uploadArtifacts.restore();
         aliyunDeploy.setupFunctions.restore();
-        aliyunDeploy.setupTriggers.restore();
+        aliyunDeploy.setupEvents.restore();
       });
 
       it('should run "before:deploy:deploy" promise chain', () => aliyunDeploy
@@ -101,7 +101,7 @@ describe('AliyunDeploy', () => {
           expect(setupServiceStub.calledOnce).toEqual(true);
           expect(uploadArtifactsStub.calledAfter(setupServiceStub)).toEqual(true);
           expect(setupFunctionsStub.calledAfter(uploadArtifactsStub)).toEqual(true);
-          expect(setupTriggersStub.calledAfter(setupFunctionsStub)).toEqual(true);
+          expect(setupEventsStub.calledAfter(setupFunctionsStub)).toEqual(true);
         }));
     });
   });

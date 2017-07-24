@@ -7,7 +7,7 @@ const _ = require('lodash');
 const BbPromise = require('bluebird');
 
 module.exports = {
-  setupTriggers() {
+  setupEvents() {
     this.apis = _.filter(
       this.templates.update.Resources,
       (item) => this.provider.isApiType(item.Type))

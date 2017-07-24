@@ -9,7 +9,7 @@ const loadTemplates = require('./lib/loadTemplates');
 const setupService = require('./lib/setupService');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
-const setupTriggers = require('./lib/setupTriggers');
+const setupEvents = require('./lib/setupEvents');
 
 class AliyunDeploy {
   constructor(serverless, options) {
@@ -25,7 +25,7 @@ class AliyunDeploy {
       setupService,
       uploadArtifacts,
       setupFunctions,
-      setupTriggers);
+      setupEvents);
 
     this.hooks = {
       'before:deploy:deploy': () => BbPromise.bind(this)
@@ -37,7 +37,7 @@ class AliyunDeploy {
         .then(this.setupService)
         .then(this.uploadArtifacts)
         .then(this.setupFunctions)
-        .then(this.setupTriggers)
+        .then(this.setupEvents)
     };
   }
 }
