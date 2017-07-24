@@ -226,10 +226,37 @@ class AliyunProvider {
     });
   }
 
+  /**
+   * @param {string} bucketName 
+   */
+  deleteBucket(bucketName) {
+    const ossClient = this.ossClient;
+    const region = this.getOssRegion();
+    return co(function *deleteBucket() {
+      return yield ossClient.deleteBucket(bucketName, region)
+    });
+  }
+
   uploadObject(objectName, filePath) {
     const ossClient = this.ossClient;
     return co(function *uploadObject() {
       return yield ossClient.put(objectName, filePath)
+    });
+  }
+
+  deleteObjects(objectNames) {
+    const ossClient = this.ossClient;
+    return co(function *deleteObjects() {
+      return yield ossClient.deleteMulti(objectNames)
+    });
+  }
+
+  listObjects() {
+    // TODO(joyeecheung): handle >= 1000 objects
+    const ossClient = this.ossClient;
+    return co(function *listObjects() {
+      const res = yield ossClient.list({ 'max-keys': 999 });
+      return res.objects;
     });
   }
 
@@ -256,6 +283,10 @@ class AliyunProvider {
    */
   createService(serviceName, options) {
     return this.fcClient.createService(serviceName, options);
+  }
+
+  deleteService(serviceName, options) {
+    return this.fcClient.deleteService(serviceName, options);
   }
 
   /**
@@ -306,11 +337,18 @@ class AliyunProvider {
 
   /**
    * @param {string} serviceName
-   * @return {{ functions: Function[], nextToken: string}}
+   * @return {{name: string, id: string}}
    * TODO(joyeecheung): paging
    */
   listFunctions(serviceName) {
-    return this.fcClient.listFunction(serviceName);
+    return this.fcClient.listFunction(serviceName).then((res) => {
+      const functions = res.functions;
+      if (!functions) return [];
+      return functions.map((item) => ({
+        name: item.functionName,
+        id: item.functionId
+      }));
+    });
   }
 
   /**
@@ -398,6 +436,14 @@ class AliyunProvider {
   }
 
   /**
+   * @param {{GroupId: string}} group
+   * https://help.aliyun.com/document_detail/43617.html
+   */
+  deleteApiGroup(group) {
+    return this.agClient.deleteApiGroup(group);
+  }
+
+  /**
    * @param {{GroupName: string, Description: string}} props
    * @return {{GroupId: string, GroupName: string, SubDomain: string}}
    * https://help.aliyun.com/document_detail/43611.html
@@ -458,6 +504,7 @@ class AliyunProvider {
   /**
    * @param {{GroupId: string}} props 
    * @returns {{GroupId: string, ApiName: string, ApiId: string}[]} 
+   * https://help.aliyun.com/document_detail/43626.html
    */
   getApis(props) {
     const query = Object.assign({}, props, { PageSize: 50 });
@@ -496,6 +543,20 @@ class AliyunProvider {
   }
 
   /**
+   * 
+   * @param {{GroupId: string}} group 
+   * @param {{ApiId: string}} api 
+   * https://help.aliyun.com/document_detail/43639.html
+   */
+  deleteApi(group, api) {
+    const props = {
+      GroupId: group.GroupId,
+      ApiId: api.ApiId
+    };
+    return this.agClient.deleteApi(props);
+  }
+
+  /**
    * @param {object} props
    * https://help.aliyun.com/document_detail/43623.html
    */
@@ -512,6 +573,36 @@ class AliyunProvider {
       Description: "Release by the Serverless framework"
     };
     return this.agClient.deployApi(props);
+  }
+
+  /**
+   * @param {{GroupId: string}} props 
+   * @returns {{GroupId: string, ApiName: string, ApiId: string}[]} 
+   */
+  getDeployedApis(props) {
+    const query = {
+      GroupId: props.GroupId,
+      StageName: "RELEASE",  // TODO(joyeecheung): should be based on this.options.stage?
+      PageSize: 50  // TODO(joyeecheung): pagination
+    };
+    return this.agClient.describeDeployedApis(query)
+      .then((res) => {
+        if (!res.DeployedApis) return [];
+        const apis = res.DeployedApis.DeployedApiItem;
+        if (res.TotalCount > apis.length) {
+          // TODO(joyeecheung): pagination
+        }
+        return apis;
+      });
+  }
+
+  abolishApi(group, api) {
+    const props = {
+      GroupId: group.GroupId,
+      ApiId: api.ApiId,
+      StageName: "RELEASE",  // TODO(joyeecheung): should be based on this.options.stage?
+    };
+    return this.agClient.abolishApi(props);
   }
 }
 
