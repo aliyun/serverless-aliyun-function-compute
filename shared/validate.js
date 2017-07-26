@@ -48,7 +48,7 @@ module.exports = {
 
   validateHandlers() {
     const functions = this.serverless.service.functions;
-    _.forEach(functions, (funcVal, funcKey) => {
+    _.forEach(functions, (funcObject, funcKey) => {
       if (!/^[a-zA-Z_][a-zA-Z0-9\-_]*$/.test(funcKey)) {
         throw new Error(
           `The name of your function ${funcKey} is invalid. A function` +
@@ -61,7 +61,16 @@ module.exports = {
           ' name should not be longer than 128 characters');
       }
 
-      if (!/^[^.]+\.[^.]+$/.test(funcVal.handler)) {
+      if (!funcObject.handler) {
+        const errorMessage = [
+          `Missing "handler" property for function "${funcKey}".`,
+          ' Your function needs a "handler".',
+          ' Please check the docs for more info.',
+        ].join('');
+        throw new Error(errorMessage);
+      }
+
+      if (!/^[^.]+\.[^.]+$/.test(funcObject.handler)) {
         const errorMessage = [
           `The "handler" property for the function "${funcKey}" is invalid.`,
           ' Handlers should be specified like ${fileName}.${funcName}',
@@ -72,4 +81,41 @@ module.exports = {
     });
     return BbPromise.resolve();
   },
+
+  validateEventsProperty () {
+    const functions = this.serverless.service.functions;
+    _.forEach(functions, (funcObject, funcKey) => {
+
+      if (!funcObject.events || funcObject.events.length === 0) {
+        const errorMessage = [
+          `Missing "events" property for function "${funcKey}".`,
+          ' Your function needs at least one "event".',
+          ' Please check the docs for more info.',
+        ].join('');
+        throw new Error(errorMessage);
+      }
+
+      if (funcObject.events.length > 1) {
+        const errorMessage = [
+          `The function "${funcKey}" has more than one event.`,
+          ' Only one event per function is supported.',
+          ' Please check the docs for more info.',
+        ].join('');
+        throw new Error(errorMessage);
+      }
+
+      const supportedEvents = [
+        'http',
+        // 'event'
+      ];
+      const eventType = Object.keys(funcObject.events[0])[0];
+      if (supportedEvents.indexOf(eventType) === -1) {
+        const errorMessage = [
+          `Event type "${eventType}" of function "${funcKey}" not supported.`,
+          ` supported event types are: ${supportedEvents.join(', ')}`,
+        ].join('');
+        throw new Error(errorMessage);
+      }
+    });
+  }
 };

@@ -54,9 +54,6 @@ module.exports = {
       this.serverless.cli
         .log(`Compiling function "${functionName}"...`);
 
-      validateHandlerProperty(funcObject, functionName);
-      validateEventsProperty(funcObject, functionName);
-
       const funcId = this.provider.getFunctionLogicalId(funcObject.name);
       const funcResource = getFunctionResource(
         funcObject,
@@ -98,50 +95,6 @@ module.exports = {
         _.merge(resources, { [apiName]: apiResource });
       }
     });
-  }
-};
-
-function validateHandlerProperty(funcObject, functionName) {
-  if (!funcObject.handler) {
-    const errorMessage = [
-      `Missing "handler" property for function "${functionName}".`,
-      ' Your function needs a "handler".',
-      ' Please check the docs for more info.',
-    ].join('');
-    throw new Error(errorMessage);
-  }
-}
-
-function validateEventsProperty (funcObject, functionName) {
-  if (!funcObject.events || funcObject.events.length === 0) {
-    const errorMessage = [
-      `Missing "events" property for function "${functionName}".`,
-      ' Your function needs at least one "event".',
-      ' Please check the docs for more info.',
-    ].join('');
-    throw new Error(errorMessage);
-  }
-
-  if (funcObject.events.length > 1) {
-    const errorMessage = [
-      `The function "${functionName}" has more than one event.`,
-      ' Only one event per function is supported.',
-      ' Please check the docs for more info.',
-    ].join('');
-    throw new Error(errorMessage);
-  }
-
-  const supportedEvents = [
-    'http',
-    // 'event'
-  ];
-  const eventType = Object.keys(funcObject.events[0])[0];
-  if (supportedEvents.indexOf(eventType) === -1) {
-    const errorMessage = [
-      `Event type "${eventType}" of function "${functionName}" not supported.`,
-      ` supported event types are: ${supportedEvents.join(', ')}`,
-    ].join('');
-    throw new Error(errorMessage);
   }
 };
 

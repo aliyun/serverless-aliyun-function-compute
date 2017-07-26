@@ -87,6 +87,16 @@ describe('Validate', () => {
   });
 
   describe('#validateHandlers()', () => {
+    it('should throw an error if the function has no handler property', () => {
+      aliyunCommand.serverless.service.functions = {
+        func1: {
+          handler: null,
+        },
+      };
+
+      expect(() => aliyunCommand.validateHandlers()).toThrow(Error);
+    });
+
     it('should throw an error if the handler name is invalid', () => {
       aliyunCommand.serverless.service.functions = {
         foo: {
@@ -111,6 +121,57 @@ describe('Validate', () => {
       };
 
       expect(() => aliyunCommand.validateHandlers()).not.toThrow(Error);
+    });
+  });
+
+  describe('#validateEventsProperty()', () => {
+    it('should throw an error if the function has no events property', () => {
+      aliyunCommand.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          events: null,
+        },
+      };
+
+      expect(() => aliyunCommand.validateEventsProperty()).toThrow(Error);
+    });
+
+    it('should throw an error if the function has 0 events', () => {
+      aliyunCommand.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          events: [],
+        },
+      };
+
+      expect(() => aliyunCommand.validateEventsProperty()).toThrow(Error);
+    });
+
+    it('should throw an error if the function has more than 1 event', () => {
+      aliyunCommand.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          events: [
+            { http: 'event1' },
+            { http: 'event2' },
+          ],
+        },
+      };
+
+      expect(() => aliyunCommand.validateEventsProperty()).toThrow(Error);
+    });
+
+    it('should throw an error if the functions event is not supported', () => {
+      aliyunCommand.serverless.service.functions = {
+        func1: {
+          handler: 'func1',
+          events: [
+            { invalidEvent: 'event1' },
+          ],
+        },
+      };
+
+      expect(() => aliyunCommand.validateEventsProperty()).toThrow(Error);
     });
   });
 });

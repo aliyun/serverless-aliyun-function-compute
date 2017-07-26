@@ -70,65 +70,6 @@ describe('CompileFunctions', () => {
   });
 
   describe('#compileFunctions()', () => {
-    it('should throw an error if the function has no handler property', () => {
-      aliyunPackage.serverless.service.functions = {
-        func1: {
-          handler: null,
-        },
-      };
-
-      expect(() => aliyunPackage.compileFunctions()).toThrow(Error);
-    });
-
-    it('should throw an error if the function has no events property', () => {
-      aliyunPackage.serverless.service.functions = {
-        func1: {
-          handler: 'func1',
-          events: null,
-        },
-      };
-
-      expect(() => aliyunPackage.compileFunctions()).toThrow(Error);
-    });
-
-    it('should throw an error if the function has 0 events', () => {
-      aliyunPackage.serverless.service.functions = {
-        func1: {
-          handler: 'func1',
-          events: [],
-        },
-      };
-
-      expect(() => aliyunPackage.compileFunctions()).toThrow(Error);
-    });
-
-    it('should throw an error if the function has more than 1 event', () => {
-      aliyunPackage.serverless.service.functions = {
-        func1: {
-          handler: 'func1',
-          events: [
-            { http: 'event1' },
-            { http: 'event2' },
-          ],
-        },
-      };
-
-      expect(() => aliyunPackage.compileFunctions()).toThrow(Error);
-    });
-
-    it('should throw an error if the functions event is not supported', () => {
-      aliyunPackage.serverless.service.functions = {
-        func1: {
-          handler: 'func1',
-          events: [
-            { invalidEvent: 'event1' },
-          ],
-        },
-      };
-
-      expect(() => aliyunPackage.compileFunctions()).toThrow(Error);
-    });
-
     it('should set the memory size based on the functions configuration', () => {
       aliyunPackage.serverless.service.functions = {
         func1: {
