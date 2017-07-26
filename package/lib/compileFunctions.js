@@ -11,7 +11,7 @@ module.exports = {
   compileFunctions() {
     this.compileStorage();
     this.compileService();
-    this._compileFunctions();
+    this.compileFunctionsAndEvents();
     return BbPromise.resolve();
   },
 
@@ -45,7 +45,7 @@ module.exports = {
     _.merge(resources, { [serviceId]: serviceResource});
   },
 
-  _compileFunctions() {
+  compileFunctionsAndEvents() {
     const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     const serviceName = this.provider.getServiceName(this.options.stage);
     this.serverless.service.getAllFunctions().forEach((functionName) => {
