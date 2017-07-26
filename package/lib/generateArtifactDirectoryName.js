@@ -5,11 +5,11 @@ const BbPromise = require('bluebird');
 module.exports = {
   generateArtifactDirectoryName() {
     const date = new Date();
-    const serviceWithStage = `${this.serverless.service.service}/${this.options.stage}`;
+    const prefix = this.provider.getArtifactDirectoryPrefix();
     const dateString = `${date.getTime().toString()}-${date.toISOString()}`;
 
     this.serverless.service.package
-      .artifactDirectoryName = `serverless/${serviceWithStage}/${dateString}`;
+      .artifactDirectoryName = `${prefix}/${dateString}`;
     this.serverless.service.stage = this.options.stage;
 
     return BbPromise.resolve();

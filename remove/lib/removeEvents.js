@@ -1,4 +1,5 @@
 'use strict';
+const BbPromise = require('bluebird');
 
 module.exports = {
   removeEvents() {
@@ -26,8 +27,6 @@ module.exports = {
   },
 
   getApiInfo() {
-    const groupName = this.provider.getApiGroupName(this.options.stage);
-
     return BbPromise.bind(this)
       .then(this.getApiGroup)
       .then(this.getApis)
@@ -35,6 +34,7 @@ module.exports = {
   },
 
   getApiGroup() {
+    const groupName = this.provider.getApiGroupName(this.options.stage);
     return this.provider.getApiGroup(groupName).then((group) => {
       this.apiGroup = group;
       return group;
@@ -45,8 +45,9 @@ module.exports = {
     if (!this.apiGroup) {
       return BbPromise.resolve();
     }
+    const groupId = this.apiGroup.GroupId;
 
-    return this.provider.getApis(group).then((apis) => {
+    return this.provider.getApis({ GroupId:  groupId}).then((apis) => {
       this.apis = apis;
       return apis;
     });
@@ -56,7 +57,8 @@ module.exports = {
     if (!this.apiGroup || !this.apis.length) {
       return BbPromise.resolve();
     }
-    return this.provider.getDeployedApis(group).then((deployedApis) => {
+    const groupId = this.apiGroup.GroupId;
+    return this.provider.getDeployedApis({ GroupId: groupId }).then((deployedApis) => {
       this.deployedApis = deployedApis;
       return deployedApis;
     });
@@ -64,30 +66,43 @@ module.exports = {
 
   abolishApisIfDeployed() {
     if (!this.deployedApis.length) {
+      this.serverless.cli.log(`No deployed APIs to abolish.`);
       return;  // no API deployed
     }
 
-    return BbPromise.map(this.deployedApis, (api) => {
-      return this.provider.abolishApi(this.apiGroup, api);
+    return BbPromise.mapSeries(this.deployedApis, (api) => {
+      this.serverless.cli.log(`Abolishing API ${api.ApiName}...`);
+      return this.provider.abolishApi(this.apiGroup, api).then(() => {
+        this.serverless.cli.log(`Abolished API ${api.ApiName}`);
+      });
     });
   },
 
   removeApisIfExists() {
     if (!this.apis.length) {
+      this.serverless.cli.log(`No APIs to remove.`);
       return;  // no API
     }
 
-    return BbPromise.map(this.apis, (api) => {
-      return this.provider.deleteApi(this.apiGroup, api);
+    return BbPromise.mapSeries(this.apis, (api) => {
+      this.serverless.cli.log(`Removing API ${api.ApiName}...`);
+      return this.provider.deleteApi(this.apiGroup, api).then(() => {
+        this.serverless.cli.log(`Removed API ${api.ApiName}`);
+      });
     });
   },
 
   removeApiGroupIfExists() {
     if (!this.apiGroup) {
+      this.serverless.cli.log(`No API groups to remove.`);
       return;
     }
 
-    return this.provider.deleteApiGroup(this.apiGroup);
+    const groupName = this.apiGroup.GroupName;
+    this.serverless.cli.log(`Removing API group ${groupName}...`);
+    return this.provider.deleteApiGroup(this.apiGroup).then(() => {
+      this.serverless.cli.log(`Removed API group ${groupName}`);
+    });
   },
 
   removeTriggersIfNeeded() {

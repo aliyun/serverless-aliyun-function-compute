@@ -199,6 +199,12 @@ class AliyunProvider {
     return type === "ALIYUN::FC::Function";
   }
 
+  getArtifactDirectoryPrefix() {
+    const service = this.serverless.service.service;
+    const stage = this.options.stage;
+    return `serverless/${service}/${stage}`;
+  }
+
   /**
    * @param {string} bucketName
    * @returns {{name: string, region: string, creationDate: string}}
@@ -247,16 +253,22 @@ class AliyunProvider {
   deleteObjects(objectNames) {
     const ossClient = this.ossClient;
     return co(function *deleteObjects() {
+      // TODO(joyeecheung): handle partial failures
       return yield ossClient.deleteMulti(objectNames)
     });
   }
 
-  listObjects() {
+  /**
+   * 
+   * @param {object} props 
+   */
+  getObjects(props) {
     // TODO(joyeecheung): handle >= 1000 objects
     const ossClient = this.ossClient;
+    const query = Object.assign({ 'max-keys': 999 }, props);
     return co(function *listObjects() {
-      const res = yield ossClient.list({ 'max-keys': 999 });
-      return res.objects;
+      const res = yield ossClient.list(query);
+      return res.objects || [];
     });
   }
 
@@ -337,17 +349,14 @@ class AliyunProvider {
 
   /**
    * @param {string} serviceName
-   * @return {{name: string, id: string}}
+   * @return {{functionName: string, functionId: string}}
    * TODO(joyeecheung): paging
    */
-  listFunctions(serviceName) {
-    return this.fcClient.listFunction(serviceName).then((res) => {
+  getFunctions(serviceName) {
+    return this.fcClient.listFunctions(serviceName).then((res) => {
       const functions = res.functions;
       if (!functions) return [];
-      return functions.map((item) => ({
-        name: item.functionName,
-        id: item.functionId
-      }));
+      return functions;
     });
   }
 
@@ -577,7 +586,7 @@ class AliyunProvider {
 
   /**
    * @param {{GroupId: string}} props 
-   * @returns {{GroupId: string, ApiName: string, ApiId: string}[]} 
+   * @returns {{GroupId: string, ApiName: string, ApiId: string}[]}
    */
   getDeployedApis(props) {
     const query = {
@@ -592,7 +601,7 @@ class AliyunProvider {
         if (res.TotalCount > apis.length) {
           // TODO(joyeecheung): pagination
         }
-        return apis;
+        return apis.filter((item) => item.RegionId === this.options.region);
       });
   }
 

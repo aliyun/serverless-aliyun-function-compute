@@ -1,11 +1,12 @@
 'use strict';
 
+const BbPromise = require('bluebird');
+
 module.exports = {
   removeFunctionsAndService() {
     this.fcService = undefined;
     this.fcFunctions = [];
     this.serverless.cli.log('Removing functions...');
-    this.serviceName = this.provider.getServiceName(this.options.stage);;
     return BbPromise.bind(this)
       .then(this.getService)
       .then(this.getFunctions)
@@ -14,34 +15,47 @@ module.exports = {
   },
 
   getService() {
-    return this.provider.getService(this.serviceName).then((service) => {
+    const serviceName = this.provider.getServiceName(this.options.stage);
+    return this.provider.getService(serviceName).then((service) => {
       this.fcService = service;
-    })
+    });
   },
 
   getFunctions() {
     if (!this.fcService) {
       return BbPromise.resolve();
     }
-    return this.provider.listFunctions(this.serviceName).then((functions) => {
+    const serviceName = this.fcService.serviceName;
+    return this.provider.getFunctions(serviceName).then((functions) => {
       this.fcFunctions = functions;
     });
   },
 
   removeFunctions() {
     if (!this.fcFunctions.length) {
+      this.serverless.cli.log(`No functions to remove.`);
       return BbPromise.resolve();
     }
 
-    return BbPromise.map(this.functions, (func) => {
-      return this.provider.deleteFunction(this.serviceName, func.name);
+    const serviceName = this.fcService.serviceName;
+    return BbPromise.mapSeries(this.fcFunctions, (func) => {
+      const funcName = func.functionName;
+      this.serverless.cli.log(`Removing function ${funcName} of service ${serviceName}...`);
+      return this.provider.deleteFunction(serviceName, funcName).then(() => {
+        this.serverless.cli.log(`Removed function ${funcName} of service ${serviceName}`);
+      });
     });
   },
 
   removeServiceIfExists() {
     if (!this.fcService) {
+      this.serverless.cli.log(`No services to remove.`);
       return BbPromise.resolve();
     }
-    return this.provider.deleteService(this.serviceName);
+    const serviceName = this.fcService.serviceName;
+    this.serverless.cli.log(`Removing service ${serviceName}...`);
+    return this.provider.deleteService(serviceName).then(() => {
+      this.serverless.cli.log(`Removed service ${serviceName}`);
+    });
   }
 };

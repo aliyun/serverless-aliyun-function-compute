@@ -7,35 +7,53 @@ module.exports = {
     this.bucket = undefined;
     this.objects = [];
     return BbPromise.bind(this)
+      .then(this.getBucket)
       .then(this.getObjectsToRemove)
       .then(this.removeObjects)
       .then(this.removeBucket);
   },
 
-  getObjectsToRemove() {
+  getBucket() {
     const bucketName = this.serverless.service.provider.deploymentBucketName;
     return this.provider.getBucket(bucketName).then((bucket) => {
       this.bucket = bucket;
-      if (bucket) {
-        this.provider.resetOssClient(bucketName);
-        return this.provider.listObjects().then((objects) => {
-          this.objects = objects;
-        });
-      }
+    });
+  },
+
+  getObjectsToRemove() {
+    if (!this.bucket) return BbPromise.resolve();
+    const bucketName = this.bucket.name;
+    this.provider.resetOssClient(bucketName);
+    const prefix = this.provider.getArtifactDirectoryPrefix();
+    return this.provider.getObjects({ prefix }).then((objects) => {
+      this.objects = objects;
     });
   },
 
   removeObjects() {
-    if (!this.objects.length) return BbPromise.resolve();
-    this.serverless.cli.log('Removing artifacts in deployment bucket...');
+    if (!this.objects.length) {
+      this.serverless.cli.log(`No artifacts to remove.`);
+      return BbPromise.resolve();
+    }
+
+    const bucketName = this.bucket.name;
     const names = this.objects.map((obj) => obj.name);
-    return this.provider.deleteObjects(names);
+    this.serverless.cli.log(`Removing ${names.length} artifacts in OSS bucket ${bucketName}...`);
+    return this.provider.deleteObjects(names).then(() => {
+      this.serverless.cli.log(`Removed ${names.length} artifacts in OSS bucket ${bucketName}`);
+    });
   },
 
   removeBucket() {
-    const bucketName = this.serverless.service.provider.deploymentBucketName;
-    if (!this.bucket) return BbPromise.resolve();
-    this.serverless.cli.log('Removing deployment bucket');
-    return this.provider.deleteBucket(bucketName);
+    if (!this.bucket) {
+      this.serverless.cli.log(`No buckets to remove.`);
+      return BbPromise.resolve();
+    }
+
+    const bucketName = this.bucket.name;
+    this.serverless.cli.log(`Removing OSS bucket ${bucketName}...`);
+    return this.provider.deleteBucket(bucketName).then(() => {
+      this.serverless.cli.log(`Removed OSS bucket ${bucketName}`);
+    });
   },
 };
