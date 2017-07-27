@@ -9,23 +9,14 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   prepareDeployment() {
-    let deploymentTemplate = this.serverless.service.provider.compiledConfigurationTemplate;
+    this.provider.initializeTemplate();
+    const deploymentTemplate = this.serverless.service.provider.compiledConfigurationTemplate;
 
-    deploymentTemplate = this.serverless.utils.readFileSync(
-      path.join(
-        __dirname,
-        '..',
-        'templates',
-        'core-configuration-template.json'));
-
-    const bucketName = this.serverless.service.provider.deploymentBucketName;
+    const bucketName = this.provider.getDeploymentBucketName();
     const bucketId = this.provider.getStorageBucketId();
-    deploymentTemplate.Resources[bucketId].Properties.BucketName = bucketName;
-    deploymentTemplate.Resources[bucketId].Properties.Region = `${this.options.region}`;
-
+    deploymentTemplate.Resources[bucketId] = this.provider.getStorageBucketResource();
     const serviceId = this.provider.getServiceId();
-    deploymentTemplate.Resources[serviceId].Properties.region = this.options.region;
-    deploymentTemplate.Resources[serviceId].Properties.name = this.provider.getServiceName(this.options.stage);
+    deploymentTemplate.Resources[serviceId] = this.provider.getServiceResource();
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
 

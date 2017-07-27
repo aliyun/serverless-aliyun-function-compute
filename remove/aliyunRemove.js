@@ -7,7 +7,6 @@ const utils = require('../shared/utils');
 const removeEvents = require('./lib/removeEvents');
 const removeFunctionsAndService = require('./lib/removeFunctionsAndService');
 const removeArtifacts = require('./lib/removeArtifacts');
-const setDeploymentBucketName = require('../shared/setDeploymentBucketName');
 
 class AliyunRemove {
   constructor(serverless, options) {
@@ -19,7 +18,6 @@ class AliyunRemove {
       this,
       validate,
       utils,
-      setDeploymentBucketName,
       removeEvents,
       removeFunctionsAndService,
       removeArtifacts
@@ -28,8 +26,7 @@ class AliyunRemove {
     this.hooks = {
       'before:remove:remove': () => BbPromise.bind(this)
         .then(this.validate)
-        .then(this.setDefaults)
-        .then(this.setDeploymentBucketName),
+        .then(this.setDefaults),
 
       'remove:remove': () => BbPromise.bind(this)
         .then(this.removeEvents)

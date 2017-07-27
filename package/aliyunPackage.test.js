@@ -39,7 +39,6 @@ describe('AliyunPackage', () => {
       let cleanupServerlessDirStub;
       let validateStub;
       let setDefaultsStub;
-      let setDeploymentBucketNameStub;
       let prepareDeploymentStub;
       let saveCreateTemplateFileStub;
       let generateArtifactDirectoryNameStub;
@@ -53,8 +52,6 @@ describe('AliyunPackage', () => {
         validateStub = sinon.stub(aliyunPackage, 'validate')
           .returns(BbPromise.resolve());
         setDefaultsStub = sinon.stub(aliyunPackage, 'setDefaults')
-          .returns(BbPromise.resolve());
-        setDeploymentBucketNameStub = sinon.stub(aliyunPackage, 'setDeploymentBucketName')
           .returns(BbPromise.resolve());
         prepareDeploymentStub = sinon.stub(aliyunPackage, 'prepareDeployment')
           .returns(BbPromise.resolve());
@@ -74,7 +71,6 @@ describe('AliyunPackage', () => {
         aliyunPackage.cleanupServerlessDir.restore();
         aliyunPackage.validate.restore();
         aliyunPackage.setDefaults.restore();
-        aliyunPackage.setDeploymentBucketName.restore();
         aliyunPackage.prepareDeployment.restore();
         aliyunPackage.saveCreateTemplateFile.restore();
         aliyunPackage.generateArtifactDirectoryName.restore();
@@ -96,8 +92,7 @@ describe('AliyunPackage', () => {
 
       it('should run "package:initialize" promise chain', () => aliyunPackage
         .hooks['package:initialize']().then(() => {
-          expect(setDeploymentBucketNameStub.calledOnce).toEqual(true);
-          expect(prepareDeploymentStub.calledAfter(setDeploymentBucketNameStub)).toEqual(true);
+          expect(prepareDeploymentStub.calledOnce).toEqual(true);
           expect(saveCreateTemplateFileStub.calledAfter(prepareDeploymentStub)).toEqual(true);
         }));
 

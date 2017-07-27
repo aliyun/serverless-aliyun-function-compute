@@ -14,7 +14,7 @@ module.exports = {
   },
 
   getBucket() {
-    const bucketName = this.serverless.service.provider.deploymentBucketName;
+    const bucketName = this.provider.getDeploymentBucketName();
     return this.provider.getBucket(bucketName).then((bucket) => {
       this.bucket = bucket;
     });

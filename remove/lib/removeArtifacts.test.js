@@ -31,8 +31,7 @@ describe('removeArtifacts', () => {
     serverless.service.service = 'my-service';
     serverless.service.provider = {
       name: 'aliyun',
-      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
-      deploymentBucketName: 'sls-my-service'
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials')
     };
     serverless.config = {
       servicePath: path.join(__dirname, '..', '..', 'test')

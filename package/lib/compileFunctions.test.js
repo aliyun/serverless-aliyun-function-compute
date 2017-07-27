@@ -22,21 +22,20 @@ describe('CompileFunctions', () => {
     serverless.config = {
       servicePath: 'my-service'
     };
-    serverless.service.stage = 'dev';
     serverless.service.provider = {
       compiledConfigurationTemplate: {
         Resources: {
           "sls-storage-bucket": {
             "Type": "ALIYUN::OSS:Bucket",
             "Properties": {
-              "BucketName": "my-service",
+              "BucketName": "sls-my-service",
               "Region": "cn-shanghai"
             }
           },
           "sls-storage-object": {
             "Type": "ALIYUN::OSS:Object",
             "Properties": {
-              "BucketName": "my-service",
+              "BucketName": "sls-my-service",
               "ObjectName": "to-be-replaced-by-serverless",
               "LocalPath": "to-be-replaced-by-serverless"
             }
@@ -49,8 +48,7 @@ describe('CompileFunctions', () => {
             }
           }
         }
-      },
-      deploymentBucketName: 'my-service'
+      }
     }
     const options = {
       stage: 'dev',
@@ -95,7 +93,7 @@ describe('CompileFunctions', () => {
             "timeout": 30,
             "runtime": "nodejs4.4",
             "code": {
-              "ossBucketName": "my-service",
+              "ossBucketName": "sls-my-service",
               "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
             }
           }
@@ -137,7 +135,7 @@ describe('CompileFunctions', () => {
             "timeout": 30,
             "runtime": "nodejs4.4",
             "code": {
-              "ossBucketName": "my-service",
+              "ossBucketName": "sls-my-service",
               "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
             }
           }
@@ -177,7 +175,7 @@ describe('CompileFunctions', () => {
             "timeout": 120,
             "runtime": "nodejs4.4",
             "code": {
-              "ossBucketName": "my-service",
+              "ossBucketName": "sls-my-service",
               "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
             }
           }
@@ -217,7 +215,7 @@ describe('CompileFunctions', () => {
             "timeout": 120,
             "runtime": "nodejs4.4",
             "code": {
-              "ossBucketName": "my-service",
+              "ossBucketName": "sls-my-service",
               "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
             }
           }
@@ -251,7 +249,7 @@ describe('CompileFunctions', () => {
         "sls-storage-bucket": {
           "Type": "ALIYUN::OSS:Bucket",
           "Properties": {
-            "BucketName": "my-service",
+            "BucketName": "sls-my-service",
             "Region": "cn-shanghai"
             
           }
@@ -259,7 +257,7 @@ describe('CompileFunctions', () => {
         "sls-storage-object": {
           "Type": "ALIYUN::OSS:Object",
           "Properties": {
-            "BucketName": "my-service",
+            "BucketName": "sls-my-service",
             "ObjectName": "serverless/my-service/dev/1498638463280/artifact.zip",
             "LocalPath": `${serverlessDirPath}/artifact.zip`
           }
@@ -292,7 +290,7 @@ describe('CompileFunctions', () => {
             "timeout": 30,
             "runtime": "nodejs4.4",
             "code": {
-              "ossBucketName": "my-service",
+              "ossBucketName": "sls-my-service",
               "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
             }
           }

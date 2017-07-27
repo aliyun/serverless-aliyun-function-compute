@@ -10,7 +10,6 @@ module.exports = {
 
     this.serverless.service.package
       .artifactDirectoryName = `${prefix}/${dateString}`;
-    this.serverless.service.stage = this.options.stage;
 
     return BbPromise.resolve();
   },

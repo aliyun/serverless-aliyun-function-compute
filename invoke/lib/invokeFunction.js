@@ -11,7 +11,7 @@ module.exports = {
   },
 
   invoke() {
-    const serviceName = this.provider.getServiceName(this.options.stage);
+    const serviceName = this.provider.getServiceName();
     const func = this.options.function;
     const funcObject = this.serverless.service.getFunction(func);
     const functionName = funcObject.name;

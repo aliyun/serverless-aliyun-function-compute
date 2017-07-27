@@ -5,7 +5,6 @@ const BbPromise = require('bluebird');
 const cleanupServerlessDir = require('./lib/cleanupServerlessDir');
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
-const setDeploymentBucketName = require('../shared/setDeploymentBucketName');
 const prepareDeployment = require('./lib/prepareDeployment');
 const saveCreateTemplateFile = require('./lib/writeFilesToDisk');
 const mergeServiceResources = require('./lib/mergeServiceResources');
@@ -24,7 +23,6 @@ class AliyunPackage {
       cleanupServerlessDir,
       validate,
       utils,
-      setDeploymentBucketName,
       prepareDeployment,
       saveCreateTemplateFile,
       generateArtifactDirectoryName,
@@ -41,7 +39,6 @@ class AliyunPackage {
         .then(this.setDefaults),
 
       'package:initialize': () => BbPromise.bind(this)
-        .then(this.setDeploymentBucketName)
         .then(this.prepareDeployment)
         .then(this.saveCreateTemplateFile),
 

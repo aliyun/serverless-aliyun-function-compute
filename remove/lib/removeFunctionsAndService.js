@@ -15,7 +15,7 @@ module.exports = {
   },
 
   getService() {
-    const serviceName = this.provider.getServiceName(this.options.stage);
+    const serviceName = this.provider.getServiceName();
     return this.provider.getService(serviceName).then((service) => {
       this.fcService = service;
     });

@@ -34,7 +34,7 @@ module.exports = {
   },
 
   getApiGroup() {
-    const groupName = this.provider.getApiGroupName(this.options.stage);
+    const groupName = this.provider.getApiGroupName();
     return this.provider.getApiGroup(groupName).then((group) => {
       this.apiGroup = group;
       return group;

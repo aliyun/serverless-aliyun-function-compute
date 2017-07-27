@@ -38,7 +38,6 @@ describe('AliyunRemove', () => {
     describe('hooks', () => {
       let validateStub;
       let setDefaultsStub;
-      let setDeploymentBucketNameStub;
       let removeEventsStub;
       let removeFunctionsAndServiceStub;
       let removeArtifactsStub;
@@ -47,8 +46,6 @@ describe('AliyunRemove', () => {
         validateStub = sinon.stub(aliyunRemove, 'validate')
           .returns(BbPromise.resolve());
         setDefaultsStub = sinon.stub(aliyunRemove, 'setDefaults')
-          .returns(BbPromise.resolve());
-        setDeploymentBucketNameStub = sinon.stub(aliyunRemove, 'setDeploymentBucketName')
           .returns(BbPromise.resolve());
         removeEventsStub = sinon.stub(aliyunRemove, 'removeEvents')
           .returns(BbPromise.resolve());
@@ -61,7 +58,6 @@ describe('AliyunRemove', () => {
       afterEach(() => {
         aliyunRemove.validate.restore();
         aliyunRemove.setDefaults.restore();
-        aliyunRemove.setDeploymentBucketName.restore();
         aliyunRemove.removeEvents.restore();
         aliyunRemove.removeFunctionsAndService.restore();
         aliyunRemove.removeArtifacts.restore();
@@ -71,7 +67,6 @@ describe('AliyunRemove', () => {
         .hooks['before:remove:remove']().then(() => {
           expect(validateStub.calledOnce).toEqual(true);
           expect(setDefaultsStub.calledAfter(validateStub)).toEqual(true);
-          expect(setDeploymentBucketNameStub.calledAfter(setDefaultsStub)).toEqual(true);
         }));
 
       it('should run "remove:remove" promise chain', () => aliyunRemove
