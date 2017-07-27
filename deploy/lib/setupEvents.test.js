@@ -192,7 +192,7 @@ describe('setupEvents', () => {
           'Created API sls_http_my_service_dev_currentTime2',
           'Deploying API sls_http_my_service_dev_currentTime...',
           'Deployed API sls_http_my_service_dev_currentTime',
-          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
+          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
           'Deploying API sls_http_my_service_dev_currentTime2...',
           'Deployed API sls_http_my_service_dev_currentTime2',
           'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
@@ -277,7 +277,7 @@ describe('setupEvents', () => {
           'Updated API sls_http_my_service_dev_currentTime2',
           'Deploying API sls_http_my_service_dev_currentTime...',
           'Deployed API sls_http_my_service_dev_currentTime',
-          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
+          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
           'Deploying API sls_http_my_service_dev_currentTime2...',
           'Deployed API sls_http_my_service_dev_currentTime2',
           'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'

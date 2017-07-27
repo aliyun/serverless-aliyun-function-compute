@@ -16,6 +16,7 @@ package:
     - node_modules/** # exclude all node_modules....
   include:
     - node_modules/moment # except necessary ones
+  excludeDevDependencies: false
 
 functions:
   currentTime:
@@ -23,7 +24,25 @@ functions:
     events:
       - http:
           path: /ping
-          method: get
+          method: post
+          BodyFormat: FORM
+          RequestParameters:
+            - ApiParameterName: foo
+              ParameterType: String
+              Location: Body
+              Required: OPTIONAL
+              isHide: false
+              DefaultValue: bar
+              DemoValue: bar
+              Description: foo
+          ServiceParameters:
+            - ServiceParameterName: foo
+              Type: String
+              Location: Body
+              ParameterCatalog: REQUEST
+          ServiceParametersMap:
+            - ServiceParameterName: foo
+              RequestParameterName: foo
 
   currentTime2:
     handler: index.ping

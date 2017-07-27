@@ -308,7 +308,6 @@ describe('CompileFunctions', () => {
               "RequestProtocol": "HTTP",
               "RequestHttpMethod": "GET",
               "RequestPath": "/test",
-              "RequestParameters": [],
               "BodyFormat": "",
               "PostBodyDescription": ""
             },
@@ -323,6 +322,9 @@ describe('CompileFunctions', () => {
               },
               "ContentTypeValue": "application/json; charset=UTF-8"
             },
+            "RequestParameters": [],
+            "ServiceParameters": [],
+            "ServiceParametersMap": [],
             "ResultType": "JSON",
             "ResultSample": "{}"
           }

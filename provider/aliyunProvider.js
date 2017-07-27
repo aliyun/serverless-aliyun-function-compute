@@ -276,7 +276,6 @@ class AliyunProvider {
       "RequestProtocol": eventType.toUpperCase(),
       "RequestHttpMethod": (event.RequestHttpMethod || event.method || "GET").toUpperCase(),
       "RequestPath": requestPath,
-      "RequestParameters": event.RequestParameters || [],
       "BodyFormat": event.BodyFormat || '',
       "PostBodyDescription": ""
     };
@@ -310,6 +309,9 @@ class AliyunProvider {
         "AuthType": event.AuthType || "ANONYMOUS",
         "RequestConfig": this.getRequestConfig(eventType, event),
         "ServiceConfig": this.getServiceConfig(event, funcObject),
+        "RequestParameters": event.RequestParameters || [],
+        "ServiceParameters": event.ServiceParameters || [],
+        "ServiceParametersMap": event.ServiceParametersMap || [],
         "ResultType": event.ResultType || "JSON",
         "ResultSample": event.ResultSample || "{}"
       }
@@ -700,16 +702,20 @@ class AliyunProvider {
   }
 
   getApiProps(group, role, api) {
+    const toStringify = ['RequestConfig', 'ServiceConfig',
+      'RequestParameters', 'ServiceParameters', 'ServiceParametersMap'];
     const props = Object.assign(
       { "GroupId": group.GroupId },
-      _.omit(api, ['RequestConfig', 'ServiceConfig'])
+      _.omit(api, toStringify)
     );
-    props.RequestConfig = JSON.stringify(api.RequestConfig);
-    props.ServiceConfig = JSON.stringify(_.merge(
+    const newApi = _.merge(
       {},
-      api.ServiceConfig,
-      { FunctionComputeConfig: { RoleArn: role.Arn } }
-    ));
+      api,
+      { ServiceConfig: { FunctionComputeConfig: { RoleArn:  role.Arn } } }
+    );
+    toStringify.forEach((key) => {
+      props[key] = JSON.stringify(newApi[key]);
+    });
     return props;
   }
 

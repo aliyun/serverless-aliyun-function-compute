@@ -1,0 +1,32 @@
+{
+  "event": {
+    "body": "{\"foo\":\"test\"}",
+    "headers": {
+      "X-Ca-Api-Gateway": "some-id",
+      "X-Forwarded-For": "some-ip"
+    },
+    "httpMethod": "POST",
+    "isBase64Encoded": false,
+    "path": "/ping",
+    "pathParameters": {
+      
+    },
+    "queryParameters": {
+      
+    }
+  },
+  "context": {
+    "requestId": "some-id",
+    "credentials": {
+      "accessKeyId": "",
+      "accessKeySecret": "",
+      "securityToken": ""
+    },
+    "function": {
+      "name": "my-service-dev-currentTime2",
+      "handler": "index.ping",
+      "memory": 128,
+      "timeout": 30
+    }
+  }
+}

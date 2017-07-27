@@ -15,10 +15,9 @@ exports.apis = [{
   "AuthType": "ANONYMOUS",
   "RequestConfig": {
     "RequestProtocol": "HTTP",
-    "RequestHttpMethod": "GET",
+    "RequestHttpMethod": "POST",
     "RequestPath": "/ping",
-    "RequestParameters": [],
-    "BodyFormat": "",
+    "BodyFormat": "FORM",
     "PostBodyDescription": ""
   },
   "ServiceConfig": {
@@ -32,6 +31,32 @@ exports.apis = [{
     },
     "ContentTypeValue": "application/json; charset=UTF-8"
   },
+  "RequestParameters": [
+    {
+      "ApiParameterName": "foo",
+      "ParameterType": "String",
+      "Location": "Body",
+      "Required": "OPTIONAL",
+      "isHide": false,
+      "DefaultValue": "bar",
+      "DemoValue": "bar",
+      "Description": "foo"
+    }
+  ],
+  "ServiceParameters": [
+    {
+      "ServiceParameterName": "foo",
+      "Type": "String",
+      "Location": "Body",
+      "ParameterCatalog": "REQUEST"
+    }
+  ],
+  "ServiceParametersMap": [
+    {
+      "ServiceParameterName": "foo",
+      "RequestParameterName": "foo"
+    }
+  ],
   "ResultType": "JSON",
   "ResultSample": "{}"
 }, {
@@ -44,7 +69,6 @@ exports.apis = [{
     "RequestProtocol": "HTTP",
     "RequestHttpMethod": "GET",
     "RequestPath": "/ping2",
-    "RequestParameters": [],
     "BodyFormat": "",
     "PostBodyDescription": ""
   },
@@ -59,6 +83,9 @@ exports.apis = [{
     },
     "ContentTypeValue": "application/json; charset=UTF-8"
   },
+  "RequestParameters": [],
+  "ServiceParameters": [],
+  "ServiceParametersMap": [],
   "ResultType": "JSON",
   "ResultSample": "{}"
 }];
