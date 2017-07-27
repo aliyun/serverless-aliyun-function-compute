@@ -4,6 +4,7 @@ const BbPromise = require('bluebird');
 
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
+const displayServiceInfo = require('./lib/displayServiceInfo');
 
 class AliyunInfo {
   constructor(serverless, options) {
@@ -15,6 +16,7 @@ class AliyunInfo {
       this,
       validate,
       utils,
+      displayServiceInfo
     );
 
     this.hooks = {
@@ -25,8 +27,8 @@ class AliyunInfo {
       // 'deploy:deploy': () => BbPromise.bind(this)
       //   .then(this.displayServiceInfo),
 
-      // 'info:info': () => BbPromise.bind(this)
-      //   .then(this.displayServiceInfo),
+      'info:info': () => BbPromise.bind(this)
+        .then(this.displayServiceInfo),
     };
   }
 }

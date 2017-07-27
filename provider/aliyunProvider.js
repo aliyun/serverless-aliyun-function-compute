@@ -709,6 +709,17 @@ class AliyunProvider {
       });
   }
 
+  /**
+   * https://help.aliyun.com/document_detail/43625.html
+   */
+  getApi(group, api) {
+    const query = {
+      GroupId: group.GroupId,
+      ApiId: api.ApiId
+    };
+    return this.agClient.describeApi(query);
+  }
+
   getApiProps(group, role, api) {
     const toStringify = ['RequestConfig', 'ServiceConfig',
       'RequestParameters', 'ServiceParameters', 'ServiceParametersMap'];
