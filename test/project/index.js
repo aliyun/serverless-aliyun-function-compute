@@ -1,3 +1,4 @@
 "use strict";
 
-module.exports.ping = require('./src/ping');
+module.exports.postHandler = require('./src/postHandler');
+module.exports.getHandler = require('./src/getHandler');

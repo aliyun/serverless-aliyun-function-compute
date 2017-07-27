@@ -47,11 +47,11 @@ package:
     - node_modules/moment # except necessary ones
 
 functions:
-  currentTime:
-    handler: index.ping
+  getTest:
+    handler: index.getHandler
     events:
       - http:
-          path: ping
+          path: /baz
           method: get
 ```
 

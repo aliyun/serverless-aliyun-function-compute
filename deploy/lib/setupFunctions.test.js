@@ -15,9 +15,9 @@ describe('setupFunctions', () => {
   let aliyunDeploy;
 
   const functions = [{
-    "name": "my-service-dev-currentTime",
+    "name": "my-service-dev-postTest",
     "service": "my-service-dev",
-    "handler": "index.ping",
+    "handler": "index.postHandler",
     "memorySize": 128,
     "timeout": 30,
     "runtime": "nodejs4.4",
@@ -26,9 +26,9 @@ describe('setupFunctions', () => {
       "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
     }
   }, {
-    "name": "my-service-dev-currentTime2",
+    "name": "my-service-dev-getTest",
     "service": "my-service-dev",
-    "handler": "index.ping",
+    "handler": "index.getHandler",
     "memorySize": 128,
     "timeout": 30,
     "runtime": "nodejs4.4",
@@ -105,23 +105,23 @@ describe('setupFunctions', () => {
 
     it('should create and update functions according to the templates', () =>  {
         getFunctionStub
-          .withArgs('my-service-dev', 'my-service-dev-currentTime')
+          .withArgs('my-service-dev', 'my-service-dev-postTest')
           .returns(BbPromise.resolve(functions[0]));
         getFunctionStub
-          .withArgs('my-service-dev', 'my-service-dev-currentTime2')
+          .withArgs('my-service-dev', 'my-service-dev-getTest')
           .returns(BbPromise.resolve(undefined));
         updateFunctionStub.returns(BbPromise.resolve());
         createFunctionStub.returns(BbPromise.resolve());
         return aliyunDeploy.setupFunctions().then(() => {
           expect(getFunctionStub.calledTwice).toEqual(true);
-          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-currentTime')).toEqual(true);
-          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-currentTime2')).toEqual(true);
+          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-postTest')).toEqual(true);
+          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-getTest')).toEqual(true);
 
           expect(updateFunctionStub.calledAfter(getFunctionStub)).toEqual(true);
           expect(updateFunctionStub.calledOnce).toEqual(true);
           expect(updateFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime',
+            'my-service-dev-postTest',
             functions[0]
           )).toEqual(true);
 
@@ -129,15 +129,15 @@ describe('setupFunctions', () => {
           expect(createFunctionStub.calledOnce).toEqual(true);
           expect(createFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime2',
+            'my-service-dev-getTest',
             functions[1]
           )).toEqual(true);
 
           const logs = [
-            'Updating function my-service-dev-currentTime...',
-            'Updated function my-service-dev-currentTime',
-            'Creating function my-service-dev-currentTime2...',
-            'Created function my-service-dev-currentTime2'
+            'Updating function my-service-dev-postTest...',
+            'Updated function my-service-dev-postTest',
+            'Creating function my-service-dev-getTest...',
+            'Created function my-service-dev-getTest'
           ];
           expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {

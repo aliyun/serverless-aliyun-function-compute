@@ -202,26 +202,26 @@ describe('AliyunDeploy', () => {
             'Created bucket sls-my-service',
             'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
             'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service',
-            'Creating function my-service-dev-currentTime...',
-            'Created function my-service-dev-currentTime',
-            'Creating function my-service-dev-currentTime2...',
-            'Created function my-service-dev-currentTime2',
+            'Creating function my-service-dev-postTest...',
+            'Created function my-service-dev-postTest',
+            'Creating function my-service-dev-getTest...',
+            'Created function my-service-dev-getTest',
             'Creating API group my_service_dev_api...',
             'Created API group my_service_dev_api',
             'Creating RAM role SLSFCInvocationFromAPIGateway...',
             'Created RAM role SLSFCInvocationFromAPIGateway',
             'Attaching RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway...',
             'Attached RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway',
-            'Creating API sls_http_my_service_dev_currentTime...',
-            'Created API sls_http_my_service_dev_currentTime',
-            'Creating API sls_http_my_service_dev_currentTime2...',
-            'Created API sls_http_my_service_dev_currentTime2',
-            'Deploying API sls_http_my_service_dev_currentTime...',
-            'Deployed API sls_http_my_service_dev_currentTime',
-            'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
-            'Deploying API sls_http_my_service_dev_currentTime2...',
-            'Deployed API sls_http_my_service_dev_currentTime2',
-            'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+            'Creating API sls_http_my_service_dev_postTest...',
+            'Created API sls_http_my_service_dev_postTest',
+            'Creating API sls_http_my_service_dev_getTest...',
+            'Created API sls_http_my_service_dev_getTest',
+            'Deploying API sls_http_my_service_dev_postTest...',
+            'Deployed API sls_http_my_service_dev_postTest',
+            'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
+            'Deploying API sls_http_my_service_dev_getTest...',
+            'Deployed API sls_http_my_service_dev_getTest',
+            'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
           ];
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -240,10 +240,10 @@ describe('AliyunDeploy', () => {
       createBucketStub.returns(BbPromise.resolve());
       uploadObjectStub.returns(BbPromise.resolve());
       getFunctionStub
-        .withArgs('my-service-dev', 'my-service-dev-currentTime')
+        .withArgs('my-service-dev', 'my-service-dev-postTest')
         .returns(BbPromise.resolve(functions[0]));
       getFunctionStub
-        .withArgs('my-service-dev', 'my-service-dev-currentTime2')
+        .withArgs('my-service-dev', 'my-service-dev-getTest')
         .returns(BbPromise.resolve(functions[1]));
       updateFunctionStub.returns(BbPromise.resolve());
       createFunctionStub.returns(BbPromise.resolve());
@@ -265,23 +265,23 @@ describe('AliyunDeploy', () => {
         'Bucket sls-my-service already exists.',
         'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
         'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service',
-        'Updating function my-service-dev-currentTime...',
-        'Updated function my-service-dev-currentTime',
-        'Updating function my-service-dev-currentTime2...',
-        'Updated function my-service-dev-currentTime2',
+        'Updating function my-service-dev-postTest...',
+        'Updated function my-service-dev-postTest',
+        'Updating function my-service-dev-getTest...',
+        'Updated function my-service-dev-getTest',
         'API group my_service_dev_api exists.',
         'RAM role SLSFCInvocationFromAPIGateway exists.',
         'RAM policy AliyunFCInvocationAccess exists.',
-        'Updating API sls_http_my_service_dev_currentTime...',
-        'Updated API sls_http_my_service_dev_currentTime',
-        'Updating API sls_http_my_service_dev_currentTime2...',
-        'Updated API sls_http_my_service_dev_currentTime2',
-        'Deploying API sls_http_my_service_dev_currentTime...',
-        'Deployed API sls_http_my_service_dev_currentTime',
-        'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
-        'Deploying API sls_http_my_service_dev_currentTime2...',
-        'Deployed API sls_http_my_service_dev_currentTime2',
-        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+        'Updating API sls_http_my_service_dev_postTest...',
+        'Updated API sls_http_my_service_dev_postTest',
+        'Updating API sls_http_my_service_dev_getTest...',
+        'Updated API sls_http_my_service_dev_getTest',
+        'Deploying API sls_http_my_service_dev_postTest...',
+        'Deployed API sls_http_my_service_dev_postTest',
+        'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
+        'Deploying API sls_http_my_service_dev_getTest...',
+        'Deployed API sls_http_my_service_dev_getTest',
+        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
       ];
       return aliyunDeploy.hooks['before:deploy:deploy']()
         .then(() => aliyunDeploy.hooks['deploy:deploy']())

@@ -86,11 +86,11 @@ describe('InvokeFunction', () => {
       invokeFunctionStub = sinon.stub(aliyunInvoke.provider, 'invokeFunction');
       consoleLogStub = sinon.stub(aliyunInvoke.serverless.cli, 'log').returns();
       aliyunInvoke.serverless.service.functions = {
-        currentTime: {
-          handler: 'index.ping',
+        getTest: {
+          handler: 'index.getHandler',
           events: [
             { http: {
-              path: '/ping',
+              path: '/baz',
               method: 'get'
             } }
           ]
@@ -104,18 +104,18 @@ describe('InvokeFunction', () => {
     });
 
     it('should invoke the provided function without data option', () => {
-      aliyunInvoke.options.function = 'currentTime';
+      aliyunInvoke.options.function = 'getTest';
       invokeFunctionStub.returns(BbPromise.resolve(response));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeFunctionStub.calledOnce).toEqual(true);
         expect(
           invokeFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime',
+            'my-service-dev-getTest',
             undefined)
           ).toEqual(true);
         const logs = [
-          'Invoking my-service-dev-currentTime of my-service-dev',
+          'Invoking my-service-dev-getTest of my-service-dev',
           response
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
@@ -126,7 +126,7 @@ describe('InvokeFunction', () => {
     });
 
     it('should invoke the provided function with JSON data', () => {
-      aliyunInvoke.options.function = 'currentTime';
+      aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.data = '{"a": "b"}';
       invokeFunctionStub.returns(BbPromise.resolve(response));
 
@@ -135,11 +135,11 @@ describe('InvokeFunction', () => {
         expect(
           invokeFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime',
+            'my-service-dev-getTest',
             {a: 'b'})
           ).toEqual(true);
         const logs = [
-          'Invoking my-service-dev-currentTime of my-service-dev with { a: \'b\' }',
+          'Invoking my-service-dev-getTest of my-service-dev with { a: \'b\' }',
           response
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
@@ -150,7 +150,7 @@ describe('InvokeFunction', () => {
     });
 
     it('should invoke the provided function with string data', () => {
-      aliyunInvoke.options.function = 'currentTime';
+      aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.data = 'test';
       invokeFunctionStub.returns(BbPromise.resolve(response));
 
@@ -159,11 +159,11 @@ describe('InvokeFunction', () => {
         expect(
           invokeFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime',
+            'my-service-dev-getTest',
             'test')
           ).toEqual(true);
         const logs = [
-          'Invoking my-service-dev-currentTime of my-service-dev with \'test\'',
+          'Invoking my-service-dev-getTest of my-service-dev with \'test\'',
           response
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
@@ -174,7 +174,7 @@ describe('InvokeFunction', () => {
     });
 
     it('should invoke the provided function with data in path', () => {
-      aliyunInvoke.options.function = 'currentTime';
+      aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.path = path.join(__dirname, '..', '..',  'test', 'invokeData.json');
       invokeFunctionStub.returns(BbPromise.resolve(response));
 
@@ -183,11 +183,11 @@ describe('InvokeFunction', () => {
         expect(
           invokeFunctionStub.calledWithExactly(
             'my-service-dev',
-            'my-service-dev-currentTime',
+            'my-service-dev-getTest',
             { foo: 'bar' })
           ).toEqual(true);
         const logs = [
-          'Invoking my-service-dev-currentTime of my-service-dev with { foo: \'bar\' }',
+          'Invoking my-service-dev-getTest of my-service-dev with { foo: \'bar\' }',
           response
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);

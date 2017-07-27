@@ -7,7 +7,7 @@
     },
     "httpMethod": "POST",
     "isBase64Encoded": false,
-    "path": "/ping",
+    "path": "/baz",
     "pathParameters": {
       
     },
@@ -23,8 +23,8 @@
       "securityToken": ""
     },
     "function": {
-      "name": "my-service-dev-currentTime2",
-      "handler": "index.ping",
+      "name": "my-service-dev-postTest",
+      "handler": "index.postHandler",
       "memory": 128,
       "timeout": 30
     }

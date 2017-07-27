@@ -10,20 +10,20 @@ const Serverless = require('../../test/serverless');
 const { fullGroup, fullApis } = require('../../test/data');
 
 const functionDefs = {
-  currentTime: {
-    handler: 'index.ping',
+  postTest: {
+    handler: 'index.postHandler',
     events: [
       { http: {
-        path: '/ping',
+        path: '/baz',
         method: 'get'
       } },
     ],
   },
-  currentTime2: {
-    handler: 'index.ping',
+  getTest: {
+    handler: 'index.getHandler',
     events: [
       { http: {
-        path: '/ping2',
+        path: '/quo',
         method: 'get'
       } },
     ],
@@ -127,14 +127,14 @@ describe('removeEvents', () => {
 
         const logs = [
           'Removing events...',
-          'Abolishing API sls_http_my_service_dev_currentTime...',
-          'Abolished API sls_http_my_service_dev_currentTime',
-          'Abolishing API sls_http_my_service_dev_currentTime2...',
-          'Abolished API sls_http_my_service_dev_currentTime2',
-          'Removing API sls_http_my_service_dev_currentTime...',
-          'Removed API sls_http_my_service_dev_currentTime',
-          'Removing API sls_http_my_service_dev_currentTime2...',
-          'Removed API sls_http_my_service_dev_currentTime2',
+          'Abolishing API sls_http_my_service_dev_postTest...',
+          'Abolished API sls_http_my_service_dev_postTest',
+          'Abolishing API sls_http_my_service_dev_getTest...',
+          'Abolished API sls_http_my_service_dev_getTest',
+          'Removing API sls_http_my_service_dev_postTest...',
+          'Removed API sls_http_my_service_dev_postTest',
+          'Removing API sls_http_my_service_dev_getTest...',
+          'Removed API sls_http_my_service_dev_getTest',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -172,12 +172,12 @@ describe('removeEvents', () => {
 
         const logs = [
           'Removing events...',
-          'Abolishing API sls_http_my_service_dev_currentTime...',
-          'Abolished API sls_http_my_service_dev_currentTime',
-          'Removing API sls_http_my_service_dev_currentTime...',
-          'Removed API sls_http_my_service_dev_currentTime',
-          'Removing API sls_http_my_service_dev_currentTime2...',
-          'Removed API sls_http_my_service_dev_currentTime2',
+          'Abolishing API sls_http_my_service_dev_postTest...',
+          'Abolished API sls_http_my_service_dev_postTest',
+          'Removing API sls_http_my_service_dev_postTest...',
+          'Removed API sls_http_my_service_dev_postTest',
+          'Removing API sls_http_my_service_dev_getTest...',
+          'Removed API sls_http_my_service_dev_getTest',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -208,8 +208,8 @@ describe('removeEvents', () => {
         const logs = [
           'Removing events...',
           'No deployed APIs to abolish.',
-          'Removing API sls_http_my_service_dev_currentTime...',
-          'Removed API sls_http_my_service_dev_currentTime',
+          'Removing API sls_http_my_service_dev_postTest...',
+          'Removed API sls_http_my_service_dev_postTest',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];

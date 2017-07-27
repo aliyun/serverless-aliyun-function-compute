@@ -15,15 +15,15 @@ package:
     - .git/**
     - node_modules/** # exclude all node_modules....
   include:
-    - node_modules/moment # except necessary ones
+    - node_modules/moment/** # except necessary ones
   excludeDevDependencies: false
 
 functions:
-  currentTime:
-    handler: index.ping
+  postTest:
+    handler: index.postHandler
     events:
       - http:
-          path: /ping
+          path: /baz
           method: post
           BodyFormat: FORM
           RequestParameters:
@@ -44,9 +44,9 @@ functions:
             - ServiceParameterName: foo
               RequestParameterName: foo
 
-  currentTime2:
-    handler: index.ping
+  getTest:
+    handler: index.getHandler
     events:
       - http:
-          path: /ping2
+          path: /quo
           method: get

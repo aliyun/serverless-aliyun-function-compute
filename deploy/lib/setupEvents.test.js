@@ -186,16 +186,16 @@ describe('setupEvents', () => {
           'Created RAM role SLSFCInvocationFromAPIGateway',
           'Attaching RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway...',
           'Attached RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway',
-          'Creating API sls_http_my_service_dev_currentTime...',
-          'Created API sls_http_my_service_dev_currentTime',
-          'Creating API sls_http_my_service_dev_currentTime2...',
-          'Created API sls_http_my_service_dev_currentTime2',
-          'Deploying API sls_http_my_service_dev_currentTime...',
-          'Deployed API sls_http_my_service_dev_currentTime',
-          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
-          'Deploying API sls_http_my_service_dev_currentTime2...',
-          'Deployed API sls_http_my_service_dev_currentTime2',
-          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+          'Creating API sls_http_my_service_dev_postTest...',
+          'Created API sls_http_my_service_dev_postTest',
+          'Creating API sls_http_my_service_dev_getTest...',
+          'Created API sls_http_my_service_dev_getTest',
+          'Deploying API sls_http_my_service_dev_postTest...',
+          'Deployed API sls_http_my_service_dev_postTest',
+          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
+          'Deploying API sls_http_my_service_dev_getTest...',
+          'Deployed API sls_http_my_service_dev_getTest',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -271,16 +271,16 @@ describe('setupEvents', () => {
           'API group my_service_dev_api exists.',
           'RAM role SLSFCInvocationFromAPIGateway exists.',
           'RAM policy AliyunFCInvocationAccess exists.',
-          'Updating API sls_http_my_service_dev_currentTime...',
-          'Updated API sls_http_my_service_dev_currentTime',
-          'Updating API sls_http_my_service_dev_currentTime2...',
-          'Updated API sls_http_my_service_dev_currentTime2',
-          'Deploying API sls_http_my_service_dev_currentTime...',
-          'Deployed API sls_http_my_service_dev_currentTime',
-          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping -> my-service-dev.my-service-dev-currentTime',
-          'Deploying API sls_http_my_service_dev_currentTime2...',
-          'Deployed API sls_http_my_service_dev_currentTime2',
-          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/ping2 -> my-service-dev.my-service-dev-currentTime2'
+          'Updating API sls_http_my_service_dev_postTest...',
+          'Updated API sls_http_my_service_dev_postTest',
+          'Updating API sls_http_my_service_dev_getTest...',
+          'Updated API sls_http_my_service_dev_getTest',
+          'Deploying API sls_http_my_service_dev_postTest...',
+          'Deployed API sls_http_my_service_dev_postTest',
+          'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
+          'Deploying API sls_http_my_service_dev_getTest...',
+          'Deployed API sls_http_my_service_dev_getTest',
+          'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {

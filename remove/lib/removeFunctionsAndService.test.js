@@ -10,20 +10,20 @@ const Serverless = require('../../test/serverless');
 const { fullGroup, fullApis } = require('../../test/data');
 
 const functionDefs = {
-  currentTime: {
-    handler: 'index.ping',
+  postTest: {
+    handler: 'index.postHandler',
     events: [
       { http: {
-        path: '/ping',
+        path: '/baz',
         method: 'get'
       } },
     ],
   },
-  currentTime2: {
-    handler: 'index.ping',
+  getTest: {
+    handler: 'index.getHandler',
     events: [
       { http: {
-        path: '/ping2',
+        path: '/quo',
         method: 'get'
       } },
     ],
@@ -31,10 +31,10 @@ const functionDefs = {
 };
 
 const functions = [{
-  functionName: 'my-service-dev-currentTime',
+  functionName: 'my-service-dev-postTest',
   functionId: new Date().getTime().toString(16)
 }, {
-  functionName: 'my-service-dev-currentTime2',
+  functionName: 'my-service-dev-getTest',
   functionId: new Date().getTime().toString(16)
 }];
 
@@ -108,12 +108,12 @@ describe('removeFunctionsAndService', () => {
         expect(deleteFunctionStub.getCall(0).args)
           .toEqual([
             'my-service-dev',
-            'my-service-dev-currentTime'
+            'my-service-dev-postTest'
           ]);
         expect(deleteFunctionStub.getCall(1).args)
           .toEqual([
             'my-service-dev',
-            'my-service-dev-currentTime2'
+            'my-service-dev-getTest'
           ]);
 
         expect(deleteServiceStub.calledAfter(deleteFunctionStub)).toEqual(true);
@@ -122,10 +122,10 @@ describe('removeFunctionsAndService', () => {
 
         const logs = [
           'Removing functions...',
-          'Removing function my-service-dev-currentTime of service my-service-dev...',
-          'Removed function my-service-dev-currentTime of service my-service-dev',
-          'Removing function my-service-dev-currentTime2 of service my-service-dev...',
-          'Removed function my-service-dev-currentTime2 of service my-service-dev',
+          'Removing function my-service-dev-postTest of service my-service-dev...',
+          'Removed function my-service-dev-postTest of service my-service-dev',
+          'Removing function my-service-dev-getTest of service my-service-dev...',
+          'Removed function my-service-dev-getTest of service my-service-dev',
           'Removing service my-service-dev...',
           'Removed service my-service-dev'
         ];
@@ -151,7 +151,7 @@ describe('removeFunctionsAndService', () => {
         expect(deleteFunctionStub.getCall(0).args)
           .toEqual([
             'my-service-dev',
-            'my-service-dev-currentTime'
+            'my-service-dev-postTest'
           ]);
 
         expect(deleteServiceStub.calledAfter(deleteFunctionStub)).toEqual(true);
@@ -160,8 +160,8 @@ describe('removeFunctionsAndService', () => {
 
         const logs = [
           'Removing functions...',
-          'Removing function my-service-dev-currentTime of service my-service-dev...',
-          'Removed function my-service-dev-currentTime of service my-service-dev',
+          'Removing function my-service-dev-postTest of service my-service-dev...',
+          'Removed function my-service-dev-postTest of service my-service-dev',
           'Removing service my-service-dev...',
           'Removed service my-service-dev'
         ];
