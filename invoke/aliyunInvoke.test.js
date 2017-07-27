@@ -19,6 +19,7 @@ describe('AliyunInvoke', () => {
       region: 'my-region',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+    serverless.pluginManager.setCliOptions(options);
     aliyunInvoke = new AliyunInvoke(serverless, options);
   });
 

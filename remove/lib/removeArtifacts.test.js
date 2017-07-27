@@ -41,6 +41,7 @@ describe('removeArtifacts', () => {
       region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+    serverless.pluginManager.setCliOptions(options);
     aliyunRemove = new AliyunRemove(serverless, options);
   });
 

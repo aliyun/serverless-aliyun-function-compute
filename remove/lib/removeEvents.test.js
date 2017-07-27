@@ -15,7 +15,7 @@ const functionDefs = {
     events: [
       { http: {
         path: '/baz',
-        method: 'get'
+        method: 'post'
       } },
     ],
   },
@@ -49,6 +49,7 @@ describe('removeEvents', () => {
       region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+    serverless.pluginManager.setCliOptions(options);
     aliyunRemove = new AliyunRemove(serverless, options);
   });
 

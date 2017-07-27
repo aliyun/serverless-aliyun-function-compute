@@ -8,7 +8,6 @@ const utils = require('../shared/utils');
 const prepareDeployment = require('./lib/prepareDeployment');
 const saveCreateTemplateFile = require('./lib/writeFilesToDisk');
 const mergeServiceResources = require('./lib/mergeServiceResources');
-const generateArtifactDirectoryName = require('./lib/generateArtifactDirectoryName');
 const compileFunctions = require('./lib/compileFunctions');
 const saveUpdateTemplateFile = require('./lib/writeFilesToDisk');
 
@@ -25,7 +24,6 @@ class AliyunPackage {
       utils,
       prepareDeployment,
       saveCreateTemplateFile,
-      generateArtifactDirectoryName,
       compileFunctions,
       mergeServiceResources,
       saveUpdateTemplateFile);
@@ -41,9 +39,6 @@ class AliyunPackage {
       'package:initialize': () => BbPromise.bind(this)
         .then(this.prepareDeployment)
         .then(this.saveCreateTemplateFile),
-
-      'before:package:compileFunctions': () => BbPromise.bind(this)
-        .then(this.generateArtifactDirectoryName),
 
       'package:compileFunctions': () => BbPromise.bind(this)
         .then(this.compileFunctions),

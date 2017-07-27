@@ -41,7 +41,6 @@ describe('AliyunPackage', () => {
       let setDefaultsStub;
       let prepareDeploymentStub;
       let saveCreateTemplateFileStub;
-      let generateArtifactDirectoryNameStub;
       let compileFunctionsStub;
       let mergeServiceResourcesStub;
       let saveUpdateTemplateFileStub;
@@ -57,8 +56,6 @@ describe('AliyunPackage', () => {
           .returns(BbPromise.resolve());
         saveCreateTemplateFileStub = sinon.stub(aliyunPackage, 'saveCreateTemplateFile')
           .returns(BbPromise.resolve());
-        generateArtifactDirectoryNameStub = sinon.stub(aliyunPackage, 'generateArtifactDirectoryName')
-          .returns(BbPromise.resolve());
         compileFunctionsStub = sinon.stub(aliyunPackage, 'compileFunctions')
           .returns(BbPromise.resolve());
         mergeServiceResourcesStub = sinon.stub(aliyunPackage, 'mergeServiceResources')
@@ -73,7 +70,6 @@ describe('AliyunPackage', () => {
         aliyunPackage.setDefaults.restore();
         aliyunPackage.prepareDeployment.restore();
         aliyunPackage.saveCreateTemplateFile.restore();
-        aliyunPackage.generateArtifactDirectoryName.restore();
         aliyunPackage.compileFunctions.restore();
         aliyunPackage.mergeServiceResources.restore();
         aliyunPackage.saveUpdateTemplateFile.restore();
@@ -94,11 +90,6 @@ describe('AliyunPackage', () => {
         .hooks['package:initialize']().then(() => {
           expect(prepareDeploymentStub.calledOnce).toEqual(true);
           expect(saveCreateTemplateFileStub.calledAfter(prepareDeploymentStub)).toEqual(true);
-        }));
-
-      it('should run "before:package:compileFunctions" promise chain', () => aliyunPackage
-        .hooks['before:package:compileFunctions']().then(() => {
-          expect(generateArtifactDirectoryNameStub.calledOnce).toEqual(true);
         }));
 
       it('should run "package:compileFunctions" promise chain', () => aliyunPackage

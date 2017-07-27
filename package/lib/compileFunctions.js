@@ -29,9 +29,10 @@ module.exports = {
     const bucketName = this.provider.getDeploymentBucketName();
 
     const fileName = artifact.split(path.sep).pop();
-    const artifactFilePath =
-      `${this.serverless.service.package.artifactDirectoryName}/${fileName}`;
+    const directory = this.provider.getArtifactDirectoryName();
+    const artifactFilePath = `${directory}/${fileName}`;
     this.serverless.service.package.artifactFilePath = artifactFilePath;
+    this.serverless.service.package.artifactDirectoryName = directory;
 
     const packagePath = 
       path.join(this.serverless.config.servicePath || '.', '.serverless');

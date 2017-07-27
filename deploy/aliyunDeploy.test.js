@@ -33,8 +33,8 @@ describe('AliyunDeploy', () => {
 
   describe('#constructor()', () => {
     const options = {
-      stage: 'my-stage',
-      region: 'my-region',
+      stage: 'dev',
+      region: 'cn-shanghai',
     };
     beforeEach(() => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
@@ -127,7 +127,13 @@ describe('AliyunDeploy', () => {
     let createApiStub;
     let deployApiStub;
 
+    const options = {
+      stage: 'dev',
+      region: 'cn-shanghai',
+    };
     beforeEach(() => {
+      serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+      aliyunDeploy = new AliyunDeploy(serverless, options);
       getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
       createServiceStub = sinon.stub(aliyunDeploy.provider, 'createService');

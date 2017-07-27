@@ -2,11 +2,13 @@
 
 const fs = require('fs');
 
+const getFuncName = Symbol('getfuncname');
+
 // mock of the serverless instance
 class Serverless {
   constructor() {
+    const sls = this;
     this.providers = {};
-
     this.service = {};
     this.service.getAllFunctions = function () { //eslint-disable-line
       return Object.keys(this.functions);
@@ -17,7 +19,7 @@ class Serverless {
         throw new Error(`Function "${functionName}" doesn't exist in this Service`);
       }
       this.functions[functionName]
-        .name = `${this.service}-dev-${functionName}`;
+        .name = sls.pluginManager[getFuncName](functionName);
       return this.functions[functionName];
     };
     this.utils = {
@@ -32,12 +34,27 @@ class Serverless {
       consoleLog() {},
       printDot() {},
     };
-
     this.plugins = [];
     this.pluginManager = {
       addPlugin: plugin => this.plugins.push(plugin),
+      spawn(key) {
+        if (key === 'package:function') {
+          const func = this.cliOptions.function;
+          sls.cli.log(`Packaging function: ${func}...`)
+          sls.service.functions[func].artifact = `${func}.zip`;
+        }
+      },
+      setCliOptions(options) {
+        this.cliOptions = options;
+      },
+      [getFuncName](func) {
+        const service = sls.service.service;
+        const stage = this.cliOptions.stage;
+        // const stage = this.cliOptions ? this.cliOptions.stage : 'dev';
+        return `${service}-${stage}-${func}`;
+      }
     };
-  }
+  }  
 
   setProvider(name, provider) {
     this.providers[name] = provider;

@@ -13,7 +13,7 @@ module.exports = {
       .then(this.createBucketIfNotExists);
   },
 
-  updateTemplates(id) {
+  updateServiceId(id) {
     const serviceKey = this.provider.getServiceId();
     const createService = this.templates.create.Resources[serviceKey].Properties;
     const updateService = this.templates.update.Resources[serviceKey].Properties;
@@ -31,7 +31,7 @@ module.exports = {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
     if (foundService) {
-      this.updateTemplates(foundService.serviceId);
+      this.updateServiceId(foundService.serviceId);
       this.serverless.cli.log(`Service ${service.name} already exists.`);
       return BbPromise.resolve();
     }
@@ -41,7 +41,7 @@ module.exports = {
     return this.provider.createService(service.name)
       .then((createdService) => {
         // Update existing service id
-        this.updateTemplates(createdService.serviceId);
+        this.updateServiceId(createdService.serviceId);
         this.serverless.cli.log(`Created service ${service.name}`);
       });
   },

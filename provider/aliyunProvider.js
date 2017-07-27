@@ -210,6 +210,14 @@ class AliyunProvider {
     return `serverless/${service}/${stage}`;
   }
 
+  getArtifactDirectoryName() {
+    const prefix = this.getArtifactDirectoryPrefix();
+    const date = new Date();
+    const dateString = `${date.getTime().toString()}-${date.toISOString()}`;
+
+    return `${prefix}/${dateString}`;
+  }
+
   initializeTemplate() {
     const deploymentTemplate = this.serverless.utils.readFileSync(
       path.join(

@@ -19,6 +19,7 @@ describe('AliyunRemove', () => {
       region: 'my-region',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+    serverless.pluginManager.setCliOptions(options);
     aliyunRemove = new AliyunRemove(serverless, options);
   });
 

@@ -11,13 +11,13 @@ describe('CompileFunctions', () => {
   let serverless;
   let aliyunPackage;
   let consoleLogStub;
+  const directory = 'serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z'
 
   beforeEach(() => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
     serverless.service.package = {
-      artifact: '/tmp/artifact.zip',
-      artifactDirectoryName: 'serverless/my-service/dev/1498638463280',
+      artifact: '/tmp/artifact.zip'
     };
     serverless.config = {
       servicePath: 'my-service'
@@ -55,9 +55,10 @@ describe('CompileFunctions', () => {
       region: 'cn-shanghai',
     };
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
-
+    serverless.pluginManager.setCliOptions(options);
     aliyunPackage = new AliyunPackage(serverless, options);
     consoleLogStub = sinon.stub(aliyunPackage.serverless.cli, 'log').returns();
+    sinon.stub(aliyunPackage.provider, 'getArtifactDirectoryName').returns(directory);
   });
 
   afterEach(() => {
@@ -65,6 +66,7 @@ describe('CompileFunctions', () => {
     aliyunPackage.serverless.service.functions = {};
     aliyunPackage.serverless.service.provider.memorySize = undefined;
     aliyunPackage.serverless.service.provider.timeout = undefined;
+    aliyunPackage.provider.getArtifactDirectoryName.restore();
   });
 
   describe('#compileFunctions()', () => {
@@ -94,7 +96,7 @@ describe('CompileFunctions', () => {
             "runtime": "nodejs4.4",
             "code": {
               "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+              "ossObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip"
             }
           }
         }
@@ -136,7 +138,7 @@ describe('CompileFunctions', () => {
             "runtime": "nodejs4.4",
             "code": {
               "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+              "ossObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip"
             }
           }
         }
@@ -176,7 +178,7 @@ describe('CompileFunctions', () => {
             "runtime": "nodejs4.4",
             "code": {
               "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+              "ossObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip"
             }
           }
         }
@@ -216,7 +218,7 @@ describe('CompileFunctions', () => {
             "runtime": "nodejs4.4",
             "code": {
               "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+              "ossObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip"
             }
           }
         }
@@ -258,7 +260,7 @@ describe('CompileFunctions', () => {
           "Type": "ALIYUN::OSS:Object",
           "Properties": {
             "BucketName": "sls-my-service",
-            "ObjectName": "serverless/my-service/dev/1498638463280/artifact.zip",
+            "ObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip",
             "LocalPath": `${serverlessDirPath}/artifact.zip`
           }
         },
@@ -291,7 +293,7 @@ describe('CompileFunctions', () => {
             "runtime": "nodejs4.4",
             "code": {
               "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1498638463280/artifact.zip"
+              "ossObjectName": "serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/artifact.zip"
             }
           }
         },
