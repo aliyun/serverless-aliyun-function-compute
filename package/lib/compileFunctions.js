@@ -9,19 +9,25 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   compileFunctions() {
-    this.compileStorage();
+    this.compileStorage(this.serverless.service.package.artifact);
     this.compileService();
     this.compileFunctionsAndEvents();
     return BbPromise.resolve();
   },
 
-  compileStorage() {
+  compileFunction(funcName, funcObject) {
+    this.compileStorage(funcObject.artifact);
+    this.compileService();
+    this.compileFunctionAndEvent(funcName, funcObject);
+    return BbPromise.resolve();
+  },
+
+  compileStorage(artifact) {
     const objectId = this.provider.getStorageObjectId();
     const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
 
     const bucketName = this.provider.getDeploymentBucketName();
 
-    const artifact = this.serverless.service.package.artifact;
     const fileName = artifact.split(path.sep).pop();
     const artifactFilePath =
       `${this.serverless.service.package.artifactDirectoryName}/${fileName}`;
@@ -45,10 +51,14 @@ module.exports = {
   },
 
   compileFunctionsAndEvents() {
-    const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.serverless.service.getAllFunctions().forEach((functionName) => {
       const funcObject = this.serverless.service.getFunction(functionName);
+      this.compileFunctionAndEvent(functionName, funcObject);
+    });
+  },
 
+  compileFunctionAndEvent(functionName, funcObject) {
+      const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
       this.serverless.cli
         .log(`Compiling function "${functionName}"...`);
 
@@ -59,7 +69,6 @@ module.exports = {
 
       this.compileApiGateway.call(this, funcObject);
       this.compileEvents.call(this, funcObject);
-    });
   },
 
   compileApiGateway(funcObject) {

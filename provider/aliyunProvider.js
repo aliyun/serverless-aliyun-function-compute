@@ -704,17 +704,11 @@ class AliyunProvider {
   getApiProps(group, role, api) {
     const toStringify = ['RequestConfig', 'ServiceConfig',
       'RequestParameters', 'ServiceParameters', 'ServiceParametersMap'];
-    const props = Object.assign(
-      { "GroupId": group.GroupId },
-      _.omit(api, toStringify)
-    );
-    const newApi = _.merge(
-      {},
-      api,
-      { ServiceConfig: { FunctionComputeConfig: { RoleArn:  role.Arn } } }
-    );
+    const props = _.cloneDeep(api);
+    props.ServiceConfig.FunctionComputeConfig.RoleArn = role.Arn;
+    props.GroupId = group.GroupId;
     toStringify.forEach((key) => {
-      props[key] = JSON.stringify(newApi[key]);
+      props[key] = JSON.stringify(props[key]);
     });
     return props;
   }
