@@ -143,7 +143,6 @@ exports.fullApis = [{
   "ApiId": '413243280141'
 }];
 
-
 exports.functions = [{
   "name": "my-service-dev-postTest",
   "service": "my-service-dev",
@@ -166,4 +165,12 @@ exports.functions = [{
     "ossBucketName": "sls-my-service",
     "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
   }
+}];
+
+exports.fullFunctions = [{
+  "functionName": "my-service-dev-postTest",
+  "lastModifiedTime": "2017-07-21T07:38:41.413Z"
+}, {
+  "functionName": "my-service-dev-getTest",
+  "lastModifiedTime": "2017-07-21T07:38:41.413Z"
 }];
