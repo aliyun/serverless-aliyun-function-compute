@@ -25,24 +25,15 @@ functions:
       - http:
           path: /baz
           method: post
-          BodyFormat: FORM
-          RequestParameters:
-            - ApiParameterName: foo
-              ParameterType: String
-              Location: Body
-              Required: OPTIONAL
-              isHide: false
-              DefaultValue: bar
-              DemoValue: bar
-              Description: foo
-          ServiceParameters:
-            - ServiceParameterName: foo
-              Type: String
-              Location: Body
-              ParameterCatalog: REQUEST
-          ServiceParametersMap:
-            - ServiceParameterName: foo
-              RequestParameterName: foo
+          bodyFormat: form
+          parameters:
+            - name: foo
+              type: string
+              location: body
+              optional: true
+              default: bar
+              demo: bar
+              description: foo
 
   getTest:
     handler: index.getHandler

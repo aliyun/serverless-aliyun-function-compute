@@ -284,7 +284,7 @@ class AliyunProvider {
       "RequestProtocol": eventType.toUpperCase(),
       "RequestHttpMethod": (event.RequestHttpMethod || event.method || "GET").toUpperCase(),
       "RequestPath": requestPath,
-      "BodyFormat": event.BodyFormat || '',
+      "BodyFormat": (event.BodyFormat || event.bodyFormat || '').toUpperCase(),
       "PostBodyDescription": ""
     };
   }
@@ -304,6 +304,74 @@ class AliyunProvider {
     };
   }
 
+  getType(type) {
+    const dict = {
+      string: 'String',
+      number: 'Number'
+    };
+    return dict[type.toLowerCase()];
+  }
+
+  getLocation(loc) {
+    const dict = {
+      head: 'Head',
+      query: 'Query',
+      path: 'Path',
+      body: 'Body',
+    };
+    return dict[loc.toLowerCase()];
+  }
+
+  getRequestParameters(event) {
+    let result = [];
+    if (event.parameters) {
+      result = event.parameters.map((p) => ({
+        ApiParameterName: p.name,
+        ParameterType: this.getType(p.type),
+        Location: this.getLocation(p.location),
+        Required: p.optional ? 'OPTIONAL' : 'REQUIRED',
+        isHide: false,  // do not support hidden params
+        DefaultValue: p.default,
+        DemoValue: p.demo,
+        Description: p.description || ''
+      }));
+    }
+    if (event.RequestParameters) {
+      result = result.concat(event.RequestParameters);
+    }
+    return result;
+  }
+
+  getServiceParameters(event) {
+    let result = [];
+    if (event.parameters) {
+      result = event.parameters.map((p) => ({
+        ServiceParameterName: p.name,
+        Type: this.getType(p.type),
+        Location: this.getLocation(p.location),
+        ParameterCatalog: 'REQUEST'
+      }));
+    }
+    if (event.ServiceParameters) {
+      result = result.concat(event.ServiceParameters);
+    }
+    return result;
+  }
+
+  getServiceParametersMap(event) {
+    let result = [];
+    if (event.parameters) {
+      result = event.parameters.map((p) => ({
+        ServiceParameterName: p.name,
+        RequestParameterName: p.name
+      }));
+    }
+    if (event.ServiceParametersMap) {
+      result = result.concat(event.ServiceParametersMap);
+    }
+    return result;
+  }
+
   getHttpApiResource(event, funcObject) {
     const eventType = 'http';
     return {
@@ -317,9 +385,9 @@ class AliyunProvider {
         "AuthType": event.AuthType || "ANONYMOUS",
         "RequestConfig": this.getRequestConfig(eventType, event),
         "ServiceConfig": this.getServiceConfig(event, funcObject),
-        "RequestParameters": event.RequestParameters || [],
-        "ServiceParameters": event.ServiceParameters || [],
-        "ServiceParametersMap": event.ServiceParametersMap || [],
+        "RequestParameters": this.getRequestParameters(event),
+        "ServiceParameters": this.getServiceParameters(event),
+        "ServiceParametersMap": this.getServiceParametersMap(event),
         "ResultType": event.ResultType || "JSON",
         "ResultSample": event.ResultSample || "{}"
       }
