@@ -11,6 +11,8 @@ module.exports = {
     this.apiGroup = undefined;
     this.apis = [];
     this.deployedApis = [];
+    this.apiRole = undefined;
+    this.apiPolicies = [];
 
     this.serverless.cli.log('Removing events...');
     return BbPromise.bind(this)
@@ -23,6 +25,9 @@ module.exports = {
       .then(this.getApiInfo)
       .then(this.abolishApisIfDeployed)
       .then(this.removeApisIfExists)
+      .then(this.getRamInfo)
+      .then(this.removeApiPolicyIfExists)
+      .then(this.removeApiRoleIfExists)
       .then(this.removeApiGroupIfExists)
   },
 
@@ -90,6 +95,59 @@ module.exports = {
         this.serverless.cli.log(`Removed API ${api.ApiName}`);
       });
     });
+  },
+
+  getRamInfo() {
+    return BbPromise.bind(this)
+      .then(this.getApiRole)
+      .then(this.getApiPolicies);
+  },
+
+  getApiRole() {
+    const roleName = this.provider.getApiRoleName();
+    return this.provider.getRole(roleName)
+      .then((foundRole) => {
+        this.apiRole = foundRole;
+      });
+  },
+
+  getApiPolicies() {
+    if (!this.apiRole) {
+      return;
+    }
+    const roleName = this.provider.getApiRoleName();
+    return this.provider.getPoliciesForRole(roleName)
+      .then((policies) => {
+        this.apiPolicies = policies;
+      });
+  },
+
+  removeApiPolicyIfExists() {
+    if (!this.apiRole || !this.apiPolicies.length) {
+        return;
+    }
+    const role = this.apiRole;
+    const roleName = this.apiRole.RoleName;
+    return BbPromise.map(this.apiPolicies, (policyProps) => {
+      const policyName = policyProps.PolicyName;
+      this.serverless.cli.log(`Detaching RAM policy ${policyName} from ${roleName}...`);
+      return this.provider.detachPolicyFromRole(role, policyProps).then(() => {
+        this.serverless.cli.log(`Detached RAM policy ${policyName} from ${roleName}`);
+        return;
+      });
+    })
+  },
+
+  removeApiRoleIfExists() {
+    if (!this.apiRole) {
+        return;
+    }
+    const roleName = this.apiRole.RoleName;
+    this.serverless.cli.log(`Removing RAM role ${roleName}...`);
+    return this.provider.deleteRole(roleName)
+      .then(() => {
+        this.serverless.cli.log(`Removed RAM role ${roleName}`);
+      });
   },
 
   removeApiGroupIfExists() {

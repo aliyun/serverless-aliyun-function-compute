@@ -28,7 +28,7 @@ module.exports = {
     return BbPromise.bind(this)
       .then(this.createApiGroupIfNotExists)
       .then(this.createApiRoleIfNotExists)
-      .then(this.createApiPolicyIfNotExists)
+      .then(this.attachApiPolicyIfNotExists)
       .then(this.checkExistingApis)
       .then(this.createOrUpdateApis)
       .then(this.deployApis);
@@ -83,7 +83,7 @@ module.exports = {
     }
 
     const role = roleResource.Properties;
-    return this.provider.getApiRole(role.RoleName)
+    return this.provider.getRole(role.RoleName)
       .then((foundRole) => {
         if (foundRole) {
           this.apiRole = foundRole;
@@ -92,7 +92,7 @@ module.exports = {
         }
 
         this.serverless.cli.log(`Creating RAM role ${role.RoleName}...`);
-        return this.provider.createApiRole(role)
+        return this.provider.createRole(role)
           .then((createdRole) => {
             this.serverless.cli.log(`Created RAM role ${role.RoleName}`);
             this.apiRole = createdRole;
@@ -101,7 +101,7 @@ module.exports = {
       });
   },
 
-  createApiPolicyIfNotExists() {
+  attachApiPolicyIfNotExists() {
     const roleResource = this.templates.update.Resources[this.provider.getApiRoleLogicalId()];
 
     if (!roleResource) {
@@ -110,7 +110,7 @@ module.exports = {
 
     const role = roleResource.Properties;
 
-    return this.provider.getPolicies(role).then((policies) => {
+    return this.provider.getPoliciesForRole(role.RoleName).then((policies) => {
       return BbPromise.map(role.Policies, (policyProps) => {
         const policyName = policyProps.PolicyName;
         const roleName = policyProps.RoleName;
@@ -122,9 +122,9 @@ module.exports = {
           return policy;
         }
         this.serverless.cli.log(`Attaching RAM policy ${policyName} to ${roleName}...`);
-        return this.provider.createPolicy(policyProps).then((createdPolicy) => {
+        return this.provider.attachPolicyToRole(policyProps).then((attachedPolicy) => {
           this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
-          return createdPolicy;
+          return attachedPolicy;
         });
       })
     });

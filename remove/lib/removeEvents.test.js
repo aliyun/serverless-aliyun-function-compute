@@ -7,7 +7,7 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis } = require('../../test/data');
+const { fullGroup, fullApis, role, fullRole } = require('../../test/data');
 
 const functionDefs = {
   postTest: {
@@ -60,6 +60,10 @@ describe('removeEvents', () => {
     let getDeployedApisStub;
     let abolishApiStub;
     let deleteApiStub;
+    let getRoleStub;
+    let getPoliciesForRoleStub;
+    let detachPolicyFromRoleStub;
+    let deleteRoleStub;
     let deleteApiGroupStub;
 
     beforeEach(() => {
@@ -70,6 +74,10 @@ describe('removeEvents', () => {
       getDeployedApisStub = sinon.stub(aliyunRemove.provider, 'getDeployedApis');
       abolishApiStub = sinon.stub(aliyunRemove.provider, 'abolishApi');
       deleteApiStub = sinon.stub(aliyunRemove.provider, 'deleteApi');
+      getRoleStub = sinon.stub(aliyunRemove.provider, 'getRole');
+      getPoliciesForRoleStub = sinon.stub(aliyunRemove.provider, 'getPoliciesForRole');
+      detachPolicyFromRoleStub = sinon.stub(aliyunRemove.provider, 'detachPolicyFromRole');
+      deleteRoleStub = sinon.stub(aliyunRemove.provider, 'deleteRole');
       deleteApiGroupStub = sinon.stub(aliyunRemove.provider, 'deleteApiGroup');
     });
 
@@ -79,6 +87,10 @@ describe('removeEvents', () => {
       aliyunRemove.provider.getApis.restore();
       aliyunRemove.provider.getDeployedApis.restore();
       aliyunRemove.provider.abolishApi.restore();
+      aliyunRemove.provider.getRole.restore();
+      aliyunRemove.provider.getPoliciesForRole.restore();
+      aliyunRemove.provider.detachPolicyFromRole.restore();
+      aliyunRemove.provider.deleteRole.restore();
       aliyunRemove.provider.deleteApi.restore();
       aliyunRemove.provider.deleteApiGroup.restore();
     });
@@ -90,6 +102,10 @@ describe('removeEvents', () => {
       getDeployedApisStub.returns(BbPromise.resolve(fullApis));
       abolishApiStub.returns(BbPromise.resolve());
       deleteApiStub.returns(BbPromise.resolve());
+      getRoleStub.returns(BbPromise.resolve(fullRole));
+      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
+      detachPolicyFromRoleStub.returns(BbPromise.resolve());
+      deleteRoleStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       return aliyunRemove.removeEvents().then(() => {
@@ -122,7 +138,18 @@ describe('removeEvents', () => {
         expect(deleteApiStub.getCall(1).args)
           .toEqual([ fullGroup, fullApis[1] ]);
 
-        expect(deleteApiGroupStub.calledAfter(deleteApiStub)).toEqual(true);
+        expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
+        expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
@@ -136,6 +163,10 @@ describe('removeEvents', () => {
           'Removed API sls_http_my_service_dev_postTest',
           'Removing API sls_http_my_service_dev_getTest...',
           'Removed API sls_http_my_service_dev_getTest',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
+          'Removing RAM role sls-my-service-dev-api-role...',
+          'Removed RAM role sls-my-service-dev-api-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -152,6 +183,10 @@ describe('removeEvents', () => {
       getDeployedApisStub.returns(BbPromise.resolve([fullApis[0]]));
       abolishApiStub.returns(BbPromise.resolve());
       deleteApiStub.returns(BbPromise.resolve());
+      getRoleStub.returns(BbPromise.resolve(fullRole));
+      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
+      detachPolicyFromRoleStub.returns(BbPromise.resolve());
+      deleteRoleStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       return aliyunRemove.removeEvents().then(() => {
@@ -167,7 +202,18 @@ describe('removeEvents', () => {
         expect(deleteApiStub.getCall(1).args)
           .toEqual([ fullGroup, fullApis[1] ]);
 
-        expect(deleteApiGroupStub.calledAfter(deleteApiStub)).toEqual(true);
+        expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
+        expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
@@ -179,6 +225,10 @@ describe('removeEvents', () => {
           'Removed API sls_http_my_service_dev_postTest',
           'Removing API sls_http_my_service_dev_getTest...',
           'Removed API sls_http_my_service_dev_getTest',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
+          'Removing RAM role sls-my-service-dev-api-role...',
+          'Removed RAM role sls-my-service-dev-api-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -195,6 +245,10 @@ describe('removeEvents', () => {
       getDeployedApisStub.returns(BbPromise.resolve([]));
       abolishApiStub.returns(BbPromise.resolve());
       deleteApiStub.returns(BbPromise.resolve());
+      getRoleStub.returns(BbPromise.resolve(fullRole));
+      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
+      detachPolicyFromRoleStub.returns(BbPromise.resolve());
+      deleteRoleStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       return aliyunRemove.removeEvents().then(() => {
@@ -202,7 +256,19 @@ describe('removeEvents', () => {
         expect(deleteApiStub.calledOnce).toEqual(true);
         expect(deleteApiStub.getCall(0).args)
           .toEqual([ fullGroup, fullApis[0] ]);
-        expect(deleteApiGroupStub.calledAfter(deleteApiStub)).toEqual(true);
+
+        expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
+        expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
+        expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+
+        expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
@@ -211,6 +277,10 @@ describe('removeEvents', () => {
           'No deployed APIs to abolish.',
           'Removing API sls_http_my_service_dev_postTest...',
           'Removed API sls_http_my_service_dev_postTest',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
+          'Removing RAM role sls-my-service-dev-api-role...',
+          'Removed RAM role sls-my-service-dev-api-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -227,12 +297,20 @@ describe('removeEvents', () => {
       getDeployedApisStub.returns(BbPromise.resolve([]));
       abolishApiStub.returns(BbPromise.resolve());
       deleteApiStub.returns(BbPromise.resolve());
+      getRoleStub.returns(BbPromise.resolve());
+      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
+      detachPolicyFromRoleStub.returns(BbPromise.resolve());
+      deleteRoleStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       return aliyunRemove.removeEvents().then(() => {
         expect(abolishApiStub.called).toEqual(false);
         expect(deleteApiStub.called).toEqual(false);
         expect(deleteApiGroupStub.called).toEqual(false);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.called).toEqual(false);
+        expect(detachPolicyFromRoleStub.called).toEqual(false);
+        expect(deleteRoleStub.called).toEqual(false);
 
         const logs = [
           'Removing events...',

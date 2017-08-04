@@ -151,10 +151,10 @@ describe('AliyunDeployFunction', () => {
     let createFunctionStub;
     let getApiGroupStub;
     let createApiGroupStub;
-    let getApiRoleStub;
-    let createApiRoleStub;
-    let getPoliciesStub;
-    let createPolicyStub;
+    let getRoleStub;
+    let createRoleStub;
+    let getPoliciesForRoleStub;
+    let attachPolicyToRoleStub;
     let getApisStub;
     let updateApiStub;
     let createApiStub;
@@ -179,10 +179,10 @@ describe('AliyunDeployFunction', () => {
       updateFunctionStub = sinon.stub(aliyunDeployFunction.provider, 'updateFunction');
       createFunctionStub = sinon.stub(aliyunDeployFunction.provider, 'createFunction');getApiGroupStub = sinon.stub(aliyunDeployFunction.provider, 'getApiGroup');
       createApiGroupStub = sinon.stub(aliyunDeployFunction.provider, 'createApiGroup');
-      getApiRoleStub = sinon.stub(aliyunDeployFunction.provider, 'getApiRole');
-      createApiRoleStub = sinon.stub(aliyunDeployFunction.provider, 'createApiRole');
-      getPoliciesStub = sinon.stub(aliyunDeployFunction.provider, 'getPolicies');
-      createPolicyStub = sinon.stub(aliyunDeployFunction.provider, 'createPolicy');
+      getRoleStub = sinon.stub(aliyunDeployFunction.provider, 'getRole');
+      createRoleStub = sinon.stub(aliyunDeployFunction.provider, 'createRole');
+      getPoliciesForRoleStub = sinon.stub(aliyunDeployFunction.provider, 'getPoliciesForRole');
+      attachPolicyToRoleStub = sinon.stub(aliyunDeployFunction.provider, 'attachPolicyToRole');
       getApisStub = sinon.stub(aliyunDeployFunction.provider, 'getApis');
       updateApiStub = sinon.stub(aliyunDeployFunction.provider, 'updateApi');
       createApiStub = sinon.stub(aliyunDeployFunction.provider, 'createApi');
@@ -203,10 +203,10 @@ describe('AliyunDeployFunction', () => {
       aliyunDeployFunction.provider.createFunction.restore();
       aliyunDeployFunction.provider.getApiGroup.restore();
       aliyunDeployFunction.provider.createApiGroup.restore();
-      aliyunDeployFunction.provider.getApiRole.restore();
-      aliyunDeployFunction.provider.createApiRole.restore();
-      aliyunDeployFunction.provider.getPolicies.restore();
-      aliyunDeployFunction.provider.createPolicy.restore();
+      aliyunDeployFunction.provider.getRole.restore();
+      aliyunDeployFunction.provider.createRole.restore();
+      aliyunDeployFunction.provider.getPoliciesForRole.restore();
+      aliyunDeployFunction.provider.attachPolicyToRole.restore();
       aliyunDeployFunction.provider.getApis.restore();
       aliyunDeployFunction.provider.updateApi.restore();
       aliyunDeployFunction.provider.createApi.restore();
@@ -226,10 +226,10 @@ describe('AliyunDeployFunction', () => {
       createFunctionStub.returns(BbPromise.resolve());
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApiRoleStub.returns(BbPromise.resolve(undefined));
-      createApiRoleStub.returns(BbPromise.resolve(fullRole));
-      getPoliciesStub.returns(BbPromise.resolve([]));
-      createPolicyStub.returns(BbPromise.resolve(role.Policies[0]));
+      getRoleStub.returns(BbPromise.resolve(undefined));
+      createRoleStub.returns(BbPromise.resolve(fullRole));
+      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
+      attachPolicyToRoleStub.returns(BbPromise.resolve(role.Policies[0]));
       getApisStub.returns(BbPromise.resolve([]));
       updateApiStub.returns(BbPromise.resolve());
       createApiStub.returns(BbPromise.resolve(fullApis[1]));
@@ -248,10 +248,10 @@ describe('AliyunDeployFunction', () => {
         'Created function my-service-dev-postTest',
         'Creating API group my_service_dev_api...',
         'Created API group my_service_dev_api',
-        'Creating RAM role SLSFCInvocationFromAPIGateway...',
-        'Created RAM role SLSFCInvocationFromAPIGateway',
-        'Attaching RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway...',
-        'Attached RAM policy AliyunFCInvocationAccess to SLSFCInvocationFromAPIGateway',
+        'Creating RAM role sls-my-service-dev-api-role...',
+        'Created RAM role sls-my-service-dev-api-role',
+        'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-api-role...',
+        'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-api-role',
         'Creating API sls_http_my_service_dev_postTest...',
         'Created API sls_http_my_service_dev_postTest',
         'Deploying API sls_http_my_service_dev_postTest...',
@@ -289,10 +289,10 @@ describe('AliyunDeployFunction', () => {
 
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       createApiGroupStub.returns(BbPromise.resolve());
-      getApiRoleStub.returns(BbPromise.resolve(fullRole));
-      createApiRoleStub.returns(BbPromise.resolve());
-      getPoliciesStub.returns(BbPromise.resolve(role.Policies));
-      createPolicyStub.returns(BbPromise.resolve());
+      getRoleStub.returns(BbPromise.resolve(fullRole));
+      createRoleStub.returns(BbPromise.resolve());
+      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
+      attachPolicyToRoleStub.returns(BbPromise.resolve());
       getApisStub.returns(BbPromise.resolve(fullApis));
       createApiStub.returns(BbPromise.resolve());
       updateApiStub.returns(BbPromise.resolve(fullApis[1]));
@@ -308,7 +308,7 @@ describe('AliyunDeployFunction', () => {
         'Updating function my-service-dev-postTest...',
         'Updated function my-service-dev-postTest',
         'API group my_service_dev_api exists.',
-        'RAM role SLSFCInvocationFromAPIGateway exists.',
+        'RAM role sls-my-service-dev-api-role exists.',
         'RAM policy AliyunFCInvocationAccess exists.',
         'Updating API sls_http_my_service_dev_postTest...',
         'Updated API sls_http_my_service_dev_postTest',
