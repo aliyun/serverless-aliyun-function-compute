@@ -104,7 +104,7 @@ module.exports = {
   },
 
   getApiRole() {
-    const roleName = this.provider.getApiRoleName();
+    const roleName = this.provider.getInvokeRoleName();
     return this.provider.getRole(roleName)
       .then((foundRole) => {
         this.apiRole = foundRole;
@@ -115,7 +115,7 @@ module.exports = {
     if (!this.apiRole) {
       return;
     }
-    const roleName = this.provider.getApiRoleName();
+    const roleName = this.provider.getInvokeRoleName();
     return this.provider.getPoliciesForRole(roleName)
       .then((policies) => {
         this.apiPolicies = policies;

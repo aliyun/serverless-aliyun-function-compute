@@ -75,12 +75,16 @@ module.exports = {
   compileApiGateway(funcObject) {
     const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     const agLogicalId = this.provider.getApiGroupLogicalId();
-    const agRoleId = this.provider.getApiRoleLogicalId();
+    const invokeRoleId = this.provider.getInvokeRoleLogicalId();
 
     if (funcObject.events.some(needsApiGateway) &&
       !resources[agLogicalId]) {
       resources[agLogicalId] = this.provider.getApiGroupResource();
-      resources[agRoleId] = this.provider.getApiRoleResource();
+      let invokeResource = resources[invokeRoleId];
+      if (!invokeResource) {
+        invokeResource = this.provider.getInvokeRoleResource();
+      }
+      this.provider.makeApiRole(invokeResource);
     }
   },
 

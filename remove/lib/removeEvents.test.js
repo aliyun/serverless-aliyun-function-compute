@@ -139,15 +139,15 @@ describe('removeEvents', () => {
           .toEqual([ fullGroup, fullApis[1] ]);
 
         expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
         expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
-        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
         expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
         expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
         expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
-        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
@@ -163,10 +163,10 @@ describe('removeEvents', () => {
           'Removed API sls_http_my_service_dev_postTest',
           'Removing API sls_http_my_service_dev_getTest...',
           'Removed API sls_http_my_service_dev_getTest',
-          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
-          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
-          'Removing RAM role sls-my-service-dev-api-role...',
-          'Removed RAM role sls-my-service-dev-api-role',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role',
+          'Removing RAM role sls-my-service-dev-invoke-role...',
+          'Removed RAM role sls-my-service-dev-invoke-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -203,15 +203,15 @@ describe('removeEvents', () => {
           .toEqual([ fullGroup, fullApis[1] ]);
 
         expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
         expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
-        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
         expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
         expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
         expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
-        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
@@ -225,10 +225,10 @@ describe('removeEvents', () => {
           'Removed API sls_http_my_service_dev_postTest',
           'Removing API sls_http_my_service_dev_getTest...',
           'Removed API sls_http_my_service_dev_getTest',
-          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
-          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
-          'Removing RAM role sls-my-service-dev-api-role...',
-          'Removed RAM role sls-my-service-dev-api-role',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role',
+          'Removing RAM role sls-my-service-dev-invoke-role...',
+          'Removed RAM role sls-my-service-dev-invoke-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -258,15 +258,15 @@ describe('removeEvents', () => {
           .toEqual([ fullGroup, fullApis[0] ]);
 
         expect(getRoleStub.calledAfter(deleteApiStub)).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
         expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
-        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getPoliciesForRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(detachPolicyFromRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
         expect(detachPolicyFromRoleStub.calledOnce).toEqual(true);
         expect(detachPolicyFromRoleStub.calledWithExactly(fullRole, role.Policies[0])).toEqual(true);
         expect(deleteRoleStub.calledAfter(detachPolicyFromRoleStub)).toEqual(true);
-        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(deleteRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(deleteApiGroupStub.calledAfter(deleteRoleStub)).toEqual(true);
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
@@ -277,10 +277,10 @@ describe('removeEvents', () => {
           'No deployed APIs to abolish.',
           'Removing API sls_http_my_service_dev_postTest...',
           'Removed API sls_http_my_service_dev_postTest',
-          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role...',
-          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-api-role',
-          'Removing RAM role sls-my-service-dev-api-role...',
-          'Removed RAM role sls-my-service-dev-api-role',
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role',
+          'Removing RAM role sls-my-service-dev-invoke-role...',
+          'Removed RAM role sls-my-service-dev-invoke-role',
           'Removing API group my_service_dev_api...',
           'Removed API group my_service_dev_api'
         ];
@@ -307,7 +307,7 @@ describe('removeEvents', () => {
         expect(abolishApiStub.called).toEqual(false);
         expect(deleteApiStub.called).toEqual(false);
         expect(deleteApiGroupStub.called).toEqual(false);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
         expect(getPoliciesForRoleStub.called).toEqual(false);
         expect(detachPolicyFromRoleStub.called).toEqual(false);
         expect(deleteRoleStub.called).toEqual(false);

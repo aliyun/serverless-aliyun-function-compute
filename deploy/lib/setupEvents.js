@@ -76,7 +76,7 @@ module.exports = {
   },
 
   createApiRoleIfNotExists() {
-    const roleResource = this.templates.update.Resources[this.provider.getApiRoleLogicalId()];
+    const roleResource = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()];
 
     if (!roleResource) {
       return BbPromise.resolve();  // No API needed
@@ -102,7 +102,7 @@ module.exports = {
   },
 
   attachApiPolicyIfNotExists() {
-    const roleResource = this.templates.update.Resources[this.provider.getApiRoleLogicalId()];
+    const roleResource = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()];
 
     if (!roleResource) {
       return BbPromise.resolve();  // No API needed

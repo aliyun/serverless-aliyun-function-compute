@@ -132,7 +132,7 @@ describe('setupEvents', () => {
 
         expect(getRoleStub.calledAfter(createApiGroupStub)).toEqual(true);
         expect(getRoleStub.calledOnce).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(createRoleStub.calledAfter(getRoleStub)).toEqual(true);
         expect(createRoleStub.calledOnce).toEqual(true);
@@ -182,10 +182,10 @@ describe('setupEvents', () => {
         const logs = [
           'Creating API group my_service_dev_api...',
           'Created API group my_service_dev_api',
-          'Creating RAM role sls-my-service-dev-api-role...',
-          'Created RAM role sls-my-service-dev-api-role',
-          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-api-role...',
-          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-api-role',
+          'Creating RAM role sls-my-service-dev-invoke-role...',
+          'Created RAM role sls-my-service-dev-invoke-role',
+          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
+          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role',
           'Creating API sls_http_my_service_dev_postTest...',
           'Created API sls_http_my_service_dev_postTest',
           'Creating API sls_http_my_service_dev_getTest...',
@@ -225,7 +225,7 @@ describe('setupEvents', () => {
 
         expect(getRoleStub.calledAfter(getApiGroupStub)).toEqual(true);
         expect(getRoleStub.calledOnce).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-api-role')).toEqual(true);
+        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
 
         expect(createRoleStub.called).toEqual(false);
 
@@ -269,7 +269,7 @@ describe('setupEvents', () => {
 
         const logs = [
           'API group my_service_dev_api exists.',
-          'RAM role sls-my-service-dev-api-role exists.',
+          'RAM role sls-my-service-dev-invoke-role exists.',
           'RAM policy AliyunFCInvocationAccess exists.',
           'Updating API sls_http_my_service_dev_postTest...',
           'Updated API sls_http_my_service_dev_postTest',
