@@ -37,6 +37,7 @@ describe('removeRoleAndPolicies', () => {
       const options = {
         stage: 'dev',
         region: 'cn-shanghai',
+        'remove-roles': true
       };
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       serverless.pluginManager.setCliOptions(options);
@@ -117,8 +118,7 @@ describe('removeRoleAndPolicies', () => {
     beforeEach(() => {
       const options = {
         stage: 'dev',
-        region: 'cn-shanghai',
-        'preserve-roles': true
+        region: 'cn-shanghai'
       };
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       serverless.pluginManager.setCliOptions(options);
@@ -138,7 +138,7 @@ describe('removeRoleAndPolicies', () => {
       aliyunRemove.provider.deleteRole.restore();
     });
 
-    it('should not do anything if --preserve-roles', () => {
+    it('should not do anything if there is no --remove-roles', () => {
       getRoleStub.returns(BbPromise.resolve());
       getPoliciesForRoleStub.returns(BbPromise.resolve([]));
       detachPolicyFromRoleStub.returns(BbPromise.resolve());
