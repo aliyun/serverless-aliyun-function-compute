@@ -18,6 +18,8 @@ module.exports = {
     const serviceId = this.provider.getServiceId();
     deploymentTemplate.Resources[serviceId] = this.provider.getServiceResource();
 
+    const execRoleId = this.provider.getExecRoleLogicalId();deploymentTemplate.Resources[execRoleId] = this.provider.getExecRoleResource();
+
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
 
     return BbPromise.resolve();
