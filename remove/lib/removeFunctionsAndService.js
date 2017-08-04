@@ -7,11 +7,13 @@ module.exports = {
     this.fcService = undefined;
     this.fcFunctions = [];
     this.serverless.cli.log('Removing functions...');
+    const execRoleName = this.provider.getExecRoleName();
     return BbPromise.bind(this)
       .then(this.getService)
       .then(this.getFunctions)
       .then(this.removeFunctions)
-      .then(this.removeServiceIfExists);
+      .then(this.removeServiceIfExists)
+      .then(() => this.removeRoleAndPolicies(execRoleName));
   },
 
   getService() {
@@ -57,5 +59,5 @@ module.exports = {
     return this.provider.deleteService(serviceName).then(() => {
       this.serverless.cli.log(`Removed service ${serviceName}`);
     });
-  }
+  },
 };

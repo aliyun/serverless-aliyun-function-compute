@@ -65,7 +65,7 @@ module.exports = {
     if (!execResource) {
       execResource = this.provider.getExecRoleResource();
     }
-    this.provider.letRoleAccessLog(execResource);
+    // this.provider.letRoleAccessLog(execResource);
     resources[execRoleId] = execResource;
   },
 

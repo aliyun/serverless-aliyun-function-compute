@@ -233,6 +233,10 @@ describe('CompileFunctions', () => {
 
     const compiledResources = require(
       path.join(__dirname, '..', '..', 'test', '.serverless','configuration-template-update.json')).Resources;
+
+    // TODO(joyeecheung): need to implement log store creation first
+    compiledResources['sls-fc-exec-role'].Properties.Policies = [];
+
     it('should compile "http" events with "parameters" properly', () => {
       aliyunPackage.serverless.service.functions = {
         postTest: {

@@ -8,28 +8,7 @@ const path = require('path');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunInfo = require('../aliyunInfo');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis, apis, fullFunctions } = require('../../test/data');
-
-const functionDefs = {
-  postTest: {
-    handler: 'index.postHandler',
-    events: [
-      { http: {
-        path: '/baz',
-        method: 'post'
-      } },
-    ],
-  },
-  getTest: {
-    handler: 'index.getHandler',
-    events: [
-      { http: {
-        path: '/quo',
-        method: 'get'
-      } },
-    ],
-  }
-};
+const { fullGroup, fullApis, apis, fullFunctions, functionDefs } = require('../../test/data');
 
 describe('DisplayServiceInfo', () => {
   let serverless;

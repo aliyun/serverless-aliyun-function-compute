@@ -7,36 +7,7 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis } = require('../../test/data');
-
-const functionDefs = {
-  postTest: {
-    handler: 'index.postHandler',
-    events: [
-      { http: {
-        path: '/baz',
-        method: 'post'
-      } },
-    ],
-  },
-  getTest: {
-    handler: 'index.getHandler',
-    events: [
-      { http: {
-        path: '/quo',
-        method: 'get'
-      } },
-    ],
-  }
-};
-
-const functions = [{
-  functionName: 'my-service-dev-postTest',
-  functionId: new Date().getTime().toString(16)
-}, {
-  functionName: 'my-service-dev-getTest',
-  functionId: new Date().getTime().toString(16)
-}];
+const { fullGroup, fullApis, functionDefs, fullFunctions } = require('../../test/data');
 
 describe('removeFunctionsAndService', () => {
   let serverless;
@@ -68,6 +39,7 @@ describe('removeFunctionsAndService', () => {
     let getFunctionsStub;
     let deleteFunctionStub;
     let deleteServiceStub;
+    let removeRoleAndPoliciesStub;
 
     beforeEach(() => {
       aliyunRemove.serverless.service.functions = {};
@@ -76,6 +48,7 @@ describe('removeFunctionsAndService', () => {
       getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
+      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
     });
 
     afterEach(() => {
@@ -84,6 +57,7 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.provider.getFunctions.restore();
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
+      aliyunRemove.removeRoleAndPolicies.restore();
     });
 
     it('should remove existing functions and service', () => {
@@ -93,7 +67,7 @@ describe('removeFunctionsAndService', () => {
         serviceId: serviceId,
         serviceName: 'my-service-dev'
       }));
-      getFunctionsStub.returns(BbPromise.resolve(functions));
+      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -122,6 +96,9 @@ describe('removeFunctionsAndService', () => {
         expect(deleteServiceStub.calledOnce).toEqual(true);
         expect(deleteServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
 
+        expect(removeRoleAndPoliciesStub.calledAfter(deleteServiceStub)).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
+
         const logs = [
           'Removing functions...',
           'Removing function my-service-dev-postTest of service my-service-dev...',
@@ -144,7 +121,7 @@ describe('removeFunctionsAndService', () => {
         serviceId: serviceId,
         serviceName: 'my-service-dev'
       }));
-      getFunctionsStub.returns(BbPromise.resolve([functions[0]]));
+      getFunctionsStub.returns(BbPromise.resolve([fullFunctions[0]]));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -159,6 +136,9 @@ describe('removeFunctionsAndService', () => {
         expect(deleteServiceStub.calledAfter(deleteFunctionStub)).toEqual(true);
         expect(deleteServiceStub.calledOnce).toEqual(true);
         expect(deleteServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
+
+        expect(removeRoleAndPoliciesStub.calledAfter(deleteServiceStub)).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
 
         const logs = [
           'Removing functions...',
@@ -184,6 +164,9 @@ describe('removeFunctionsAndService', () => {
       return aliyunRemove.removeFunctionsAndService().then(() => {
         expect(deleteFunctionStub.called).toEqual(false);
         expect(deleteServiceStub.called).toEqual(false);
+        expect(removeRoleAndPoliciesStub.calledOnce).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
+
         const logs = [
           'Removing functions...',
           'No functions to remove.',

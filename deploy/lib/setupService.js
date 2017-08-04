@@ -8,17 +8,19 @@ const BbPromise = require('bluebird');
 module.exports = {
   setupService() {
     return BbPromise.bind(this)
+      // .then(this.checkForExistingLogStore)
+      // .then(this.createLogStoreIfNotExists)
+      .then(this.setupExecRole)
       .then(this.checkForExistingService)
       .then(this.createServiceIfNotExists)
       .then(this.createBucketIfNotExists);
   },
 
-  updateServiceId(id) {
-    const serviceKey = this.provider.getServiceId();
-    const createService = this.templates.create.Resources[serviceKey].Properties;
-    const updateService = this.templates.update.Resources[serviceKey].Properties;
-    updateService.id = id;
-    createService.id = id;
+  setupExecRole() {
+    const role = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Properties;
+    return BbPromise.bind(this)
+      .then(() => this.setupRole(role))
+      .then((execRole) => this.execRole = execRole)
   },
 
   checkForExistingService() {
@@ -31,17 +33,14 @@ module.exports = {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
     if (foundService) {
-      this.updateServiceId(foundService.serviceId);
       this.serverless.cli.log(`Service ${service.name} already exists.`);
+      // TODO(joyeecheung): check if role and log is configured
       return BbPromise.resolve();
     }
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
     // TODO(joyeecheung): generate description
-    return this.provider.createService(service.name)
-      .then((createdService) => {
-        // Update existing service id
-        this.updateServiceId(createdService.serviceId);
+    return this.provider.createService(service.name, this.execRole).then((createdService) => {
         this.serverless.cli.log(`Created service ${service.name}`);
       });
   },

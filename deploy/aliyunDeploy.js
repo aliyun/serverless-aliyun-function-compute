@@ -10,6 +10,7 @@ const setupService = require('./lib/setupService');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
 const setupEvents = require('./lib/setupEvents');
+const setupRole = require('./lib/setupRole');
 
 class AliyunDeploy {
   constructor(serverless, options) {
@@ -25,7 +26,8 @@ class AliyunDeploy {
       setupService,
       uploadArtifacts,
       setupFunctions,
-      setupEvents);
+      setupEvents,
+      setupRole);
 
     this.hooks = {
       'before:deploy:deploy': () => BbPromise.bind(this)

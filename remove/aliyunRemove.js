@@ -7,6 +7,7 @@ const utils = require('../shared/utils');
 const removeEvents = require('./lib/removeEvents');
 const removeFunctionsAndService = require('./lib/removeFunctionsAndService');
 const removeArtifacts = require('./lib/removeArtifacts');
+const removeRoleAndPolicies = require('./lib/removeRoleAndPolicies');
 
 class AliyunRemove {
   constructor(serverless, options) {
@@ -20,7 +21,8 @@ class AliyunRemove {
       utils,
       removeEvents,
       removeFunctionsAndService,
-      removeArtifacts
+      removeArtifacts,
+      removeRoleAndPolicies
     );
 
     this.hooks = {

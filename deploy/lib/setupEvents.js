@@ -25,21 +25,32 @@ module.exports = {
     if (!this.apis.length) {
       return BbPromise.resolve();
     }
+
     return BbPromise.bind(this)
+      .then(this.setupInvokeRole)
       .then(this.createApiGroupIfNotExists)
-      .then(this.createApiRoleIfNotExists)
-      .then(this.attachApiPolicyIfNotExists)
       .then(this.checkExistingApis)
       .then(this.createOrUpdateApis)
       .then(this.deployApis);
+  },
+
+  setupInvokeRole() {
+    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
+
+    return BbPromise.bind(this)
+      .then(() => this.setupRole(role))
+      .then((invokeRole) => this.invokeRole = invokeRole);
   },
 
   createTriggersIfNeeded() {
     if (!this.triggers.length) {
       return BbPromise.resolve();
     }
+    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
+
     return BbPromise.bind(this)
-      .then(this.createTriggerRoleIfNotExists)
+      .then(() => this.setupRole(role))
+      .then((invokeRole) => this.invokeRole = invokeRole)
       .then(this.createOrUpdateTriggers);
   },
 
@@ -75,61 +86,6 @@ module.exports = {
       });
   },
 
-  createApiRoleIfNotExists() {
-    const roleResource = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()];
-
-    if (!roleResource) {
-      return BbPromise.resolve();  // No API needed
-    }
-
-    const role = roleResource.Properties;
-    return this.provider.getRole(role.RoleName)
-      .then((foundRole) => {
-        if (foundRole) {
-          this.apiRole = foundRole;
-          this.serverless.cli.log(`RAM role ${role.RoleName} exists.`);
-          return foundRole;
-        }
-
-        this.serverless.cli.log(`Creating RAM role ${role.RoleName}...`);
-        return this.provider.createRole(role)
-          .then((createdRole) => {
-            this.serverless.cli.log(`Created RAM role ${role.RoleName}`);
-            this.apiRole = createdRole;
-            return createdRole;
-          });
-      });
-  },
-
-  attachApiPolicyIfNotExists() {
-    const roleResource = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()];
-
-    if (!roleResource) {
-      return BbPromise.resolve();  // No API needed
-    }
-
-    const role = roleResource.Properties;
-
-    return this.provider.getPoliciesForRole(role.RoleName).then((policies) => {
-      return BbPromise.map(role.Policies, (policyProps) => {
-        const policyName = policyProps.PolicyName;
-        const roleName = policyProps.RoleName;
-        const policy = policies.find(
-          (item) => item.PolicyName === policyName
-        );
-        if (policy) {
-          this.serverless.cli.log(`RAM policy ${policyName} exists.`);
-          return policy;
-        }
-        this.serverless.cli.log(`Attaching RAM policy ${policyName} to ${roleName}...`);
-        return this.provider.attachPolicyToRole(policyProps).then((attachedPolicy) => {
-          this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
-          return attachedPolicy;
-        });
-      })
-    });
-  },
-
   checkExistingApis() {
     if (!this.apis.length) {
       return;
@@ -158,7 +114,7 @@ module.exports = {
 
   createOrUpdateApi(api) {
     const group = this.apiGroup;
-    const role = this.apiRole;
+    const role = this.invokeRole;
     const apiInMap = this.apiMap.get(api.ApiName);
     if (apiInMap) {
       const apiProps = Object.assign({ApiId: apiInMap.ApiId}, api);
@@ -202,10 +158,6 @@ module.exports = {
         throw err;
       });
     });
-  },
-
-  createTriggerRoleIfNotExists() {
-    return BbPromise.reject('Not implemented');
   },
 
   createOrUpdateTriggers() {

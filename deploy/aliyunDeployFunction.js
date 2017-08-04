@@ -13,6 +13,7 @@ const setupService = require('./lib/setupService');
 const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
 const setupEvents = require('./lib/setupEvents');
+const setupRole = require('./lib/setupRole');
 
 class AliyunDeployFunction {
   constructor(serverless, options) {
@@ -30,7 +31,8 @@ class AliyunDeployFunction {
       setupService,
       uploadArtifacts,
       setupFunctions,
-      setupEvents
+      setupEvents,
+      setupRole
     );
 
     this.hooks = {

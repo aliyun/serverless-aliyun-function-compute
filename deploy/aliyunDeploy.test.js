@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const BbPromise = require('bluebird');
 const path = require('path');
 const fs = require('fs');
-const { apiGroup, apis, group, fullGroup, role, fullRole, fullApis, functions } = require('../test/data');
+const { apiGroup, apis, group, fullGroup, role, fullRole, execRole, fullExecRole, fullApis, functions } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunDeploy = require('./aliyunDeploy');
@@ -13,7 +13,6 @@ const Serverless = require('../test/serverless');
 describe('AliyunDeploy', () => {
   let serverless;
   let aliyunDeploy;
-  const servicePath = path.join(__dirname, '..', 'test');
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -107,6 +106,12 @@ describe('AliyunDeploy', () => {
   });
 
   describe('#deploy()', () => {
+    let getRoleStub;
+    let createRoleStub;
+    let getPoliciesForRoleStub;
+    let getPolicyStub;
+    let createPolicyStub;
+    let attachPolicyToRoleStub;
     let getServiceStub;
     let consoleLogStub;
     let createServiceStub;
@@ -118,10 +123,6 @@ describe('AliyunDeploy', () => {
     let createFunctionStub;
     let getApiGroupStub;
     let createApiGroupStub;
-    let getRoleStub;
-    let createRoleStub;
-    let getPoliciesForRoleStub;
-    let attachPolicyToRoleStub;
     let getApisStub;
     let updateApiStub;
     let createApiStub;
@@ -131,23 +132,30 @@ describe('AliyunDeploy', () => {
       stage: 'dev',
       region: 'cn-shanghai',
     };
+
     beforeEach(() => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       aliyunDeploy = new AliyunDeploy(serverless, options);
-      getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+
+      getRoleStub = sinon.stub(aliyunDeploy.provider, 'getRole');
+      createRoleStub = sinon.stub(aliyunDeploy.provider, 'createRole');
+      getPolicyStub = sinon.stub(aliyunDeploy.provider, 'getPolicy');
+      createPolicyStub = sinon.stub(aliyunDeploy.provider, 'createPolicy');
+      getPoliciesForRoleStub = sinon.stub(aliyunDeploy.provider, 'getPoliciesForRole');
+      attachPolicyToRoleStub = sinon.stub(aliyunDeploy.provider, 'attachPolicyToRole');
+
+      getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
       createServiceStub = sinon.stub(aliyunDeploy.provider, 'createService');
       getBucketStub = sinon.stub(aliyunDeploy.provider, 'getBucket');
       createBucketStub = sinon.stub(aliyunDeploy.provider, 'createBucket');
       uploadObjectStub = sinon.stub(aliyunDeploy.provider, 'uploadObject');
       getFunctionStub = sinon.stub(aliyunDeploy.provider, 'getFunction');
       updateFunctionStub = sinon.stub(aliyunDeploy.provider, 'updateFunction');
-      createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
+      createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');
+      
+      getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
       createApiGroupStub = sinon.stub(aliyunDeploy.provider, 'createApiGroup');
-      getRoleStub = sinon.stub(aliyunDeploy.provider, 'getRole');
-      createRoleStub = sinon.stub(aliyunDeploy.provider, 'createRole');
-      getPoliciesForRoleStub = sinon.stub(aliyunDeploy.provider, 'getPoliciesForRole');
-      attachPolicyToRoleStub = sinon.stub(aliyunDeploy.provider, 'attachPolicyToRole');
       getApisStub = sinon.stub(aliyunDeploy.provider, 'getApis');
       updateApiStub = sinon.stub(aliyunDeploy.provider, 'updateApi');
       createApiStub = sinon.stub(aliyunDeploy.provider, 'createApi');
@@ -155,8 +163,15 @@ describe('AliyunDeploy', () => {
     });
 
     afterEach(() => {
-      aliyunDeploy.provider.getService.restore();
       aliyunDeploy.serverless.cli.log.restore();
+
+      aliyunDeploy.provider.getRole.restore();
+      aliyunDeploy.provider.createRole.restore();
+      aliyunDeploy.provider.getPoliciesForRole.restore();
+      aliyunDeploy.provider.getPolicy.restore();
+      aliyunDeploy.provider.createPolicy.restore();
+
+      aliyunDeploy.provider.getService.restore();
       aliyunDeploy.provider.createService.restore();
       aliyunDeploy.provider.getBucket.restore();
       aliyunDeploy.provider.createBucket.restore();
@@ -164,12 +179,9 @@ describe('AliyunDeploy', () => {
       aliyunDeploy.provider.getFunction.restore();
       aliyunDeploy.provider.updateFunction.restore();
       aliyunDeploy.provider.createFunction.restore();
+
       aliyunDeploy.provider.getApiGroup.restore();
       aliyunDeploy.provider.createApiGroup.restore();
-      aliyunDeploy.provider.getRole.restore();
-      aliyunDeploy.provider.createRole.restore();
-      aliyunDeploy.provider.getPoliciesForRole.restore();
-      aliyunDeploy.provider.attachPolicyToRole.restore();
       aliyunDeploy.provider.getApis.restore();
       aliyunDeploy.provider.updateApi.restore();
       aliyunDeploy.provider.createApi.restore();
@@ -177,6 +189,14 @@ describe('AliyunDeploy', () => {
     });
 
     it('should set up service from scratch', () => {
+      getRoleStub.returns(BbPromise.resolve(undefined));
+      createRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
+      createRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
+      getPolicyStub.returns(BbPromise.resolve(undefined));
+      createPolicyStub.returns(BbPromise.resolve({}));
+      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
+      attachPolicyToRoleStub.returns(BbPromise.resolve());
+
       const serviceId = new Date().getTime().toString(16);
       getServiceStub.returns(BbPromise.resolve(undefined));
       createServiceStub.returns(BbPromise.resolve({ serviceId }));
@@ -188,10 +208,7 @@ describe('AliyunDeploy', () => {
       createFunctionStub.returns(BbPromise.resolve());
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.returns(BbPromise.resolve(fullRole));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve(role.Policies[0]));
+
       getApisStub.returns(BbPromise.resolve([]));
       updateApiStub.returns(BbPromise.resolve());
       createApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
@@ -202,6 +219,8 @@ describe('AliyunDeploy', () => {
         .then(() => aliyunDeploy.hooks['deploy:deploy']())
         .then(() => {
           const logs = [
+            'Creating RAM role sls-my-service-dev-exec-role...',
+            'Created RAM role sls-my-service-dev-exec-role',
             'Creating service my-service-dev...',
             'Created service my-service-dev',
             'Creating bucket sls-my-service...',
@@ -212,12 +231,12 @@ describe('AliyunDeploy', () => {
             'Created function my-service-dev-postTest',
             'Creating function my-service-dev-getTest...',
             'Created function my-service-dev-getTest',
-            'Creating API group my_service_dev_api...',
-            'Created API group my_service_dev_api',
             'Creating RAM role sls-my-service-dev-invoke-role...',
             'Created RAM role sls-my-service-dev-invoke-role',
             'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
             'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role',
+            'Creating API group my_service_dev_api...',
+            'Created API group my_service_dev_api',
             'Creating API sls_http_my_service_dev_postTest...',
             'Created API sls_http_my_service_dev_postTest',
             'Creating API sls_http_my_service_dev_getTest...',
@@ -236,6 +255,18 @@ describe('AliyunDeploy', () => {
     });
 
     it('should handle existing service ', () => {
+      getRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
+      getRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
+      createRoleStub.returns(BbPromise.resolve());
+      getPolicyStub.returns(BbPromise.resolve({
+        PolicyType: 'Custom',
+        PolicyName: execRole.Policies[0].PolicyName
+      }));
+      createPolicyStub.returns(BbPromise.resolve({}));
+      getPoliciesForRoleStub.onCall(0).returns(BbPromise.resolve(execRole.Policies));
+      getPoliciesForRoleStub.onCall(1).returns(BbPromise.resolve(role.Policies));
+      attachPolicyToRoleStub.returns(BbPromise.resolve());
+
       const serviceId = new Date().getTime().toString(16);
       getServiceStub.returns(BbPromise.resolve({ serviceId }));
       createServiceStub.returns(BbPromise.resolve({ serviceId }));
@@ -256,10 +287,6 @@ describe('AliyunDeploy', () => {
 
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       createApiGroupStub.returns(BbPromise.resolve());
-      getRoleStub.returns(BbPromise.resolve(fullRole));
-      createRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
       getApisStub.returns(BbPromise.resolve(fullApis));
       createApiStub.returns(BbPromise.resolve());
       updateApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
@@ -267,6 +294,7 @@ describe('AliyunDeploy', () => {
       deployApiStub.returns(BbPromise.resolve());
 
       const logs = [
+        'RAM role sls-my-service-dev-exec-role exists.',
         'Service my-service-dev already exists.',
         'Bucket sls-my-service already exists.',
         'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
@@ -275,9 +303,9 @@ describe('AliyunDeploy', () => {
         'Updated function my-service-dev-postTest',
         'Updating function my-service-dev-getTest...',
         'Updated function my-service-dev-getTest',
-        'API group my_service_dev_api exists.',
         'RAM role sls-my-service-dev-invoke-role exists.',
-        'RAM policy AliyunFCInvocationAccess exists.',
+        'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-invoke-role.',
+        'API group my_service_dev_api exists.',
         'Updating API sls_http_my_service_dev_postTest...',
         'Updated API sls_http_my_service_dev_postTest',
         'Updating API sls_http_my_service_dev_getTest...',

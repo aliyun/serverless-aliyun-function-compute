@@ -673,13 +673,15 @@ class AliyunProvider {
 
   /**
    * @param {string} serviceName
-   * @param {{description: string}} options
+   * @param {{Arn: string}} role
    * @return {ServiceResponse}
    * https://help.aliyun.com/document_detail/52877.html#service
    * https://help.aliyun.com/document_detail/52877.html#serviceresponse
    */
-  createService(serviceName, options) {
-    return this.fcClient.createService(serviceName, options);
+  createService(serviceName, role) {
+    return this.fcClient.createService(serviceName, {
+      role: role.Arn
+    });
   }
 
   deleteService(serviceName, options) {
@@ -893,15 +895,51 @@ class AliyunProvider {
   }
 
   /**
-   * @param {{PolicyName: string, PolicyType: string, RoleName: string}} policy
-   * @return {{PolicyName: string}[]}
+   * 
+   * @param {string} policyName 
+   * @param {'Custom' | 'System' } policyType 
    */
-  attachPolicyToRole(policy) {
-    return this.ramClient.attachPolicyToRole(policy);
+  getPolicy(policyName, policyType) {
+    return this.ramClient.getPolicy({
+      PolicyName: policyName,
+      PolicyType: policyType
+    }).then(
+      (res) => res.Policy,
+      (err) => {
+        if (err.name === 'EntityNotExist.PolicyError') return undefined;
+        throw err;
+      }
+    );
   }
 
   /**
-   * @param {{PolicyName: string, PolicyType: string, RoleName: string}} plicy
+   * 
+   * @param {{PolicyName: string, PolicyDocument: object, Description: string}} policy 
+   */
+  createPolicy(policy) {
+    return this.ramClient.createPolicy({
+      PolicyName: policy.PolicyName,
+      Description: policy.Description,
+      PolicyDocument: JSON.stringify(policy.PolicyDocument)
+    });
+  }
+
+  /**
+   * @param {{RoleName: string}} role
+   * @param {{PolicyName: string, PolicyType: string}} policy
+   * @return {{PolicyName: string}[]}
+   */
+  attachPolicyToRole(role, policy) {
+    return this.ramClient.attachPolicyToRole({
+      RoleName: role.RoleName,
+      PolicyName: policy.PolicyName,
+      PolicyType: policy.PolicyType
+    });
+  }
+
+  /**
+   * @param {{RoleName: string}} role
+   * @param {{PolicyName: string, PolicyType: string}} policy
    */
   detachPolicyFromRole(role, policy) {
     return this.ramClient.detachPolicyFromRole({

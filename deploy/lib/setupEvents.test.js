@@ -67,14 +67,10 @@ describe('setupEvents', () => {
     );
   });
 
-
   describe('#setupEvents()', () => {
+    let setupRoleStub;
     let getApiGroupStub;
     let createApiGroupStub;
-    let getRoleStub;
-    let createRoleStub;
-    let getPoliciesForRoleStub;
-    let attachPolicyToRoleStub;
     let getApisStub;
     let updateApiStub;
     let createApiStub;
@@ -82,12 +78,9 @@ describe('setupEvents', () => {
     let consoleLogStub;
 
     beforeEach(() => {
+      setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole');
       getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
       createApiGroupStub = sinon.stub(aliyunDeploy.provider, 'createApiGroup');
-      getRoleStub = sinon.stub(aliyunDeploy.provider, 'getRole');
-      createRoleStub = sinon.stub(aliyunDeploy.provider, 'createRole');
-      getPoliciesForRoleStub = sinon.stub(aliyunDeploy.provider, 'getPoliciesForRole');
-      attachPolicyToRoleStub = sinon.stub(aliyunDeploy.provider, 'attachPolicyToRole');
       getApisStub = sinon.stub(aliyunDeploy.provider, 'getApis');
       updateApiStub = sinon.stub(aliyunDeploy.provider, 'updateApi');
       createApiStub = sinon.stub(aliyunDeploy.provider, 'createApi');
@@ -95,13 +88,10 @@ describe('setupEvents', () => {
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
     });
 
-    afterEach(() => {      
+    afterEach(() => {
+      aliyunDeploy.setupRole.restore();
       aliyunDeploy.provider.getApiGroup.restore();
       aliyunDeploy.provider.createApiGroup.restore();
-      aliyunDeploy.provider.getRole.restore();
-      aliyunDeploy.provider.createRole.restore();
-      aliyunDeploy.provider.getPoliciesForRole.restore();
-      aliyunDeploy.provider.attachPolicyToRole.restore();
       aliyunDeploy.provider.getApis.restore();
       aliyunDeploy.provider.updateApi.restore();
       aliyunDeploy.provider.createApi.restore();
@@ -110,12 +100,9 @@ describe('setupEvents', () => {
     });
 
     it('should set up apis property from scratch', () => {
+      setupRoleStub.returns(BbPromise.resolve(fullRole));
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.returns(BbPromise.resolve(fullRole));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve(role.Policies[0]));
       getApisStub.returns(BbPromise.resolve([]));
       updateApiStub.returns(BbPromise.resolve());
       createApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
@@ -123,6 +110,10 @@ describe('setupEvents', () => {
       deployApiStub.returns(BbPromise.resolve());
 
       return aliyunDeploy.setupEvents().then(() => {
+        expect(setupRoleStub.calledOnce).toEqual(true);
+        expect(setupRoleStub.calledWithExactly(role)).toEqual(true);
+
+        expect(getApiGroupStub.calledAfter(setupRoleStub)).toEqual(true);
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
@@ -130,23 +121,7 @@ describe('setupEvents', () => {
         expect(createApiGroupStub.calledOnce).toEqual(true);
         expect(createApiGroupStub.calledWithExactly(apiGroup)).toEqual(true);
 
-        expect(getRoleStub.calledAfter(createApiGroupStub)).toEqual(true);
-        expect(getRoleStub.calledOnce).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
-
-        expect(createRoleStub.calledAfter(getRoleStub)).toEqual(true);
-        expect(createRoleStub.calledOnce).toEqual(true);
-        expect(createRoleStub.calledWithExactly(role)).toEqual(true);
-
-        expect(getPoliciesForRoleStub.calledAfter(createRoleStub)).toEqual(true);
-        expect(getPoliciesForRoleStub.calledOnce).toEqual(true);
-        expect(getPoliciesForRoleStub.calledWithExactly(role.RoleName)).toEqual(true);
-
-        expect(attachPolicyToRoleStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
-        expect(attachPolicyToRoleStub.calledOnce).toEqual(true);
-        expect(attachPolicyToRoleStub.calledWithExactly(role.Policies[0])).toEqual(true);
-
-        expect(getApisStub.calledAfter(attachPolicyToRoleStub)).toEqual(true);
+        expect(getApisStub.calledAfter(createApiGroupStub)).toEqual(true);
         expect(getApisStub.calledOnce).toEqual(true);
         expect(getApisStub.calledWithExactly({
           GroupId: fullGroup.GroupId
@@ -182,10 +157,6 @@ describe('setupEvents', () => {
         const logs = [
           'Creating API group my_service_dev_api...',
           'Created API group my_service_dev_api',
-          'Creating RAM role sls-my-service-dev-invoke-role...',
-          'Created RAM role sls-my-service-dev-invoke-role',
-          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
-          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role',
           'Creating API sls_http_my_service_dev_postTest...',
           'Created API sls_http_my_service_dev_postTest',
           'Creating API sls_http_my_service_dev_getTest...',
@@ -205,12 +176,9 @@ describe('setupEvents', () => {
     });
 
     it('should update apis properly', () => {
+      setupRoleStub.returns(BbPromise.resolve(fullRole));
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       createApiGroupStub.returns(BbPromise.resolve());
-      getRoleStub.returns(BbPromise.resolve(fullRole));
-      createRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
       getApisStub.returns(BbPromise.resolve(fullApis));
       createApiStub.returns(BbPromise.resolve());
       updateApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
@@ -218,24 +186,16 @@ describe('setupEvents', () => {
       deployApiStub.returns(BbPromise.resolve());
 
       return aliyunDeploy.setupEvents().then(() => {
+        expect(setupRoleStub.calledOnce).toEqual(true);
+        expect(setupRoleStub.calledWithExactly(role)).toEqual(true);
+
+        expect(getApiGroupStub.calledAfter(setupRoleStub)).toEqual(true);
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
         expect(createApiGroupStub.called).toEqual(false);
 
-        expect(getRoleStub.calledAfter(getApiGroupStub)).toEqual(true);
-        expect(getRoleStub.calledOnce).toEqual(true);
-        expect(getRoleStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
-
-        expect(createRoleStub.called).toEqual(false);
-
-        expect(getPoliciesForRoleStub.calledAfter(getRoleStub)).toEqual(true);
-        expect(getPoliciesForRoleStub.called).toEqual(true);
-        expect(getPoliciesForRoleStub.calledWithExactly(role.RoleName)).toEqual(true);
-
-        expect(attachPolicyToRoleStub.called).toEqual(false);
-
-        expect(getApisStub.calledAfter(getPoliciesForRoleStub)).toEqual(true);
+        expect(getApisStub.calledAfter(getApiGroupStub)).toEqual(true);
         expect(getApisStub.calledOnce).toEqual(true);
         expect(getApisStub.calledWithExactly({
           GroupId: fullGroup.GroupId
@@ -269,8 +229,6 @@ describe('setupEvents', () => {
 
         const logs = [
           'API group my_service_dev_api exists.',
-          'RAM role sls-my-service-dev-invoke-role exists.',
-          'RAM policy AliyunFCInvocationAccess exists.',
           'Updating API sls_http_my_service_dev_postTest...',
           'Updated API sls_http_my_service_dev_postTest',
           'Updating API sls_http_my_service_dev_getTest...',

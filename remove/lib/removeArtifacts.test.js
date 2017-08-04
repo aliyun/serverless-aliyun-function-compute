@@ -7,20 +7,7 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis } = require('../../test/data');
-
-const bucket = {
-  name: 'sls-my-service',
-  region: 'cn-shanghai'
-};
-
-const objects = [{
-  name: 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
-},{
-  name: 'serverless/my-service/dev/1510622721413-2017-07-23T07:38:41.413Z/my-service.zip'
-},{
-  name: 'serverless/my-service/dev/1520622721413-2017-07-25T07:38:41.413Z/my-service.zip'
-}];
+const { fullGroup, fullApis, bucket, objects } = require('../../test/data');
 
 describe('removeArtifacts', () => {
   let serverless;
