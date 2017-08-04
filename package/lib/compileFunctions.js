@@ -9,22 +9,26 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   compileFunctions() {
+    this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.compileStorage(this.serverless.service.package.artifact);
     this.compileService();
+    this.compileLogProject();
     this.compileFunctionsAndEvents();
     return BbPromise.resolve();
   },
 
   compileFunction(funcName, funcObject) {
+    this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.compileStorage(funcObject.artifact);
     this.compileService();
+    this.compileLogProject();
     this.compileFunctionAndEvent(funcName, funcObject);
     return BbPromise.resolve();
   },
 
   compileStorage(artifact) {
     const objectId = this.provider.getStorageObjectId();
-    const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
+    const resources = this.resources;
 
     const bucketName = this.provider.getDeploymentBucketName();
 
@@ -45,10 +49,24 @@ module.exports = {
 
   compileService() {
     const serviceId = this.provider.getServiceId();
-    const resources = this.serverless.service.provider.compiledConfigurationTemplate
-      .Resources;
+    const resources = this.resources;
     const serviceResource = this.provider.getServiceResource();
     _.merge(resources, { [serviceId]: serviceResource});
+  },
+
+  compileLogProject() {
+    const logProjectId = this.provider.getLogProjectId();
+    const resources = this.resources;
+    const logProjectResource = this.provider.getLogProjectResource();
+    _.merge(resources, { [logProjectId]: logProjectResource});
+
+    const execRoleId = this.provider.getExecRoleLogicalId();
+    let execResource = resources[execRoleId];
+    if (!execResource) {
+      execResource = this.provider.getExecRoleResource();
+    }
+    this.provider.letRoleAccessLog(execResource);
+    resources[execRoleId] = execResource;
   },
 
   compileFunctionsAndEvents() {
@@ -59,21 +77,29 @@ module.exports = {
   },
 
   compileFunctionAndEvent(functionName, funcObject) {
-      const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
-      this.serverless.cli
-        .log(`Compiling function "${functionName}"...`);
+    const resources = this.resources;
+    this.serverless.cli
+      .log(`Compiling function "${functionName}"...`);
 
-      const funcId = this.provider.getFunctionLogicalId(funcObject.name);
-      const funcResource = this.provider.getFunctionResource(funcObject);
-      // recursive merge
-      _.merge(resources, { [funcId]: funcResource });
+    const funcId = this.provider.getFunctionLogicalId(funcObject.name);
+    const funcResource = this.provider.getFunctionResource(funcObject);
+    // recursive merge
+    _.merge(resources, { [funcId]: funcResource });
 
-      this.compileApiGateway.call(this, funcObject);
-      this.compileEvents.call(this, funcObject);
+    this.compileLogStore.call(this, funcObject);
+    this.compileApiGateway.call(this, funcObject);
+    this.compileEvents.call(this, funcObject);
+  },
+
+  compileLogStore(funcObject) {
+    const logStoreId = this.provider.getLogStoreId(funcObject.name);
+    const resources = this.resources;
+    const logStoreResource = this.provider.getLogStoreResource(funcObject.name);
+    _.merge(resources, { [logStoreId]: logStoreResource});
   },
 
   compileApiGateway(funcObject) {
-    const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
+    const resources = this.resources;
     const agLogicalId = this.provider.getApiGroupLogicalId();
     const invokeRoleId = this.provider.getInvokeRoleLogicalId();
 
@@ -84,12 +110,13 @@ module.exports = {
       if (!invokeResource) {
         invokeResource = this.provider.getInvokeRoleResource();
       }
-      this.provider.makeApiRole(invokeResource);
+      this.provider.makeRoleAccessibleFromAG(invokeResource);
+      resources[invokeRoleId] = invokeResource;
     }
   },
 
   compileEvents(funcObject) {
-    const resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
+    const resources = this.resources;
     const agLogicalId = this.provider.getApiGroupLogicalId();
 
     funcObject.events.forEach((event) => {

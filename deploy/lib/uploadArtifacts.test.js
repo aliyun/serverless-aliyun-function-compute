@@ -61,7 +61,7 @@ describe('UploadArtifacts', () => {
         expect(uploadObjectStub.calledOnce).toEqual(true);
         expect(uploadObjectStub.calledWithExactly(
           'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip',
-          '/projects/my-service.zip'
+          '/projects/.serverless/my-service.zip'
         )).toEqual(true);
         const logs = [
           'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
