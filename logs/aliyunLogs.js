@@ -4,6 +4,7 @@ const BbPromise = require('bluebird');
 
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
+// const retrieveLogs = require('./lib/retrieveLogs');
 
 class AliyunLogs {
   constructor(serverless, options) {
@@ -15,6 +16,7 @@ class AliyunLogs {
       this,
       validate,
       utils,
+      // retrieveLogs
     );
 
     this.hooks = {

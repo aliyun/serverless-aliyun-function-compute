@@ -11,17 +11,38 @@ module.exports = {
   prepareDeployment() {
     this.provider.initializeTemplate();
     const deploymentTemplate = this.serverless.service.provider.compiledConfigurationTemplate;
+    const resources = deploymentTemplate.Resources;
 
+    // resource: oss bucket
     const bucketName = this.provider.getDeploymentBucketName();
     const bucketId = this.provider.getStorageBucketId();
-    deploymentTemplate.Resources[bucketId] = this.provider.getStorageBucketResource();
-    const serviceId = this.provider.getServiceId();
-    deploymentTemplate.Resources[serviceId] = this.provider.getServiceResource();
+    resources[bucketId] = this.provider.getStorageBucketResource();
 
-    const execRoleId = this.provider.getExecRoleLogicalId();deploymentTemplate.Resources[execRoleId] = this.provider.getExecRoleResource();
+    // resource: log project
+    const logProjectId = this.provider.getLogProjectId();
+    const logProjectResource = this.provider.getLogProjectResource();
+    _.merge(resources, { [logProjectId]: logProjectResource});
+
+    // resource: log store
+    const logStoreId = this.provider.getLogStoreId();
+    const logStoreResource = this.provider.getLogStoreResource();
+    _.merge(resources, { [logStoreId]: logStoreResource});
+
+    // resource: log index
+    const logIndexId = this.provider.getLogIndexId();
+    const logIndexResource = this.provider.getLogIndexResource();
+    _.merge(resources, { [logIndexId]: logIndexResource});
+
+    // resource: exec role
+    const execRoleId = this.provider.getExecRoleLogicalId();
+    const execResource = this.provider.getExecRoleResource();
+    this.provider.letRoleAccessLog(execResource);
+    resources[execRoleId] = execResource;
+
+    const serviceId = this.provider.getServiceId();
+    resources[serviceId] = this.provider.getServiceResource();
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
-
     return BbPromise.resolve();
   },
 };

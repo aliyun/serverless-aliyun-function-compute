@@ -7,6 +7,7 @@ const _ = require('lodash');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunPackage = require('../aliyunPackage');
 const Serverless = require('../../test/serverless');
+const createTemplate = require('../../test/.serverless/configuration-template-create.json');
 
 describe('CompileFunctions', () => {
   let serverless;
@@ -24,32 +25,8 @@ describe('CompileFunctions', () => {
       servicePath: '/projects/'
     };
     serverless.service.provider = {
-      compiledConfigurationTemplate: {
-        Resources: {
-          "sls-storage-bucket": {
-            "Type": "ALIYUN::OSS:Bucket",
-            "Properties": {
-              "BucketName": "sls-my-service",
-              "Region": "cn-shanghai"
-            }
-          },
-          "sls-storage-object": {
-            "Type": "ALIYUN::OSS:Object",
-            "Properties": {
-              "BucketName": "sls-my-service",
-              "ObjectName": "to-be-replaced-by-serverless",
-              "LocalPath": "to-be-replaced-by-serverless"
-            }
-          },
-          "sls-function-service": {
-            "Type": "ALIYUN::FC::Service",
-            "Properties": {
-              "name": "my-service-dev",
-              "region": "cn-shanghai"
-            }
-          }
-        }
-      }
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
+      compiledConfigurationTemplate: _.cloneDeep(createTemplate)
     }
     const options = {
       stage: 'dev',
@@ -233,9 +210,6 @@ describe('CompileFunctions', () => {
 
     const compiledResources = require(
       path.join(__dirname, '..', '..', 'test', '.serverless','configuration-template-update.json')).Resources;
-
-    // TODO(joyeecheung): need to implement log store creation first
-    compiledResources['sls-fc-exec-role'].Properties.Policies = [];
 
     it('should compile "http" events with "parameters" properly', () => {
       aliyunPackage.serverless.service.functions = {

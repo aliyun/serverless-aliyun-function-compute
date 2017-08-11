@@ -11,8 +11,6 @@ module.exports = {
   compileFunctions() {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.compileStorage(this.serverless.service.package.artifact);
-    this.compileService();
-    this.compileLogProject();
     this.compileFunctionsAndEvents();
     return BbPromise.resolve();
   },
@@ -20,8 +18,6 @@ module.exports = {
   compileFunction(funcName, funcObject) {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.compileStorage(funcObject.artifact);
-    this.compileService();
-    this.compileLogProject();
     this.compileFunctionAndEvent(funcName, funcObject);
     return BbPromise.resolve();
   },
@@ -47,25 +43,9 @@ module.exports = {
     _.merge(resources, { [objectId]: objectResource });
   },
 
-  compileService() {
-    const serviceId = this.provider.getServiceId();
-    const resources = this.resources;
-    const serviceResource = this.provider.getServiceResource();
-    _.merge(resources, { [serviceId]: serviceResource});
-  },
-
   compileLogProject() {
-    const logProjectId = this.provider.getLogProjectId();
     const resources = this.resources;
-    const logProjectResource = this.provider.getLogProjectResource();
-    _.merge(resources, { [logProjectId]: logProjectResource});
-
-    const execRoleId = this.provider.getExecRoleLogicalId();
-    let execResource = resources[execRoleId];
-    if (!execResource) {
-      execResource = this.provider.getExecRoleResource();
-    }
-    // this.provider.letRoleAccessLog(execResource);
+    // resource: log project exec role
     resources[execRoleId] = execResource;
   },
 
@@ -86,16 +66,8 @@ module.exports = {
     // recursive merge
     _.merge(resources, { [funcId]: funcResource });
 
-    this.compileLogStore.call(this, funcObject);
     this.compileApiGateway.call(this, funcObject);
     this.compileEvents.call(this, funcObject);
-  },
-
-  compileLogStore(funcObject) {
-    const logStoreId = this.provider.getLogStoreId(funcObject.name);
-    const resources = this.resources;
-    const logStoreResource = this.provider.getLogStoreResource(funcObject.name);
-    _.merge(resources, { [logStoreId]: logStoreResource});
   },
 
   compileApiGateway(funcObject) {

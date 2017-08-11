@@ -14,7 +14,9 @@ describe('PrepareDeployment', () => {
   beforeEach(() => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
-    serverless.service.provider = {};
+    serverless.service.provider = {
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials')
+    };
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
