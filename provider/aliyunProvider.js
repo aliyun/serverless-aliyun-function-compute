@@ -700,6 +700,26 @@ class AliyunProvider {
     }).then(() => this.getLogIndex(projectName, storeName));
   }
 
+  getLogsIfAvailable(projectName, storeName, days, query) {
+    const from = new Date();
+    const to = new Date(from);
+    from.setDate(from.getDate() - days);
+
+    const fullQuery = Object.keys(query)
+      .map((key) => `${key}:${query[key]}`).join(' or ');
+    return this.slsClient.getLogs(projectName, storeName, from, to, {
+      query: fullQuery
+    }).catch((err) => {
+      if (err.code === 'IndexConfigNotExist' ||
+        err.code === 'LogStoreNotExist' ||
+        err.code === 'ProjectNotExist') {
+          return [];
+        }
+        throw err;
+      }
+    );
+  }
+
   /**
    * @param {string} bucketName
    * @returns {{name: string, region: string, creationDate: string}}
