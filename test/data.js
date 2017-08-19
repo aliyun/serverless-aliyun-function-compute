@@ -328,3 +328,28 @@ exports.fullLogIndex = {
   "ttl": 30,
   "lastModifyTime": 1502963801
 };
+
+exports.logs = [{
+  __source__: '',
+  __time__: '1503051506',
+  __topic__: 'my-service-dev',
+  functionName: 'my-service-dev-postTest',
+  message: '2017-08-18T10:18:26.131Z  [info] FunctionCompute nodejs runtime inited.\r',
+  serviceName: 'my-service-dev'
+},
+{
+  __source__: '',
+  __time__: '1503051506',
+  __topic__: 'my-service-dev',
+  functionName: 'my-service-dev-postTest',
+  message: 'FC Invoke Start RequestId: 332425-41-143112-415219434\r',
+  serviceName: 'my-service-dev'
+},
+{
+  __source__: '',
+  __time__: '1503052461',
+  __topic__: 'my-service-dev',
+  functionName: 'my-service-dev-postTest',
+  message: 'FC Invoke End RequestId: 25222ee9-41-143112-415219434',
+  serviceName: 'my-service-dev'
+}];
