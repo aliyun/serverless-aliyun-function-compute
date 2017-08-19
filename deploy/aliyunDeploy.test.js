@@ -4,7 +4,12 @@ const sinon = require('sinon');
 const BbPromise = require('bluebird');
 const path = require('path');
 const fs = require('fs');
-const { apiGroup, apis, group, fullGroup, role, fullRole, execRole, fullExecRole, fullApis, functions } = require('../test/data');
+const {
+  apiGroup, apis, group, fullGroup, role,
+  fullRole, execRole, fullExecRole, fullApis,
+  functions, logIndex, fullLogIndex, logProject,
+  fullLogProject, logStore, fullLogStore
+} = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunDeploy = require('./aliyunDeploy');
@@ -106,12 +111,20 @@ describe('AliyunDeploy', () => {
   });
 
   describe('#deploy()', () => {
+    let getLogProjectStub;
+    let createLogProjectStub;
+    let getLogStoreStub;
+    let createLogStoreStub;
+    let getLogIndexStub;
+    let createLogIndexStub;
+
     let getRoleStub;
     let createRoleStub;
     let getPoliciesForRoleStub;
     let getPolicyStub;
     let createPolicyStub;
     let attachPolicyToRoleStub;
+
     let getServiceStub;
     let consoleLogStub;
     let createServiceStub;
@@ -121,6 +134,7 @@ describe('AliyunDeploy', () => {
     let getFunctionStub;
     let updateFunctionStub;
     let createFunctionStub;
+
     let getApiGroupStub;
     let createApiGroupStub;
     let getApisStub;
@@ -137,6 +151,13 @@ describe('AliyunDeploy', () => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       aliyunDeploy = new AliyunDeploy(serverless, options);
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+
+      getLogProjectStub = sinon.stub(aliyunDeploy.provider, 'getLogProject');
+      createLogProjectStub = sinon.stub(aliyunDeploy.provider, 'createLogProject');
+      getLogStoreStub = sinon.stub(aliyunDeploy.provider, 'getLogStore');
+      createLogStoreStub = sinon.stub(aliyunDeploy.provider, 'createLogStore');
+      getLogIndexStub = sinon.stub(aliyunDeploy.provider, 'getLogIndex');
+      createLogIndexStub = sinon.stub(aliyunDeploy.provider, 'createLogIndex');
 
       getRoleStub = sinon.stub(aliyunDeploy.provider, 'getRole');
       createRoleStub = sinon.stub(aliyunDeploy.provider, 'createRole');
@@ -165,6 +186,13 @@ describe('AliyunDeploy', () => {
     afterEach(() => {
       aliyunDeploy.serverless.cli.log.restore();
 
+      aliyunDeploy.provider.getLogProject.restore();
+      aliyunDeploy.provider.createLogProject.restore();
+      aliyunDeploy.provider.getLogStore.restore();
+      aliyunDeploy.provider.createLogStore.restore();
+      aliyunDeploy.provider.getLogIndex.restore();
+      aliyunDeploy.provider.createLogIndex.restore();
+
       aliyunDeploy.provider.getRole.restore();
       aliyunDeploy.provider.createRole.restore();
       aliyunDeploy.provider.getPoliciesForRole.restore();
@@ -189,6 +217,13 @@ describe('AliyunDeploy', () => {
     });
 
     it('should set up service from scratch', () => {
+      getLogProjectStub.returns(BbPromise.resolve(undefined));
+      createLogProjectStub.returns(BbPromise.resolve(fullLogProject));
+      getLogStoreStub.returns(BbPromise.resolve(undefined));
+      createLogStoreStub.returns(BbPromise.resolve(fullLogStore));
+      getLogIndexStub.returns(BbPromise.resolve(undefined));
+      createLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+
       getRoleStub.returns(BbPromise.resolve(undefined));
       createRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
       createRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
@@ -219,8 +254,18 @@ describe('AliyunDeploy', () => {
         .then(() => aliyunDeploy.hooks['deploy:deploy']())
         .then(() => {
           const logs = [
+            'Creating log project sls-my-service-logs...',
+            'Created log project sls-my-service-logs',
+            'Creating log store sls-my-service-logs/my-service-dev...',
+            'Created log store sls-my-service-logs/my-service-dev',
+            'Creating log index for sls-my-service-logs/my-service-dev...',
+            'Created log index for sls-my-service-logs/my-service-dev',
             'Creating RAM role sls-my-service-dev-exec-role...',
             'Created RAM role sls-my-service-dev-exec-role',
+            'Creating RAM policy fc-access-sls-my-service-logs-dev...',
+            'Created RAM policy fc-access-sls-my-service-logs-dev',
+            'Attaching RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role...',
+            'Attached RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role',
             'Creating service my-service-dev...',
             'Created service my-service-dev',
             'Creating bucket sls-my-service...',
@@ -255,6 +300,13 @@ describe('AliyunDeploy', () => {
     });
 
     it('should handle existing service ', () => {
+      getLogProjectStub.returns(BbPromise.resolve(fullLogProject));
+      createLogProjectStub.returns(BbPromise.resolve());
+      getLogStoreStub.returns(BbPromise.resolve(fullLogStore));
+      createLogStoreStub.returns(BbPromise.resolve());
+      getLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+      createLogIndexStub.returns(BbPromise.resolve());
+
       getRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
       getRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
       createRoleStub.returns(BbPromise.resolve());
@@ -294,7 +346,12 @@ describe('AliyunDeploy', () => {
       deployApiStub.returns(BbPromise.resolve());
 
       const logs = [
+        'Log project sls-my-service-logs already exists.',
+        'Log store sls-my-service-logs/my-service-dev already exists.',
+        'Log store sls-my-service-logs/my-service-dev already has an index.',
         'RAM role sls-my-service-dev-exec-role exists.',
+        'RAM policy fc-access-sls-my-service-logs-dev exists.',
+        'RAM policy fc-access-sls-my-service-logs-dev has been attached to sls-my-service-dev-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-my-service already exists.',
         'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',

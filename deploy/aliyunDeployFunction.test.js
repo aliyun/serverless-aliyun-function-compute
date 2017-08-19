@@ -4,7 +4,12 @@ const sinon = require('sinon');
 const BbPromise = require('bluebird');
 const path = require('path');
 const fs = require('fs');
-const { apiGroup, apis, group, fullGroup, role, fullRole, fullApis, functions, fullExecRole, execRole, functionDefs } = require('../test/data');
+const {
+  apiGroup, apis, group, fullGroup, role, fullRole,
+  fullApis, functions, fullExecRole, execRole, functionDefs,
+  logIndex, fullLogIndex, logProject, fullLogProject, logStore,
+  fullLogStore
+} = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunDeployFunction = require('./aliyunDeployFunction');
@@ -120,6 +125,13 @@ describe('AliyunDeployFunction', () => {
   });
 
   describe('#deployFunction()', () => {
+    let getLogProjectStub;
+    let createLogProjectStub;
+    let getLogStoreStub;
+    let createLogStoreStub;
+    let getLogIndexStub;
+    let createLogIndexStub;
+
     let getRoleStub;
     let createRoleStub;
     let getPoliciesForRoleStub;
@@ -154,6 +166,13 @@ describe('AliyunDeployFunction', () => {
       aliyunDeployFunction = new AliyunDeployFunction(serverless, options);
       consoleLogStub = sinon.stub(aliyunDeployFunction.serverless.cli, 'log').returns();
 
+      getLogProjectStub = sinon.stub(aliyunDeployFunction.provider, 'getLogProject');
+      createLogProjectStub = sinon.stub(aliyunDeployFunction.provider, 'createLogProject');
+      getLogStoreStub = sinon.stub(aliyunDeployFunction.provider, 'getLogStore');
+      createLogStoreStub = sinon.stub(aliyunDeployFunction.provider, 'createLogStore');
+      getLogIndexStub = sinon.stub(aliyunDeployFunction.provider, 'getLogIndex');
+      createLogIndexStub = sinon.stub(aliyunDeployFunction.provider, 'createLogIndex');
+
       getRoleStub = sinon.stub(aliyunDeployFunction.provider, 'getRole');
       createRoleStub = sinon.stub(aliyunDeployFunction.provider, 'createRole');
       getPolicyStub = sinon.stub(aliyunDeployFunction.provider, 'getPolicy');
@@ -183,6 +202,13 @@ describe('AliyunDeployFunction', () => {
     afterEach(() => {
       aliyunDeployFunction.serverless.cli.log.restore();
 
+      aliyunDeployFunction.provider.getLogProject.restore();
+      aliyunDeployFunction.provider.createLogProject.restore();
+      aliyunDeployFunction.provider.getLogStore.restore();
+      aliyunDeployFunction.provider.createLogStore.restore();
+      aliyunDeployFunction.provider.getLogIndex.restore();
+      aliyunDeployFunction.provider.createLogIndex.restore();
+
       aliyunDeployFunction.provider.getRole.restore();
       aliyunDeployFunction.provider.createRole.restore();
       aliyunDeployFunction.provider.getPoliciesForRole.restore();
@@ -208,6 +234,13 @@ describe('AliyunDeployFunction', () => {
     });
 
     it('should set up service from scratch', () => {
+      getLogProjectStub.returns(BbPromise.resolve(undefined));
+      createLogProjectStub.returns(BbPromise.resolve(fullLogProject));
+      getLogStoreStub.returns(BbPromise.resolve(undefined));
+      createLogStoreStub.returns(BbPromise.resolve(fullLogStore));
+      getLogIndexStub.returns(BbPromise.resolve(undefined));
+      createLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+
       getRoleStub.returns(BbPromise.resolve(undefined));
       createRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
       createRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
@@ -236,8 +269,18 @@ describe('AliyunDeployFunction', () => {
       const logs = [
         'Packaging function: postTest...',
         'Compiling function "postTest"...',
+        'Creating log project sls-my-service-logs...',
+        'Created log project sls-my-service-logs',
+        'Creating log store sls-my-service-logs/my-service-dev...',
+        'Created log store sls-my-service-logs/my-service-dev',
+        'Creating log index for sls-my-service-logs/my-service-dev...',
+        'Created log index for sls-my-service-logs/my-service-dev',
         'Creating RAM role sls-my-service-dev-exec-role...',
         'Created RAM role sls-my-service-dev-exec-role',
+        'Creating RAM policy fc-access-sls-my-service-logs-dev...',
+        'Created RAM policy fc-access-sls-my-service-logs-dev',
+        'Attaching RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role...',
+        'Attached RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role',
         'Creating service my-service-dev...',
         'Created service my-service-dev',
         'Creating bucket sls-my-service...',
@@ -269,6 +312,13 @@ describe('AliyunDeployFunction', () => {
     });
 
     it('should handle existing service ', () => {
+      getLogProjectStub.returns(BbPromise.resolve(fullLogProject));
+      createLogProjectStub.returns(BbPromise.resolve());
+      getLogStoreStub.returns(BbPromise.resolve(fullLogStore));
+      createLogStoreStub.returns(BbPromise.resolve());
+      getLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+      createLogIndexStub.returns(BbPromise.resolve());
+
       getRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
       getRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
       createRoleStub.returns(BbPromise.resolve());
@@ -309,7 +359,12 @@ describe('AliyunDeployFunction', () => {
       const logs = [
         'Packaging function: postTest...',
         'Compiling function "postTest"...',
+        'Log project sls-my-service-logs already exists.',
+        'Log store sls-my-service-logs/my-service-dev already exists.',
+        'Log store sls-my-service-logs/my-service-dev already has an index.',
         'RAM role sls-my-service-dev-exec-role exists.',
+        'RAM policy fc-access-sls-my-service-logs-dev exists.',
+        'RAM policy fc-access-sls-my-service-logs-dev has been attached to sls-my-service-dev-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-my-service already exists.',
         'Uploading serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service...',
