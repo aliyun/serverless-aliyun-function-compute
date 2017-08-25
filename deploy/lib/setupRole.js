@@ -20,6 +20,7 @@ module.exports = {
     return this.provider.getRole(role.RoleName)
       .then((foundRole) => {
         if (foundRole) {
+          // TODO: update if AssumeRolePolicyDocument is different/smaller
           this[roleSym] = foundRole;
           this.serverless.cli.log(`RAM role ${role.RoleName} exists.`);
           return;
@@ -51,6 +52,7 @@ module.exports = {
     return this.provider.getPolicy(policyName, 'Custom')
       .then((foundPolicy) => {
         if (foundPolicy) {
+          // TODO: Update if PolicyDocument is different
           this.serverless.cli.log(`RAM policy ${policyName} exists.`);
           return;
         }

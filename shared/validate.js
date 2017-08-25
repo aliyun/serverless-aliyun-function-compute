@@ -106,7 +106,7 @@ module.exports = {
 
       const supportedEvents = [
         'http',
-        // 'event'
+        'oss'
       ];
       const eventType = Object.keys(funcObject.events[0])[0];
       if (supportedEvents.indexOf(eventType) === -1) {
@@ -116,6 +116,7 @@ module.exports = {
         ].join('');
         throw new Error(errorMessage);
       }
+      // TODO: verify that http events has paths and oss events have triggerConfig, sourceArn, .etc
     });
   }
 };

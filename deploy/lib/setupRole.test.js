@@ -221,10 +221,10 @@ describe('setupRole', () => {
         const logs = [
           'Creating RAM role sls-my-service-dev-exec-role...',
           'Created RAM role sls-my-service-dev-exec-role',
-          'Creating RAM policy fc-access-sls-my-service-logs-dev...',
-          'Created RAM policy fc-access-sls-my-service-logs-dev',
-          'Attaching RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role...',
-          'Attached RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role'
+          'Creating RAM policy fc-my-service-dev-access...',
+          'Created RAM policy fc-my-service-dev-access',
+          'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
+          'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -273,9 +273,9 @@ describe('setupRole', () => {
         const logs = [
           'Creating RAM role sls-my-service-dev-exec-role...',
           'Created RAM role sls-my-service-dev-exec-role',
-          'RAM policy fc-access-sls-my-service-logs-dev exists.',
-          'Attaching RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role...',
-          'Attached RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role'
+          'RAM policy fc-my-service-dev-access exists.',
+          'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
+          'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {

@@ -207,8 +207,8 @@ describe('AliyunRemove', () => {
         'Removing service my-service-dev...',
         'Removed service my-service-dev',
 
-        'Detaching RAM policy fc-access-sls-my-service-logs-dev from sls-my-service-dev-exec-role...',
-        'Detached RAM policy fc-access-sls-my-service-logs-dev from sls-my-service-dev-exec-role',
+        'Detaching RAM policy fc-my-service-dev-access from sls-my-service-dev-exec-role...',
+        'Detached RAM policy fc-my-service-dev-access from sls-my-service-dev-exec-role',
         'Removing RAM role sls-my-service-dev-exec-role...',
         'Removed RAM role sls-my-service-dev-exec-role',
 

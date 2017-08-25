@@ -11,12 +11,16 @@ module.exports = {
   compileFunctions() {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     this.compileStorage(this.serverless.service.package.artifact);
-    this.compileFunctionsAndEvents();
+    this.serverless.service.getAllFunctions().forEach((functionName) => {
+      const funcObject = this.serverless.service.getFunction(functionName);
+      this.compileFunctionAndEvent(functionName, funcObject);
+    });
     return BbPromise.resolve();
   },
 
   compileFunction(funcName, funcObject) {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
+    // Notice artifact is different
     this.compileStorage(funcObject.artifact);
     this.compileFunctionAndEvent(funcName, funcObject);
     return BbPromise.resolve();
@@ -43,19 +47,6 @@ module.exports = {
     _.merge(resources, { [objectId]: objectResource });
   },
 
-  compileLogProject() {
-    const resources = this.resources;
-    // resource: log project exec role
-    resources[execRoleId] = execResource;
-  },
-
-  compileFunctionsAndEvents() {
-    this.serverless.service.getAllFunctions().forEach((functionName) => {
-      const funcObject = this.serverless.service.getFunction(functionName);
-      this.compileFunctionAndEvent(functionName, funcObject);
-    });
-  },
-
   compileFunctionAndEvent(functionName, funcObject) {
     const resources = this.resources;
     this.serverless.cli
@@ -67,6 +58,7 @@ module.exports = {
     _.merge(resources, { [funcId]: funcResource });
 
     this.compileApiGateway.call(this, funcObject);
+    this.compileOSSTrigger.call(this, funcObject);
     this.compileEvents.call(this, funcObject);
   },
 
@@ -75,14 +67,29 @@ module.exports = {
     const agLogicalId = this.provider.getApiGroupLogicalId();
     const invokeRoleId = this.provider.getInvokeRoleLogicalId();
 
-    if (funcObject.events.some(needsApiGateway) &&
-      !resources[agLogicalId]) {
-      resources[agLogicalId] = this.provider.getApiGroupResource();
+    if (funcObject.events.some(needsApiGateway)) {
+      if (!resources[agLogicalId]) {
+        resources[agLogicalId] = this.provider.getApiGroupResource();
+      }
       let invokeResource = resources[invokeRoleId];
       if (!invokeResource) {
         invokeResource = this.provider.getInvokeRoleResource();
       }
       this.provider.makeRoleAccessibleFromAG(invokeResource);
+      resources[invokeRoleId] = invokeResource;
+    }
+  },
+
+  compileOSSTrigger(funcObject) {
+    const resources = this.resources;
+    const invokeRoleId = this.provider.getInvokeRoleLogicalId();
+
+    if (funcObject.events.some(needsOSSTrigger)) {
+      let invokeResource = resources[invokeRoleId];
+      if (!invokeResource) {
+        invokeResource = this.provider.getInvokeRoleResource();
+      }
+      this.provider.makeRoleAccessibleFromOSS(invokeResource);
       resources[invokeRoleId] = invokeResource;
     }
   },
@@ -93,14 +100,15 @@ module.exports = {
 
     funcObject.events.forEach((event) => {
       const eventType = Object.keys(event)[0];
-
       // TODO: support more event types
       if (eventType === 'http') {
-        // TODO: ROS does not support API gateway and FC at the moment
-        // So this is fake config
         const apiResource = this.provider.getHttpApiResource(event.http, funcObject);
         const apiName = apiResource.Properties.ApiName;
         _.merge(resources, { [apiName]: apiResource });
+      } else if (eventType === 'oss') {
+        const triggerResource = this.provider.getOSSTriggerResource(event.oss, funcObject);
+        const triggerName = triggerResource.Properties.triggerName;
+        _.merge(resources, { [triggerName]: triggerResource });
       }
     });
   }
@@ -108,4 +116,8 @@ module.exports = {
 
 function needsApiGateway(event) {
   return Object.keys(event)[0] === 'http';
+}
+
+function needsOSSTrigger(event) {
+  return Object.keys(event)[0] === 'oss';
 }

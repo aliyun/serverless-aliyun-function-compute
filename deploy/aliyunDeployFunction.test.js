@@ -8,7 +8,7 @@ const {
   apiGroup, apis, group, fullGroup, role, fullRole,
   fullApis, functions, fullExecRole, execRole, functionDefs,
   logIndex, fullLogIndex, logProject, fullLogProject, logStore,
-  fullLogStore
+  fullLogStore, directory
 } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -19,7 +19,6 @@ describe('AliyunDeployFunction', () => {
   let serverless;
   let aliyunDeployFunction;
   const servicePath = path.join(__dirname, '..', 'test');
-  const directory = 'serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z'
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -277,10 +276,10 @@ describe('AliyunDeployFunction', () => {
         'Created log index for sls-my-service-logs/my-service-dev',
         'Creating RAM role sls-my-service-dev-exec-role...',
         'Created RAM role sls-my-service-dev-exec-role',
-        'Creating RAM policy fc-access-sls-my-service-logs-dev...',
-        'Created RAM policy fc-access-sls-my-service-logs-dev',
-        'Attaching RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role...',
-        'Attached RAM policy fc-access-sls-my-service-logs-dev to sls-my-service-dev-exec-role',
+        'Creating RAM policy fc-my-service-dev-access...',
+        'Created RAM policy fc-my-service-dev-access',
+        'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
+        'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role',
         'Creating service my-service-dev...',
         'Created service my-service-dev',
         'Creating bucket sls-my-service...',
@@ -363,8 +362,8 @@ describe('AliyunDeployFunction', () => {
         'Log store sls-my-service-logs/my-service-dev already exists.',
         'Log store sls-my-service-logs/my-service-dev already has an index.',
         'RAM role sls-my-service-dev-exec-role exists.',
-        'RAM policy fc-access-sls-my-service-logs-dev exists.',
-        'RAM policy fc-access-sls-my-service-logs-dev has been attached to sls-my-service-dev-exec-role.',
+        'RAM policy fc-my-service-dev-access exists.',
+        'RAM policy fc-my-service-dev-access has been attached to sls-my-service-dev-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-my-service already exists.',
         'Uploading serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service...',

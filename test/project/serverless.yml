@@ -2,8 +2,15 @@ service: my-service
 
 provider:
   name: aliyun
-  runtime: nodejs4.4
+  runtime: nodejs6
   credentials: ~/.aliyuncli/credentials # path must be absolute
+  ramRoleStatements:
+    - Effect: Allow
+      Action:
+        - oss:GetObject
+        - oss:PutObject
+      Resource:
+        - acs:oss:*:*:my-service-resource
 
 plugins:
   - serverless-aliyun-function-compute
@@ -41,3 +48,16 @@ functions:
       - http:
           path: /quo
           method: get
+
+  ossTriggerTest:
+    handler: index.ossTriggerHandler
+    events:
+      - oss:
+          sourceArn: acs:oss:*:*:my-service-resource
+          triggerConfig: 
+            events:
+              - oss:ObjectCreated:PostObject
+              - oss:ObjectCreated:PutObject
+            filter:
+              key:
+                prefix: source/

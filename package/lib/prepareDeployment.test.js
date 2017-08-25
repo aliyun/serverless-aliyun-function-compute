@@ -6,6 +6,7 @@ const path = require('path');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunPackage = require('../aliyunPackage');
 const Serverless = require('../../test/serverless');
+const { ramRoleStatements } = require('../../test/data');
 
 describe('PrepareDeployment', () => {
   let serverless;
@@ -15,7 +16,8 @@ describe('PrepareDeployment', () => {
     serverless = new Serverless();
     serverless.service.service = 'my-service';
     serverless.service.provider = {
-      credentials: path.join(__dirname, '..', '..', 'test', 'credentials')
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
+      ramRoleStatements: ramRoleStatements
     };
     const options = {
       stage: 'dev',
