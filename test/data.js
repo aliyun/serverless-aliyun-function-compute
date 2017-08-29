@@ -227,7 +227,7 @@ exports.functions = [{
 }, {
   "name": "my-service-dev-ossTriggerTest",
   "service": "my-service-dev",
-  "handler": "index.getHandler",
+  "handler": "index.ossTriggerHandler",
   "memorySize": 128,
   "timeout": 30,
   "runtime": "nodejs6",
@@ -411,3 +411,39 @@ exports.ramRoleStatements = [{
   Action: ['oss:GetObject', 'oss:PutObject'],
   Resource: ['acs:oss:*:*:my-service-resource']
 }];
+
+exports.triggers = [{
+  sourceArn: "acs:oss:*:*:my-service-resource",
+  triggerConfig: {
+    events: [
+      "oss:ObjectCreated:PostObject",
+      "oss:ObjectCreated:PutObject"
+    ],
+    filter: { key: { prefix: "source/" } }
+  },
+  triggerName: "sls_oss_my_service_dev_ossTriggerTest",
+  triggerType: "oss",
+  functionName: "my-service-dev-ossTriggerTest",
+  serviceName: "my-service-dev"
+}];
+
+exports.fullTriggers = [{
+  createdTime: "2017-08-15T15:00:00.000+0000",
+  invocationRole: "acs:ram::1234567890123456:role/sls-my-service-dev-invoke-role",
+  lastModifiedTime: "2017-08-15T15:00:00.000+0000",
+  sourceArn: "acs:oss:*:*:my-service-resource",
+  triggerConfig: {
+    events: [
+      "oss:ObjectCreated:PostObject",
+      "oss:ObjectCreated:PutObject"
+    ],
+    filter: { key: { prefix: "source/" } }
+  },
+  triggerName: "sls_oss_my_service_dev_ossTriggerTest",
+  triggerType: "oss"
+}];
+
+exports.fullService = {
+  serviceId: '15e2c99d57e1cbbf2e267',
+  serviceName: 'my-service-dev'
+};

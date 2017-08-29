@@ -243,6 +243,10 @@ class AliyunProvider {
     return type === "ALIYUN::API::HTTP";
   }
 
+  isTriggerType(type) {
+    return type === "ALIYUN::FC::Trigger";
+  }
+
   isLogStoreType(type) {
     return type === "ALIYUN::SLS::Store";
   }
@@ -501,7 +505,9 @@ class AliyunProvider {
         "sourceArn": event.sourceArn,
         "triggerConfig": event.triggerConfig,
         "triggerName": this.getEventName(eventType, funcObject.name),
-        "triggerType": eventType
+        "triggerType": eventType,
+        "functionName": funcObject.name,
+        "serviceName": this.getServiceName()
       }
     };
   }
@@ -940,8 +946,11 @@ class AliyunProvider {
    * @return {TriggerResponse}https://help.aliyun.com/document_detail/52877.html#trigger
    * https://help.aliyun.com/document_detail/52877.html#triggerresponse
    */
-  createTrigger(serviceName, functionName, trigger) {
-    return this.fcClient.createTrigger(serviceName, functionName, trigger);
+  createTrigger(serviceName, functionName, trigger, role) {
+    const triggerProps = Object.assign({}, trigger, {
+      invocationRole: role.Arn
+    });
+    return this.fcClient.createTrigger(serviceName, functionName, triggerProps);
   }
 
   /**
@@ -951,7 +960,17 @@ class AliyunProvider {
    * @return {TriggerResponse}
    */
   getTrigger(serviceName, functionName, triggerName) {
-    return this.fcClient.getTrigger(serviceName, functionName, triggerName);
+    return this.fcClient.getTrigger(serviceName, functionName, triggerName)
+      .catch((err) => {
+        if (['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'].indexOf(err.code)) {
+          return undefined;
+        }
+        throw err;
+      });
+  }
+
+  listTrigger(serviceName, functionName) {
+    return this.fcClient.listTrigger(serviceName, functionName);
   }
 
   /**
@@ -961,8 +980,13 @@ class AliyunProvider {
    * @param {Trigger} trigger
    * @return {TriggerResponse}
    */
-  updateTrigger(serviceName, functionName, triggerName, trigger) {
-    return this.fcClient.createTrigger(serviceName, functionName, triggerName, trigger);
+  updateTrigger(serviceName, functionName, triggerName, trigger, role) {
+    const triggerProps = Object.assign({}, trigger, {
+      invocationRole: role.Arn
+    });
+
+    return this.fcClient.createTrigger(
+      serviceName, functionName, triggerName, triggerProps);
   }
 
   /**

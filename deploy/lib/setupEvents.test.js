@@ -9,7 +9,10 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
-const { apiGroup, apis, group, fullGroup, role, fullRole, fullApis, functions } = require('../../test/data');
+const {
+  apiGroup, apis, group, fullGroup, role, fullRole, fullApis,
+  functions, triggers, fullTriggers
+} = require('../../test/data');
 
 describe('setupEvents', () => {
   let serverless;
@@ -37,10 +40,13 @@ describe('setupEvents', () => {
   });
 
   describe('#setupEvents()', () => {
+    let setupInvokeRoleStub;
     let createApisIfNeededStub;
     let createTriggersIfNeededStub;
 
     beforeEach(() => {
+      setupInvokeRoleStub = sinon.stub(aliyunDeploy, 'setupInvokeRole')
+        .returns(BbPromise.resolve(role));
       createApisIfNeededStub = sinon.stub(aliyunDeploy, 'createApisIfNeeded')
         .returns(BbPromise.resolve());
       createTriggersIfNeededStub = sinon.stub(aliyunDeploy, 'createTriggersIfNeeded')
@@ -48,27 +54,49 @@ describe('setupEvents', () => {
     });
 
     afterEach(() => {
+      aliyunDeploy.setupInvokeRole.restore();
       aliyunDeploy.createApisIfNeeded.restore();
       aliyunDeploy.createTriggersIfNeeded.restore();
     });
 
     it('should run promise chain', () => aliyunDeploy
       .setupEvents().then(() => {
-        expect(createApisIfNeededStub.calledOnce).toEqual(true);
+        expect(setupInvokeRoleStub.calledOnce).toEqual(true);
+        expect(createApisIfNeededStub.calledAfter(setupInvokeRoleStub));
         expect(createTriggersIfNeededStub.calledAfter(createApisIfNeededStub));
       })
     );
 
-    it('should set apis property', () => {
+    it('should set apis and triggers property', () => {
       return aliyunDeploy.setupEvents().then(() => {
-          expect(aliyunDeploy.apis).toEqual(apis);
-        });
-      }
-    );
+        expect(aliyunDeploy.apis).toEqual(apis);
+        expect(aliyunDeploy.triggers).toEqual(triggers);
+      });
+    });
   });
 
-  describe('#setupEvents()', () => {
+  describe('#setupInvokeRole()', () => {
     let setupRoleStub;
+
+    beforeEach(() => {
+      setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole')
+        .returns(BbPromise.resolve(fullRole));;
+    });
+
+    afterEach(() => {
+      aliyunDeploy.setupRole.restore();
+    });
+
+    it('should set up invoke role', () => {
+      return aliyunDeploy.setupInvokeRole().then(() => {
+        expect(setupRoleStub.calledOnce).toEqual(true);
+        expect(setupRoleStub.calledWithExactly(role)).toEqual(true);
+        expect(aliyunDeploy.invokeRole).toEqual(fullRole);
+      });
+    });
+  });
+
+  describe('#createApisIfNeeded()', () => {
     let getApiGroupStub;
     let createApiGroupStub;
     let getApisStub;
@@ -78,7 +106,9 @@ describe('setupEvents', () => {
     let consoleLogStub;
 
     beforeEach(() => {
-      setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole');
+      aliyunDeploy.apis = apis;
+      aliyunDeploy.invokeRole = fullRole;
+
       getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
       createApiGroupStub = sinon.stub(aliyunDeploy.provider, 'createApiGroup');
       getApisStub = sinon.stub(aliyunDeploy.provider, 'getApis');
@@ -89,7 +119,9 @@ describe('setupEvents', () => {
     });
 
     afterEach(() => {
-      aliyunDeploy.setupRole.restore();
+      aliyunDeploy.apis = [];
+      aliyunDeploy.invokeRole = undefined;
+
       aliyunDeploy.provider.getApiGroup.restore();
       aliyunDeploy.provider.createApiGroup.restore();
       aliyunDeploy.provider.getApis.restore();
@@ -100,7 +132,6 @@ describe('setupEvents', () => {
     });
 
     it('should set up apis property from scratch', () => {
-      setupRoleStub.returns(BbPromise.resolve(fullRole));
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       createApiGroupStub.returns(BbPromise.resolve(fullGroup));
       getApisStub.returns(BbPromise.resolve([]));
@@ -109,11 +140,7 @@ describe('setupEvents', () => {
       createApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
 
-      return aliyunDeploy.setupEvents().then(() => {
-        expect(setupRoleStub.calledOnce).toEqual(true);
-        expect(setupRoleStub.calledWithExactly(role)).toEqual(true);
-
-        expect(getApiGroupStub.calledAfter(setupRoleStub)).toEqual(true);
+      return aliyunDeploy.createApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
@@ -132,27 +159,21 @@ describe('setupEvents', () => {
         expect(createApiStub.calledAfter(getApisStub)).toEqual(true);
         expect(createApiStub.calledTwice).toEqual(true);
 
-        expect(createApiStub.calledWithExactly(
-          fullGroup,
-          fullRole,
-          apis[0]
-        )).toEqual(true);
-        expect(createApiStub.calledWithExactly(
-          fullGroup,
-          fullRole,
-          apis[1]
-        )).toEqual(true);
+        expect(createApiStub.getCall(0).args).toEqual(
+          [fullGroup, fullRole, apis[0]]
+        );
+        expect(createApiStub.getCall(1).args).toEqual(
+          [fullGroup, fullRole, apis[1]]
+        );
 
         expect(deployApiStub.calledAfter(createApiStub)).toEqual(true);
         expect(deployApiStub.calledTwice).toEqual(true);
-        expect(deployApiStub.calledWithExactly(
-          fullGroup,
-          fullApis[0]
-        )).toEqual(true);
-        expect(deployApiStub.calledWithExactly(
-          fullGroup,
-          fullApis[0]
-        )).toEqual(true);
+        expect(deployApiStub.getCall(0).args).toEqual(
+          [fullGroup, fullApis[0]]
+        );
+        expect(deployApiStub.getCall(1).args).toEqual(
+          [fullGroup, fullApis[1]]
+        );
 
         const logs = [
           'Creating API group my_service_dev_api...',
@@ -176,7 +197,6 @@ describe('setupEvents', () => {
     });
 
     it('should update apis properly', () => {
-      setupRoleStub.returns(BbPromise.resolve(fullRole));
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       createApiGroupStub.returns(BbPromise.resolve());
       getApisStub.returns(BbPromise.resolve(fullApis));
@@ -185,11 +205,7 @@ describe('setupEvents', () => {
       updateApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
 
-      return aliyunDeploy.setupEvents().then(() => {
-        expect(setupRoleStub.calledOnce).toEqual(true);
-        expect(setupRoleStub.calledWithExactly(role)).toEqual(true);
-
-        expect(getApiGroupStub.calledAfter(setupRoleStub)).toEqual(true);
+      return aliyunDeploy.createApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
@@ -239,6 +255,98 @@ describe('setupEvents', () => {
           'Deploying API sls_http_my_service_dev_getTest...',
           'Deployed API sls_http_my_service_dev_getTest',
           'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
+      });
+    });
+  });
+
+  describe('#createTriggersIfNeeded()', () => {
+    let getTriggerStub;
+    let updateTriggerStub;
+    let createTriggerStub;
+    let consoleLogStub;
+
+    beforeEach(() => {
+      aliyunDeploy.triggers = triggers;
+      aliyunDeploy.invokeRole = fullRole;
+
+      getTriggerStub = sinon.stub(aliyunDeploy.provider, 'getTrigger');
+      updateTriggerStub = sinon.stub(aliyunDeploy.provider, 'updateTrigger');
+      createTriggerStub = sinon.stub(aliyunDeploy.provider, 'createTrigger');
+      consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+    });
+
+    afterEach(() => {
+      aliyunDeploy.triggers = [];
+      aliyunDeploy.invokeRole = undefined;
+
+      aliyunDeploy.provider.getTrigger.restore();
+      aliyunDeploy.provider.updateTrigger.restore();
+      aliyunDeploy.provider.createTrigger.restore();
+      aliyunDeploy.serverless.cli.log.restore();
+    });
+
+    it('should set up triggers from scratch', () => {
+      getTriggerStub.returns(BbPromise.resolve());
+      updateTriggerStub.returns(BbPromise.resolve());
+      createTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+
+      return aliyunDeploy.createTriggersIfNeeded().then(() => {
+        const trigger = triggers[0];
+
+        expect(getTriggerStub.calledOnce).toEqual(true);
+        expect(getTriggerStub.calledWithExactly(
+          trigger.serviceName, trigger.functionName, trigger.triggerName
+        )).toEqual(true);
+
+        expect(updateTriggerStub.called).toEqual(false);
+
+        expect(createTriggerStub.calledAfter(getTriggerStub)).toEqual(true);
+        expect(createTriggerStub.calledOnce).toEqual(true);
+
+        expect(createTriggerStub.getCall(0).args).toEqual(
+          [trigger.serviceName, trigger.functionName, trigger, fullRole]
+        );
+
+        const logs = [
+          'Creating trigger sls_oss_my_service_dev_ossTriggerTest...',
+          'Created trigger sls_oss_my_service_dev_ossTriggerTest'
+        ];
+        expect(consoleLogStub.callCount).toEqual(logs.length);
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+        }
+      });
+    });
+
+    it('should update triggers properly', () => {
+      getTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+      updateTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+      createTriggerStub.returns(BbPromise.resolve());
+
+      return aliyunDeploy.createTriggersIfNeeded().then(() => {
+        const trigger = triggers[0];
+
+        expect(getTriggerStub.calledOnce).toEqual(true);
+        expect(getTriggerStub.calledWithExactly(
+          trigger.serviceName, trigger.functionName, trigger.triggerName
+        )).toEqual(true);
+
+        expect(createTriggerStub.called).toEqual(false);
+
+        expect(updateTriggerStub.calledAfter(getTriggerStub)).toEqual(true);
+        expect(updateTriggerStub.calledOnce).toEqual(true);
+        expect(updateTriggerStub.getCall(0).args).toEqual(
+          [trigger.serviceName, trigger.functionName, trigger.triggerName, trigger, fullRole]
+        );
+
+        const logs = [
+          'Updating trigger sls_oss_my_service_dev_ossTriggerTest...',
+          'Updated trigger sls_oss_my_service_dev_ossTriggerTest'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {

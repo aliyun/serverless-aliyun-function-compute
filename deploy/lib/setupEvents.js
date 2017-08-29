@@ -12,13 +12,24 @@ module.exports = {
       this.templates.update.Resources,
       (item) => this.provider.isApiType(item.Type))
       .map((item) => item.Properties);
-    this.triggers = [];
-    // TODO(joyeecheung): OSS triggers
-    // this.triggers = ...?
+    this.triggers = _.filter(
+      this.templates.update.Resources,
+      (item) => this.provider.isTriggerType(item.Type))
+      .map((item) => item.Properties);
 
     return BbPromise.bind(this)
+      .then(this.setupInvokeRole)
       .then(this.createApisIfNeeded)
       .then(this.createTriggersIfNeeded);
+  },
+
+  setupInvokeRole() {
+    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
+
+    // TODO: update if needed
+    return BbPromise.bind(this)
+      .then(() => this.setupRole(role))
+      .then((invokeRole) => this.invokeRole = invokeRole);
   },
 
   createApisIfNeeded() {
@@ -27,30 +38,19 @@ module.exports = {
     }
 
     return BbPromise.bind(this)
-      .then(this.setupInvokeRole)
       .then(this.createApiGroupIfNotExists)
       .then(this.checkExistingApis)
       .then(this.createOrUpdateApis)
       .then(this.deployApis);
   },
 
-  setupInvokeRole() {
-    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
-
-    return BbPromise.bind(this)
-      .then(() => this.setupRole(role))
-      .then((invokeRole) => this.invokeRole = invokeRole);
-  },
-
   createTriggersIfNeeded() {
     if (!this.triggers.length) {
       return BbPromise.resolve();
     }
-    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
 
     return BbPromise.bind(this)
-      .then(() => this.setupRole(role))
-      .then((invokeRole) => this.invokeRole = invokeRole)
+      .then(this.checkExistingTriggers)
       .then(this.createOrUpdateTriggers);
   },
 
@@ -160,7 +160,53 @@ module.exports = {
     });
   },
 
+  checkExistingTriggers() {
+    this.triggerMap = new Map();
+    return BbPromise.mapSeries(this.triggers, (trigger) => {
+      return this.provider.getTrigger(
+        trigger.serviceName, trigger.functionName, trigger.triggerName
+      ).then((foundTrigger) => {
+        if (foundTrigger) {
+          this.triggerMap.set(trigger.triggerName, foundTrigger)
+        }
+      })
+    });
+  },
+
   createOrUpdateTriggers() {
-    return BbPromise.reject('Not implemented');
+    if (!this.triggers.length) {
+      return;
+    }
+
+    return BbPromise.mapSeries(this.triggers,
+      (trigger) => this.createOrUpdateTrigger(trigger));
+  },
+
+  createOrUpdateTrigger(trigger) {
+    const role = this.invokeRole;
+    const triggerName = trigger.triggerName;
+    const serviceName = trigger.serviceName;
+    const functionName = trigger.functionName;
+    const triggerInMap = this.triggerMap.get(triggerName);
+    if (triggerInMap) {
+      this.serverless.cli.log(`Updating trigger ${triggerName}...`);
+      return this.provider.updateTrigger(serviceName, functionName, triggerName, trigger, role)
+        .then((newtrigger) => {
+          this.serverless.cli.log(`Updated trigger ${triggerName}`);
+        }, (err) => {
+          this.serverless.cli.log(`Failed to update trigger ${triggerName}!`);
+          throw err;
+        });
+    } else {
+      this.serverless.cli.log(`Creating trigger ${triggerName}...`);
+      return this.provider.createTrigger(serviceName, functionName, trigger, role)
+        .then((newtrigger) => {
+          this.serverless.cli.log(`Created trigger ${triggerName}`);
+          this.triggerMap.set(triggerName, newtrigger);
+        }, (err) => {
+          this.serverless.cli.log(`Failed to create trigger ${triggerName}!`);
+          throw err;
+        });
+    }
   }
 };

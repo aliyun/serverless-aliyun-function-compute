@@ -10,33 +10,11 @@ const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
 
+const { functions } = require('../../test/data');
+
 describe('setupFunctions', () => {
   let serverless;
   let aliyunDeploy;
-
-  const functions = [{
-    "name": "my-service-dev-postTest",
-    "service": "my-service-dev",
-    "handler": "index.postHandler",
-    "memorySize": 128,
-    "timeout": 30,
-    "runtime": "nodejs6",
-    "code": {
-      "ossBucketName": "sls-my-service",
-      "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
-    }
-  }, {
-    "name": "my-service-dev-getTest",
-    "service": "my-service-dev",
-    "handler": "index.getHandler",
-    "memorySize": 128,
-    "timeout": 30,
-    "runtime": "nodejs6",
-    "code": {
-      "ossBucketName": "sls-my-service",
-      "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
-    }
-  }];
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -110,34 +88,46 @@ describe('setupFunctions', () => {
         getFunctionStub
           .withArgs('my-service-dev', 'my-service-dev-getTest')
           .returns(BbPromise.resolve(undefined));
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+          .returns(BbPromise.resolve(undefined));
+
         updateFunctionStub.returns(BbPromise.resolve());
         createFunctionStub.returns(BbPromise.resolve());
         return aliyunDeploy.setupFunctions().then(() => {
-          expect(getFunctionStub.calledTwice).toEqual(true);
+          expect(getFunctionStub.callCount).toEqual(3);
           expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-postTest')).toEqual(true);
           expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-getTest')).toEqual(true);
+          expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-ossTriggerTest')).toEqual(true);
 
           expect(updateFunctionStub.calledAfter(getFunctionStub)).toEqual(true);
           expect(updateFunctionStub.calledOnce).toEqual(true);
-          expect(updateFunctionStub.calledWithExactly(
+          expect(updateFunctionStub.getCall(0).args).toEqual([
             'my-service-dev',
             'my-service-dev-postTest',
             functions[0]
-          )).toEqual(true);
+          ]);
 
           expect(createFunctionStub.calledAfter(updateFunctionStub)).toEqual(true);
-          expect(createFunctionStub.calledOnce).toEqual(true);
-          expect(createFunctionStub.calledWithExactly(
+          expect(createFunctionStub.calledTwice).toEqual(true);
+          expect(createFunctionStub.getCall(0).args).toEqual([
             'my-service-dev',
             'my-service-dev-getTest',
             functions[1]
-          )).toEqual(true);
+          ]);
+          expect(createFunctionStub.getCall(1).args).toEqual([
+            'my-service-dev',
+            'my-service-dev-ossTriggerTest',
+            functions[2]
+          ]);
 
           const logs = [
             'Updating function my-service-dev-postTest...',
             'Updated function my-service-dev-postTest',
             'Creating function my-service-dev-getTest...',
-            'Created function my-service-dev-getTest'
+            'Created function my-service-dev-getTest',
+            'Creating function my-service-dev-ossTriggerTest...',
+            'Created function my-service-dev-ossTriggerTest'
           ];
           expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {

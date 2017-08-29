@@ -8,7 +8,8 @@ const {
   apiGroup, apis, group, fullGroup, role, fullRole,
   fullApis, functions, fullExecRole, execRole, functionDefs,
   logIndex, fullLogIndex, logProject, fullLogProject, logStore,
-  fullLogStore, directory
+  fullLogStore, directory, fullService,
+  triggers, fullTriggers
 } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -153,6 +154,11 @@ describe('AliyunDeployFunction', () => {
     let updateApiStub;
     let createApiStub;
     let deployApiStub;
+
+    let getTriggerStub;
+    let updateTriggerStub;
+    let createTriggerStub;
+
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -195,6 +201,10 @@ describe('AliyunDeployFunction', () => {
       createApiStub = sinon.stub(aliyunDeployFunction.provider, 'createApi');
       deployApiStub = sinon.stub(aliyunDeployFunction.provider, 'deployApi');
 
+      getTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'getTrigger');
+      updateTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'updateTrigger');
+      createTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'createTrigger');
+
       sinon.stub(aliyunDeployFunction.provider, 'getArtifactDirectoryName').returns(directory);
     });
 
@@ -229,6 +239,11 @@ describe('AliyunDeployFunction', () => {
       aliyunDeployFunction.provider.updateApi.restore();
       aliyunDeployFunction.provider.createApi.restore();
       aliyunDeployFunction.provider.deployApi.restore();
+
+      aliyunDeployFunction.provider.getTrigger.restore();
+      aliyunDeployFunction.provider.updateTrigger.restore();
+      aliyunDeployFunction.provider.createTrigger.restore();
+
       aliyunDeployFunction.provider.getArtifactDirectoryName.restore();
     });
 
@@ -248,9 +263,8 @@ describe('AliyunDeployFunction', () => {
       getPoliciesForRoleStub.returns(BbPromise.resolve([]));
       attachPolicyToRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
       getServiceStub.returns(BbPromise.resolve(undefined));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve(undefined));
       createBucketStub.returns(BbPromise.resolve());
       uploadObjectStub.returns(BbPromise.resolve());
@@ -264,6 +278,8 @@ describe('AliyunDeployFunction', () => {
       updateApiStub.returns(BbPromise.resolve());
       createApiStub.returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
+
+      getTriggerStub.returns(BbPromise.resolve());
 
       const logs = [
         'Packaging function: postTest...',
@@ -284,8 +300,8 @@ describe('AliyunDeployFunction', () => {
         'Created service my-service-dev',
         'Creating bucket sls-my-service...',
         'Created bucket sls-my-service',
-        'Uploading serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service...',
-        'Uploaded serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service',
+        'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-my-service...',
+        'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-my-service',
         'Creating function my-service-dev-postTest...',
         'Created function my-service-dev-postTest',
         'Creating RAM role sls-my-service-dev-invoke-role...',
@@ -330,9 +346,8 @@ describe('AliyunDeployFunction', () => {
       getPoliciesForRoleStub.onCall(1).returns(BbPromise.resolve(role.Policies));
       attachPolicyToRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({ serviceId }));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getServiceStub.returns(BbPromise.resolve(fullService));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve({
         name: 'sls-my-service',
         region: 'cn-shanghai'
@@ -355,6 +370,8 @@ describe('AliyunDeployFunction', () => {
       updateApiStub.returns(BbPromise.resolve(fullApis[1]));
       deployApiStub.returns(BbPromise.resolve());
 
+      getTriggerStub.returns(BbPromise.resolve());
+
       const logs = [
         'Packaging function: postTest...',
         'Compiling function "postTest"...',
@@ -366,8 +383,8 @@ describe('AliyunDeployFunction', () => {
         'RAM policy fc-my-service-dev-access has been attached to sls-my-service-dev-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-my-service already exists.',
-        'Uploading serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service...',
-        'Uploaded serverless/my-service/dev/1501150613924-2017-07-27T10:16:53.924Z/postTest.zip to OSS bucket sls-my-service',
+        'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-my-service...',
+        'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-my-service',
         'Updating function my-service-dev-postTest...',
         'Updated function my-service-dev-postTest',
         'RAM role sls-my-service-dev-invoke-role exists.',

@@ -118,6 +118,7 @@ module.exports = {
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
     // TODO(joyeecheung): generate description
+    // TODO(joyeecheung): update service
     const spec = Object.assign({
       role: this.execRole.Arn
     }, service);

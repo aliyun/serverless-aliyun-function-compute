@@ -303,7 +303,9 @@
           }
         },
         "triggerName": "sls_oss_my_service_dev_ossTriggerTest",
-        "triggerType": "oss"
+        "triggerType": "oss",
+        "functionName": "my-service-dev-ossTriggerTest",
+        "serviceName": "my-service-dev"
       }
     }
   }

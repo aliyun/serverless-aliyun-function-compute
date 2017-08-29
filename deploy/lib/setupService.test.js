@@ -10,7 +10,10 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
-const { service, execRole, fullExecRole, logIndex, fullLogIndex, logProject, fullLogProject, logStore, fullLogStore } = require('../../test/data');
+const {
+  service, execRole, fullExecRole, logIndex, fullLogIndex,
+  logProject, fullLogProject, logStore, fullLogStore, fullService
+} = require('../../test/data');
 
 describe('setupServices', () => {
   let serverless;
@@ -127,10 +130,9 @@ describe('setupServices', () => {
     });
 
     it('should set up service from scratch', () => {
-      const serviceId = new Date().getTime().toString(16);
       setupRoleStub.returns(BbPromise.resolve(fullExecRole));
       getServiceStub.returns(BbPromise.resolve(undefined));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve(undefined));
       createBucketStub.returns(BbPromise.resolve());
       resetOssClientStub.returns();
@@ -215,10 +217,9 @@ describe('setupServices', () => {
     });
 
     it('should handle existing service ', () => {
-      const serviceId = new Date().getTime().toString(16);
       setupRoleStub.returns(BbPromise.resolve(fullExecRole));
-      getServiceStub.returns(BbPromise.resolve({ serviceId }));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getServiceStub.returns(BbPromise.resolve(fullService));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve({
         name: 'sls-my-service',
         region: 'cn-shanghai'

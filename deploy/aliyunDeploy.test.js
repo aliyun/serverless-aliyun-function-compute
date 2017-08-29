@@ -8,7 +8,8 @@ const {
   apiGroup, apis, group, fullGroup, role,
   fullRole, execRole, fullExecRole, fullApis,
   functions, logIndex, fullLogIndex, logProject,
-  fullLogProject, logStore, fullLogStore
+  fullLogProject, logStore, fullLogStore, fullService,
+  triggers, fullTriggers
 } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -142,6 +143,10 @@ describe('AliyunDeploy', () => {
     let createApiStub;
     let deployApiStub;
 
+    let getTriggerStub;
+    let updateTriggerStub;
+    let createTriggerStub;
+
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -174,7 +179,11 @@ describe('AliyunDeploy', () => {
       getFunctionStub = sinon.stub(aliyunDeploy.provider, 'getFunction');
       updateFunctionStub = sinon.stub(aliyunDeploy.provider, 'updateFunction');
       createFunctionStub = sinon.stub(aliyunDeploy.provider, 'createFunction');
-      
+
+      getTriggerStub = sinon.stub(aliyunDeploy.provider, 'getTrigger');
+      updateTriggerStub = sinon.stub(aliyunDeploy.provider, 'updateTrigger');
+      createTriggerStub = sinon.stub(aliyunDeploy.provider, 'createTrigger');
+
       getApiGroupStub = sinon.stub(aliyunDeploy.provider, 'getApiGroup');
       createApiGroupStub = sinon.stub(aliyunDeploy.provider, 'createApiGroup');
       getApisStub = sinon.stub(aliyunDeploy.provider, 'getApis');
@@ -208,6 +217,10 @@ describe('AliyunDeploy', () => {
       aliyunDeploy.provider.updateFunction.restore();
       aliyunDeploy.provider.createFunction.restore();
 
+      aliyunDeploy.provider.getTrigger.restore();
+      aliyunDeploy.provider.updateTrigger.restore();
+      aliyunDeploy.provider.createTrigger.restore();
+
       aliyunDeploy.provider.getApiGroup.restore();
       aliyunDeploy.provider.createApiGroup.restore();
       aliyunDeploy.provider.getApis.restore();
@@ -232,9 +245,8 @@ describe('AliyunDeploy', () => {
       getPoliciesForRoleStub.returns(BbPromise.resolve([]));
       attachPolicyToRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
       getServiceStub.returns(BbPromise.resolve(undefined));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve(undefined));
       createBucketStub.returns(BbPromise.resolve());
       uploadObjectStub.returns(BbPromise.resolve());
@@ -243,6 +255,10 @@ describe('AliyunDeploy', () => {
       createFunctionStub.returns(BbPromise.resolve());
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       createApiGroupStub.returns(BbPromise.resolve(fullGroup));
+
+      getTriggerStub.returns(BbPromise.resolve());
+      updateTriggerStub.returns(BbPromise.resolve());
+      createTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
 
       getApisStub.returns(BbPromise.resolve([]));
       updateApiStub.returns(BbPromise.resolve());
@@ -276,6 +292,8 @@ describe('AliyunDeploy', () => {
             'Created function my-service-dev-postTest',
             'Creating function my-service-dev-getTest...',
             'Created function my-service-dev-getTest',
+            'Creating function my-service-dev-ossTriggerTest...',
+            'Created function my-service-dev-ossTriggerTest',
             'Creating RAM role sls-my-service-dev-invoke-role...',
             'Created RAM role sls-my-service-dev-invoke-role',
             'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
@@ -291,7 +309,9 @@ describe('AliyunDeploy', () => {
             'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
             'Deploying API sls_http_my_service_dev_getTest...',
             'Deployed API sls_http_my_service_dev_getTest',
-            'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
+            'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest',
+            'Creating trigger sls_oss_my_service_dev_ossTriggerTest...',
+            'Created trigger sls_oss_my_service_dev_ossTriggerTest'
           ];
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -319,9 +339,8 @@ describe('AliyunDeploy', () => {
       getPoliciesForRoleStub.onCall(1).returns(BbPromise.resolve(role.Policies));
       attachPolicyToRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({ serviceId }));
-      createServiceStub.returns(BbPromise.resolve({ serviceId }));
+      getServiceStub.returns(BbPromise.resolve(fullService));
+      createServiceStub.returns(BbPromise.resolve(fullService));
       getBucketStub.returns(BbPromise.resolve({
         name: 'sls-my-service',
         region: 'cn-shanghai'
@@ -334,8 +353,15 @@ describe('AliyunDeploy', () => {
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
         .returns(BbPromise.resolve(functions[1]));
+        getFunctionStub
+          .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+          .returns(BbPromise.resolve(functions[2]));
       updateFunctionStub.returns(BbPromise.resolve());
       createFunctionStub.returns(BbPromise.resolve());
+
+      getTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+      updateTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+      createTriggerStub.returns(BbPromise.resolve());
 
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       createApiGroupStub.returns(BbPromise.resolve());
@@ -360,6 +386,8 @@ describe('AliyunDeploy', () => {
         'Updated function my-service-dev-postTest',
         'Updating function my-service-dev-getTest...',
         'Updated function my-service-dev-getTest',
+        'Updating function my-service-dev-ossTriggerTest...',
+        'Updated function my-service-dev-ossTriggerTest',
         'RAM role sls-my-service-dev-invoke-role exists.',
         'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-invoke-role.',
         'API group my_service_dev_api exists.',
@@ -372,7 +400,9 @@ describe('AliyunDeploy', () => {
         'POST http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/baz -> my-service-dev.my-service-dev-postTest',
         'Deploying API sls_http_my_service_dev_getTest...',
         'Deployed API sls_http_my_service_dev_getTest',
-        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest'
+        'GET http://523e8dc7bbe04613b5b1d726c2a7889d-cn-shanghai.alicloudapi.com/quo -> my-service-dev.my-service-dev-getTest',
+        'Updating trigger sls_oss_my_service_dev_ossTriggerTest...',
+        'Updated trigger sls_oss_my_service_dev_ossTriggerTest'
       ];
       return aliyunDeploy.hooks['before:deploy:deploy']()
         .then(() => aliyunDeploy.hooks['deploy:deploy']())
