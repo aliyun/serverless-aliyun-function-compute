@@ -7,9 +7,11 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis, functionDefs } = require('../../test/data');
+const {
+  fullGroup, fullApis, functionDefs, fullFunctions, fullService, fullTriggers
+} = require('../../test/data');
 
-describe('removeEvents', () => {
+describe('removeApisIfNeeded', () => {
   let serverless;
   let aliyunRemove;
 
@@ -32,7 +34,64 @@ describe('removeEvents', () => {
     aliyunRemove = new AliyunRemove(serverless, options);
   });
 
-  describe('#removeEvents()', () => {
+  describe('#removeApisIfNeeded()', () => {
+    let removeApisIfNeededStub;
+    let removeTriggersIfNeededStub;
+    let removeInvokeRoleStub;
+
+    beforeEach(() => {
+      removeApisIfNeededStub = sinon.stub(aliyunRemove, 'removeApisIfNeeded')
+        .returns(BbPromise.resolve());
+      removeTriggersIfNeededStub = sinon.stub(aliyunRemove, 'removeTriggersIfNeeded')
+        .returns(BbPromise.resolve());
+      removeInvokeRoleStub = sinon.stub(aliyunRemove, 'removeInvokeRole')
+        .returns(BbPromise.resolve());
+    });
+
+    afterEach(() => {
+      aliyunRemove.removeApisIfNeeded.restore();
+      aliyunRemove.removeTriggersIfNeeded.restore();
+      aliyunRemove.removeInvokeRole.restore();
+    });
+
+    it('should run promise chain', () => aliyunRemove
+      .removeEvents().then(() => {
+        expect(removeApisIfNeededStub.calledOnce).toEqual(true);
+        expect(removeTriggersIfNeededStub.calledAfter(removeApisIfNeededStub));
+        expect(removeInvokeRoleStub.calledAfter(removeTriggersIfNeededStub));
+      })
+    );
+
+    it('should set apis and triggers property', () => {
+      return aliyunRemove.removeEvents().then(() => {
+        expect(aliyunRemove.apiGroup).toEqual(undefined);
+        expect(aliyunRemove.deployedApis).toEqual([]);
+        expect(aliyunRemove.apis).toEqual([]);
+        expect(aliyunRemove.triggers).toEqual([]);
+      });
+    });
+  });
+
+  describe('#removeInvokeRole()', () => {
+    let removeRoleAndPoliciesStub;
+
+    beforeEach(() => {
+      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
+    });
+
+    afterEach(() => {
+      aliyunRemove.removeRoleAndPolicies.restore();
+    });
+
+    it('should remove invoke role', () => {
+      return aliyunRemove.removeInvokeRole().then(() => {
+        expect(removeRoleAndPoliciesStub.calledOnce).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
+      });
+    });
+  });
+
+  describe('#removeApisIfNeeded()', () => {
     let consoleLogStub;
     let getApiGroupStub;
     let getApisStub;
@@ -40,7 +99,6 @@ describe('removeEvents', () => {
     let abolishApiStub;
     let deleteApiStub;
     let deleteApiGroupStub;
-    let removeRoleAndPoliciesStub;
 
     beforeEach(() => {
       aliyunRemove.serverless.service.functions = {};
@@ -51,7 +109,11 @@ describe('removeEvents', () => {
       abolishApiStub = sinon.stub(aliyunRemove.provider, 'abolishApi');
       deleteApiStub = sinon.stub(aliyunRemove.provider, 'deleteApi');
       deleteApiGroupStub = sinon.stub(aliyunRemove.provider, 'deleteApiGroup');
-      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
+
+      aliyunRemove.apiGroup = undefined;
+      aliyunRemove.apis = [];
+      aliyunRemove.deployedApis = [];
+      aliyunRemove.triggers = [];
     });
 
     afterEach(() => {
@@ -62,7 +124,6 @@ describe('removeEvents', () => {
       aliyunRemove.provider.abolishApi.restore();
       aliyunRemove.provider.deleteApi.restore();
       aliyunRemove.provider.deleteApiGroup.restore();
-      aliyunRemove.removeRoleAndPolicies.restore();
     });
 
     it('should remove existing events', () => {
@@ -74,7 +135,7 @@ describe('removeEvents', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
-      return aliyunRemove.removeEvents().then(() => {
+      return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
         expect(getApiGroupStub.calledWithExactly('my_service_dev_api')).toEqual(true);
 
@@ -108,11 +169,7 @@ describe('removeEvents', () => {
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
-        expect(removeRoleAndPoliciesStub.calledAfter(deleteApiGroupStub)).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
-
         const logs = [
-          'Removing events...',
           'Abolishing API sls_http_my_service_dev_postTest...',
           'Abolished API sls_http_my_service_dev_postTest',
           'Abolishing API sls_http_my_service_dev_getTest...',
@@ -139,7 +196,7 @@ describe('removeEvents', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
-      return aliyunRemove.removeEvents().then(() => {
+      return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.calledAfter(getDeployedApisStub)).toEqual(true);
         expect(abolishApiStub.calledOnce).toEqual(true);
         expect(abolishApiStub.getCall(0).args)
@@ -156,11 +213,7 @@ describe('removeEvents', () => {
         expect(deleteApiGroupStub.calledOnce).toEqual(true);
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
-        expect(removeRoleAndPoliciesStub.calledAfter(deleteApiGroupStub)).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
-
         const logs = [
-          'Removing events...',
           'Abolishing API sls_http_my_service_dev_postTest...',
           'Abolished API sls_http_my_service_dev_postTest',
           'Removing API sls_http_my_service_dev_postTest...',
@@ -185,7 +238,7 @@ describe('removeEvents', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
-      return aliyunRemove.removeEvents().then(() => {
+      return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.called).toEqual(false);
         expect(deleteApiStub.calledOnce).toEqual(true);
         expect(deleteApiStub.getCall(0).args)
@@ -196,7 +249,6 @@ describe('removeEvents', () => {
         expect(deleteApiGroupStub.calledWithExactly(fullGroup)).toEqual(true);
 
         const logs = [
-          'Removing events...',
           'No deployed APIs to abolish.',
           'Removing API sls_http_my_service_dev_postTest...',
           'Removed API sls_http_my_service_dev_postTest',
@@ -218,19 +270,96 @@ describe('removeEvents', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
-      return aliyunRemove.removeEvents().then(() => {
+      return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.called).toEqual(false);
         expect(deleteApiStub.called).toEqual(false);
         expect(deleteApiGroupStub.called).toEqual(false);
 
-        expect(removeRoleAndPoliciesStub.calledOnce).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
-
         const logs = [
-          'Removing events...',
           'No deployed APIs to abolish.',
           'No APIs to remove.',
           'No API groups to remove.',
+        ];
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
+        }
+      });
+    });
+  });
+
+  describe('#removeTriggersIfNeeded()', () => {
+    let listTriggersStub;
+    let deleteTriggerStub;
+    let consoleLogStub;
+
+    beforeEach(() => {
+      consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
+      listTriggersStub = sinon.stub(aliyunRemove.provider, 'listTriggers');
+      deleteTriggerStub = sinon.stub(aliyunRemove.provider, 'deleteTrigger');
+
+    });
+
+    afterEach(() => {
+      aliyunRemove.serverless.cli.log.restore();
+      aliyunRemove.provider.listTriggers.restore();
+      aliyunRemove.provider.deleteTrigger.restore();
+    });
+
+    it('should remove existing triggers', () => {
+      aliyunRemove.triggers = [];
+      aliyunRemove.fcService = fullService;
+      aliyunRemove.fcFunctions = fullFunctions;
+
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-getTest')
+        .returns(BbPromise.resolve([]));
+        listTriggersStub
+          .withArgs('my-service-dev', 'my-service-dev-postTest')
+          .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+        .returns(BbPromise.resolve(fullTriggers));
+      deleteTriggerStub.returns(BbPromise.resolve());
+
+      return aliyunRemove.removeTriggersIfNeeded().then(() => {
+        expect(listTriggersStub.callCount).toEqual(fullFunctions.length);
+        fullFunctions.forEach((func, i) => {
+          expect(listTriggersStub.getCall(i).args).toEqual([
+            'my-service-dev', func.functionName
+          ]);
+        });
+
+        expect(deleteTriggerStub.calledAfter(listTriggersStub)).toEqual(true);
+        expect(deleteTriggerStub.calledOnce).toEqual(true);
+        expect(deleteTriggerStub.getCall(0).args)
+          .toEqual([
+            'my-service-dev',
+            'my-service-dev-ossTriggerTest', 'sls_oss_my_service_dev_ossTriggerTest'
+          ]);
+
+          const logs = [
+            'Removing trigger sls_oss_my_service_dev_ossTriggerTest...',
+            'Removed trigger sls_oss_my_service_dev_ossTriggerTest'
+          ];
+          for (var i = 0; i < consoleLogStub.callCount; ++i) {
+            expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
+          }
+      });
+    });
+
+    it('should not do anything if there are no existing triggers', () => {
+      aliyunRemove.triggers = [];
+      aliyunRemove.fcService = undefined;
+      aliyunRemove.fcFunctions = [];
+
+      listTriggersStub.returns(BbPromise.resolve([]));
+      deleteTriggerStub.returns(BbPromise.resolve());
+
+      return aliyunRemove.removeTriggersIfNeeded().then(() => {
+        expect(listTriggersStub.called).toEqual(false);
+        expect(deleteTriggerStub.called).toEqual(false);
+        const logs = [
+          'No triggers to remove.'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);

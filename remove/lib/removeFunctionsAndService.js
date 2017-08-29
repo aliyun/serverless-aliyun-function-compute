@@ -4,33 +4,12 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   removeFunctionsAndService() {
-    this.fcService = undefined;
-    this.fcFunctions = [];
     this.serverless.cli.log('Removing functions...');
     const execRoleName = this.provider.getExecRoleName();
     return BbPromise.bind(this)
-      .then(this.getService)
-      .then(this.getFunctions)
       .then(this.removeFunctions)
       .then(this.removeServiceIfExists)
       .then(() => this.removeRoleAndPolicies(execRoleName));
-  },
-
-  getService() {
-    const serviceName = this.provider.getServiceName();
-    return this.provider.getService(serviceName).then((service) => {
-      this.fcService = service;
-    });
-  },
-
-  getFunctions() {
-    if (!this.fcService) {
-      return BbPromise.resolve();
-    }
-    const serviceName = this.fcService.serviceName;
-    return this.provider.getFunctions(serviceName).then((functions) => {
-      this.fcFunctions = functions;
-    });
   },
 
   removeFunctions() {

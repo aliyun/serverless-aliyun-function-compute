@@ -3,29 +3,29 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   removeEvents() {
-    this.events = this.serverless.service.getAllFunctions().map((functionName) => {
-      const funcObject = this.serverless.service.getFunction(functionName);
-      return funcObject.events;
-    }).filter((item) => !!item);
-
     this.apiGroup = undefined;
     this.apis = [];
     this.deployedApis = [];
+    this.triggers = [];
 
     this.serverless.cli.log('Removing events...');
     return BbPromise.bind(this)
       .then(this.removeApisIfNeeded)
-      .then(this.removeTriggersIfNeeded);
+      .then(this.removeTriggersIfNeeded)
+      .then(this.removeInvokeRole);
+  },
+
+  removeInvokeRole() {
+    const invokeRoleName = this.provider.getInvokeRoleName();
+    return this.removeRoleAndPolicies(invokeRoleName);
   },
 
   removeApisIfNeeded() {
-    const invokeRoleName = this.provider.getInvokeRoleName();
     return BbPromise.bind(this)
       .then(this.getApiInfo)
       .then(this.abolishApisIfDeployed)
       .then(this.removeApisIfExists)
-      .then(this.removeApiGroupIfExists)
-      .then(() => this.removeRoleAndPolicies(invokeRoleName));
+      .then(this.removeApiGroupIfExists);
   },
 
   getApiInfo() {
@@ -108,7 +108,27 @@ module.exports = {
   },
 
   removeTriggersIfNeeded() {
-    // const triggers = this.events.filter(needsApiGateway);
-    return BbPromise.resolve();
+    if (!this.fcService || !this.fcFunctions.length) {
+      this.serverless.cli.log(`No triggers to remove.`);
+      return BbPromise.resolve();
+    }
+
+    const serviceName = this.fcService.serviceName;
+    return BbPromise.mapSeries(this.fcFunctions, (func) => {
+      const functionName = func.functionName;
+      return this.provider.listTriggers(serviceName, functionName)
+        .then((triggers) => this.removeTriggers(serviceName, functionName, triggers));
+    });
+  },
+
+  removeTriggers(serviceName, functionName, triggers) {
+    return BbPromise.mapSeries(triggers, (trigger) => {
+      const triggerName = trigger.triggerName;
+      this.serverless.cli.log(`Removing trigger ${triggerName}...`);
+      return this.provider.deleteTrigger(serviceName, functionName, triggerName)
+        .then(() => {
+          this.serverless.cli.log(`Removed trigger ${triggerName}`);
+        });
+    });
   }
 };

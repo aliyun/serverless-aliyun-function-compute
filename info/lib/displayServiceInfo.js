@@ -124,6 +124,8 @@ module.exports = {
       message += 'There are no endpoints yet\n';
     }
 
+    // TODO(joyeecheung): display triggers
+
     this.serverless.cli.consoleLog(message);
     return BbPromise.resolve();
   },

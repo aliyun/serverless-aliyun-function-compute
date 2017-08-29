@@ -969,8 +969,8 @@ class AliyunProvider {
       });
   }
 
-  listTrigger(serviceName, functionName) {
-    return this.fcClient.listTrigger(serviceName, functionName);
+  listTriggers(serviceName, functionName) {
+    return this.fcClient.listTriggers(serviceName, functionName);
   }
 
   /**

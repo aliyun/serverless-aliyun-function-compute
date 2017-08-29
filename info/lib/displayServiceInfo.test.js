@@ -97,6 +97,8 @@ describe('DisplayServiceInfo', () => {
         '  last modified: 2017-07-21T07:38:41.413Z',
         `- ${chalk.yellow('my-service-dev-getTest')}`,
         '  last modified: 2017-07-21T07:38:41.413Z',
+        `- ${chalk.yellow('my-service-dev-ossTriggerTest')}`,
+        '  last modified: 2017-07-21T07:38:41.413Z',
         '',
         `${chalk.yellow.underline('Endpoints')}`,
         `API Group: ${chalk.yellow('my_service_dev_api')}`,

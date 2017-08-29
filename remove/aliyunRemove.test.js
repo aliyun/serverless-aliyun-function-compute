@@ -7,7 +7,11 @@ const path = require('path');
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunRemove = require('./aliyunRemove');
 const Serverless = require('../test/serverless');
-const { apiGroup, apis, group, fullGroup, role, fullRole, execRole, fullExecRole, fullApis, functions, fullFunctions, bucket, objects, functionDefs } = require('../test/data');
+const {
+  apiGroup, apis, group, fullGroup, role, fullRole, execRole,
+  fullExecRole, fullApis, functions, fullFunctions, bucket,
+  objects, functionDefs, fullService, fullTriggers
+} = require('../test/data');
 
 describe('AliyunRemove', () => {
   let serverless;
@@ -54,6 +58,7 @@ describe('AliyunRemove', () => {
     describe('hooks', () => {
       let validateStub;
       let setDefaultsStub;
+      let getFunctionsAndServiceStub;
       let removeEventsStub;
       let removeFunctionsAndServiceStub;
       let removeArtifactsStub;
@@ -63,6 +68,8 @@ describe('AliyunRemove', () => {
           .returns(BbPromise.resolve());
         setDefaultsStub = sinon.stub(aliyunRemove, 'setDefaults')
           .returns(BbPromise.resolve());
+        getFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'getFunctionsAndService')
+            .returns(BbPromise.resolve());
         removeEventsStub = sinon.stub(aliyunRemove, 'removeEvents')
           .returns(BbPromise.resolve());
         removeFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'removeFunctionsAndService')
@@ -74,6 +81,7 @@ describe('AliyunRemove', () => {
       afterEach(() => {
         aliyunRemove.validate.restore();
         aliyunRemove.setDefaults.restore();
+        aliyunRemove.getFunctionsAndService.restore();
         aliyunRemove.removeEvents.restore();
         aliyunRemove.removeFunctionsAndService.restore();
         aliyunRemove.removeArtifacts.restore();
@@ -87,7 +95,8 @@ describe('AliyunRemove', () => {
 
       it('should run "remove:remove" promise chain', () => aliyunRemove
         .hooks['remove:remove']().then(() => {
-          expect(removeEventsStub.calledOnce).toEqual(true);
+          expect(getFunctionsAndServiceStub.calledOnce).toEqual(true);
+          expect(removeEventsStub.calledAfter(getFunctionsAndServiceStub)).toEqual(true);
           expect(removeFunctionsAndServiceStub.calledAfter(removeEventsStub)).toEqual(true);
           expect(removeArtifactsStub.calledAfter(removeFunctionsAndServiceStub)).toEqual(true);
         }));
@@ -97,6 +106,9 @@ describe('AliyunRemove', () => {
   describe('remove --remove-roles', () => {
     let consoleLogStub;
 
+    let getServiceStub;
+    let getFunctionsStub;
+
     let getApiGroupStub;
     let getApisStub;
     let getDeployedApisStub;
@@ -104,13 +116,14 @@ describe('AliyunRemove', () => {
     let deleteApiStub;
     let deleteApiGroupStub;
 
+    let listTriggersStub;
+    let deleteTriggerStub;
+
     let getRoleStub;
     let getPoliciesForRoleStub;
     let detachPolicyFromRoleStub;
     let deleteRoleStub;
 
-    let getServiceStub;
-    let getFunctionsStub;
     let deleteFunctionStub;
     let deleteServiceStub;
     let removeRoleAndPoliciesStub;
@@ -131,6 +144,9 @@ describe('AliyunRemove', () => {
       aliyunRemove = new AliyunRemove(serverless, options);
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
 
+      getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
+      getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
+
       getApiGroupStub = sinon.stub(aliyunRemove.provider, 'getApiGroup');
       getApisStub = sinon.stub(aliyunRemove.provider, 'getApis');
       getDeployedApisStub = sinon.stub(aliyunRemove.provider, 'getDeployedApis');
@@ -138,13 +154,14 @@ describe('AliyunRemove', () => {
       deleteApiStub = sinon.stub(aliyunRemove.provider, 'deleteApi');
       deleteApiGroupStub = sinon.stub(aliyunRemove.provider, 'deleteApiGroup');
 
+      listTriggersStub = sinon.stub(aliyunRemove.provider, 'listTriggers');
+      deleteTriggerStub = sinon.stub(aliyunRemove.provider, 'deleteTrigger');
+
       getRoleStub = sinon.stub(aliyunRemove.provider, 'getRole');
       getPoliciesForRoleStub = sinon.stub(aliyunRemove.provider, 'getPoliciesForRole');
       detachPolicyFromRoleStub = sinon.stub(aliyunRemove.provider, 'detachPolicyFromRole');
       deleteRoleStub = sinon.stub(aliyunRemove.provider, 'deleteRole');
 
-      getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
-      getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
 
@@ -157,6 +174,9 @@ describe('AliyunRemove', () => {
     afterEach(() => {
       aliyunRemove.serverless.cli.log.restore();
 
+      aliyunRemove.provider.getService.restore();
+      aliyunRemove.provider.getFunctions.restore();
+
       aliyunRemove.provider.getApiGroup.restore();
       aliyunRemove.provider.getApis.restore();
       aliyunRemove.provider.getDeployedApis.restore();
@@ -164,13 +184,14 @@ describe('AliyunRemove', () => {
       aliyunRemove.provider.deleteApi.restore();
       aliyunRemove.provider.deleteApiGroup.restore();
 
+      aliyunRemove.provider.listTriggers.restore();
+      aliyunRemove.provider.deleteTrigger.restore();
+
       aliyunRemove.provider.getRole.restore();
       aliyunRemove.provider.getPoliciesForRole.restore();
       aliyunRemove.provider.detachPolicyFromRole.restore();
       aliyunRemove.provider.deleteRole.restore();
 
-      aliyunRemove.provider.getService.restore();
-      aliyunRemove.provider.getFunctions.restore();
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
 
@@ -193,7 +214,8 @@ describe('AliyunRemove', () => {
         'Removed API sls_http_my_service_dev_getTest',
         'Removing API group my_service_dev_api...',
         'Removed API group my_service_dev_api',
-
+        'Removing trigger sls_oss_my_service_dev_ossTriggerTest...',
+        'Removed trigger sls_oss_my_service_dev_ossTriggerTest',
         'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role...',
         'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role',
         'Removing RAM role sls-my-service-dev-invoke-role...',
@@ -204,6 +226,8 @@ describe('AliyunRemove', () => {
         'Removed function my-service-dev-postTest of service my-service-dev',
         'Removing function my-service-dev-getTest of service my-service-dev...',
         'Removed function my-service-dev-getTest of service my-service-dev',
+        'Removing function my-service-dev-ossTriggerTest of service my-service-dev...',
+        'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
         'Removing service my-service-dev...',
         'Removed service my-service-dev',
 
@@ -219,12 +243,27 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
+
+      getServiceStub.returns(BbPromise.resolve(fullService));
+      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       getApisStub.returns(BbPromise.resolve(fullApis));
       getDeployedApisStub.returns(BbPromise.resolve(fullApis));
       abolishApiStub.returns(BbPromise.resolve());
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
+
+      listTriggersStub
+      .withArgs('my-service-dev', 'my-service-dev-getTest')
+      .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-postTest')
+        .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+        .returns(BbPromise.resolve(fullTriggers));
+      deleteTriggerStub.returns(BbPromise.resolve());
 
       getRoleStub.withArgs(role.RoleName).returns(BbPromise.resolve(fullRole));
       getRoleStub.withArgs(execRole.RoleName).returns(BbPromise.resolve(fullExecRole));
@@ -235,12 +274,6 @@ describe('AliyunRemove', () => {
       detachPolicyFromRoleStub.returns(BbPromise.resolve());
       deleteRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({
-        serviceId: serviceId,
-        serviceName: 'my-service-dev'
-      }));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -252,10 +285,10 @@ describe('AliyunRemove', () => {
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
         .then(() => {
-          expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
           }
+          expect(consoleLogStub.callCount).toEqual(logs.length);
         });
     });
 
@@ -265,6 +298,7 @@ describe('AliyunRemove', () => {
         'No deployed APIs to abolish.',
         'No APIs to remove.',
         'No API groups to remove.',
+        'No triggers to remove.',
 
         'Removing functions...',
         'No functions to remove.',
@@ -275,6 +309,10 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
+ 
+      getServiceStub.returns(BbPromise.resolve(undefined));
+      getFunctionsStub.returns(BbPromise.resolve([])); 
+
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       getApisStub.returns(BbPromise.resolve([]));
       getDeployedApisStub.returns(BbPromise.resolve([]));
@@ -282,13 +320,14 @@ describe('AliyunRemove', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
+      listTriggersStub.returns(BbPromise.resolve([]));
+      deleteTriggerStub.returns(BbPromise.resolve());
+
       getRoleStub.returns(BbPromise.resolve());
       getPoliciesForRoleStub.returns(BbPromise.resolve([]));
       detachPolicyFromRoleStub.returns(BbPromise.resolve());
       deleteRoleStub.returns(BbPromise.resolve());
 
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -300,16 +339,19 @@ describe('AliyunRemove', () => {
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
         .then(() => {
-          expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
           }
+          expect(consoleLogStub.callCount).toEqual(logs.length);
         });
     });
   });
 
   describe('remove', () => {
     let consoleLogStub;
+
+    let getServiceStub;
+    let getFunctionsStub;
 
     let getApiGroupStub;
     let getApisStub;
@@ -318,13 +360,14 @@ describe('AliyunRemove', () => {
     let deleteApiStub;
     let deleteApiGroupStub;
 
+    let listTriggersStub;
+    let deleteTriggerStub;
+
     let getRoleStub;
     let getPoliciesForRoleStub;
     let detachPolicyFromRoleStub;
     let deleteRoleStub;
 
-    let getServiceStub;
-    let getFunctionsStub;
     let deleteFunctionStub;
     let deleteServiceStub;
     let removeRoleAndPoliciesStub;
@@ -344,6 +387,9 @@ describe('AliyunRemove', () => {
       aliyunRemove = new AliyunRemove(serverless, options);
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
 
+      getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
+      getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
+
       getApiGroupStub = sinon.stub(aliyunRemove.provider, 'getApiGroup');
       getApisStub = sinon.stub(aliyunRemove.provider, 'getApis');
       getDeployedApisStub = sinon.stub(aliyunRemove.provider, 'getDeployedApis');
@@ -351,13 +397,14 @@ describe('AliyunRemove', () => {
       deleteApiStub = sinon.stub(aliyunRemove.provider, 'deleteApi');
       deleteApiGroupStub = sinon.stub(aliyunRemove.provider, 'deleteApiGroup');
 
+      listTriggersStub = sinon.stub(aliyunRemove.provider, 'listTriggers');
+      deleteTriggerStub = sinon.stub(aliyunRemove.provider, 'deleteTrigger');
+
       getRoleStub = sinon.stub(aliyunRemove.provider, 'getRole');
       getPoliciesForRoleStub = sinon.stub(aliyunRemove.provider, 'getPoliciesForRole');
       detachPolicyFromRoleStub = sinon.stub(aliyunRemove.provider, 'detachPolicyFromRole');
       deleteRoleStub = sinon.stub(aliyunRemove.provider, 'deleteRole');
 
-      getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
-      getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
 
@@ -370,6 +417,9 @@ describe('AliyunRemove', () => {
     afterEach(() => {
       aliyunRemove.serverless.cli.log.restore();
 
+      aliyunRemove.provider.getService.restore();
+      aliyunRemove.provider.getFunctions.restore();
+
       aliyunRemove.provider.getApiGroup.restore();
       aliyunRemove.provider.getApis.restore();
       aliyunRemove.provider.getDeployedApis.restore();
@@ -377,13 +427,14 @@ describe('AliyunRemove', () => {
       aliyunRemove.provider.deleteApi.restore();
       aliyunRemove.provider.deleteApiGroup.restore();
 
+      aliyunRemove.provider.listTriggers.restore();
+      aliyunRemove.provider.deleteTrigger.restore();
+
       aliyunRemove.provider.getRole.restore();
       aliyunRemove.provider.getPoliciesForRole.restore();
       aliyunRemove.provider.detachPolicyFromRole.restore();
       aliyunRemove.provider.deleteRole.restore();
 
-      aliyunRemove.provider.getService.restore();
-      aliyunRemove.provider.getFunctions.restore();
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
 
@@ -406,15 +457,17 @@ describe('AliyunRemove', () => {
         'Removed API sls_http_my_service_dev_getTest',
         'Removing API group my_service_dev_api...',
         'Removed API group my_service_dev_api',
-
+        'Removing trigger sls_oss_my_service_dev_ossTriggerTest...',
+        'Removed trigger sls_oss_my_service_dev_ossTriggerTest',
         'Removing functions...',
         'Removing function my-service-dev-postTest of service my-service-dev...',
         'Removed function my-service-dev-postTest of service my-service-dev',
         'Removing function my-service-dev-getTest of service my-service-dev...',
         'Removed function my-service-dev-getTest of service my-service-dev',
+        'Removing function my-service-dev-ossTriggerTest of service my-service-dev...',
+        'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
         'Removing service my-service-dev...',
         'Removed service my-service-dev',
-
         'Removing 3 artifacts in OSS bucket sls-my-service...',
         'Removed 3 artifacts in OSS bucket sls-my-service',
         'Removing OSS bucket sls-my-service...',
@@ -422,6 +475,10 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
+
+      getServiceStub.returns(BbPromise.resolve(fullService));
+      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+
       getApiGroupStub.returns(BbPromise.resolve(fullGroup));
       getApisStub.returns(BbPromise.resolve(fullApis));
       getDeployedApisStub.returns(BbPromise.resolve(fullApis));
@@ -429,17 +486,22 @@ describe('AliyunRemove', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
+      listTriggersStub
+      .withArgs('my-service-dev', 'my-service-dev-getTest')
+      .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-postTest')
+        .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+        .returns(BbPromise.resolve(fullTriggers));
+      deleteTriggerStub.returns(BbPromise.resolve());
+
       getRoleStub.returns(BbPromise.resolve());
       getPoliciesForRoleStub.returns(BbPromise.resolve());
       detachPolicyFromRoleStub.returns(BbPromise.resolve());
       deleteRoleStub.returns(BbPromise.resolve());
 
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({
-        serviceId: serviceId,
-        serviceName: 'my-service-dev'
-      }));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -451,10 +513,10 @@ describe('AliyunRemove', () => {
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
         .then(() => {
-          expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
           }
+          expect(consoleLogStub.callCount).toEqual(logs.length);
           expect(getRoleStub.called).toEqual(false);
           expect(getPoliciesForRoleStub.called).toEqual(false);
           expect(detachPolicyFromRoleStub.called).toEqual(false);
@@ -468,6 +530,7 @@ describe('AliyunRemove', () => {
         'No deployed APIs to abolish.',
         'No APIs to remove.',
         'No API groups to remove.',
+        'No triggers to remove.',
 
         'Removing functions...',
         'No functions to remove.',
@@ -478,6 +541,10 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
+
+      getServiceStub.returns(BbPromise.resolve(undefined));
+      getFunctionsStub.returns(BbPromise.resolve([]));
+
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       getApisStub.returns(BbPromise.resolve([]));
       getDeployedApisStub.returns(BbPromise.resolve([]));
@@ -485,13 +552,14 @@ describe('AliyunRemove', () => {
       deleteApiStub.returns(BbPromise.resolve());
       deleteApiGroupStub.returns(BbPromise.resolve());
 
+      listTriggersStub.returns(BbPromise.resolve([]));
+      deleteTriggerStub.returns(BbPromise.resolve());
+
       getRoleStub.returns(BbPromise.resolve());
       getPoliciesForRoleStub.returns(BbPromise.resolve([]));
       detachPolicyFromRoleStub.returns(BbPromise.resolve());
       deleteRoleStub.returns(BbPromise.resolve());
 
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -503,10 +571,10 @@ describe('AliyunRemove', () => {
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
         .then(() => {
-          expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
           }
+          expect(consoleLogStub.callCount).toEqual(logs.length);
           expect(getRoleStub.called).toEqual(false);
           expect(getPoliciesForRoleStub.called).toEqual(false);
           expect(detachPolicyFromRoleStub.called).toEqual(false);

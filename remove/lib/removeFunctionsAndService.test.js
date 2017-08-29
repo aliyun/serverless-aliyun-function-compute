@@ -7,7 +7,7 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis, functionDefs, fullFunctions } = require('../../test/data');
+const { fullGroup, fullApis, functionDefs, fullFunctions, fullService } = require('../../test/data');
 
 describe('removeFunctionsAndService', () => {
   let serverless;
@@ -35,8 +35,6 @@ describe('removeFunctionsAndService', () => {
 
   describe('#removeFunctionsAndService()', () => {
     let consoleLogStub;
-    let getServiceStub;
-    let getFunctionsStub;
     let deleteFunctionStub;
     let deleteServiceStub;
     let removeRoleAndPoliciesStub;
@@ -44,17 +42,15 @@ describe('removeFunctionsAndService', () => {
     beforeEach(() => {
       aliyunRemove.serverless.service.functions = {};
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
-      getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
-      getFunctionsStub = sinon.stub(aliyunRemove.provider, 'getFunctions');
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
       removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
+      aliyunRemove.fcService = undefined;
+      aliyunRemove.fcFunctions = [];
     });
 
     afterEach(() => {
       aliyunRemove.serverless.cli.log.restore();
-      aliyunRemove.provider.getService.restore();
-      aliyunRemove.provider.getFunctions.restore();
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
       aliyunRemove.removeRoleAndPolicies.restore();
@@ -62,25 +58,13 @@ describe('removeFunctionsAndService', () => {
 
     it('should remove existing functions and service', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({
-        serviceId: serviceId,
-        serviceName: 'my-service-dev'
-      }));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+      aliyunRemove.fcService = fullService;
+      aliyunRemove.fcFunctions = fullFunctions;
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
       return aliyunRemove.removeFunctionsAndService().then(() => {
-        expect(getServiceStub.calledOnce).toEqual(true);
-        expect(getServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
-
-        expect(getFunctionsStub.calledAfter(getServiceStub)).toEqual(true);
-        expect(getFunctionsStub.calledOnce).toEqual(true);
-        expect(getFunctionsStub.calledWithExactly('my-service-dev')).toEqual(true);
-
-        expect(deleteFunctionStub.calledAfter(getFunctionsStub)).toEqual(true);
-        expect(deleteFunctionStub.calledTwice).toEqual(true);
+        expect(deleteFunctionStub.callCount).toEqual(3);
         expect(deleteFunctionStub.getCall(0).args)
           .toEqual([
             'my-service-dev',
@@ -90,6 +74,11 @@ describe('removeFunctionsAndService', () => {
           .toEqual([
             'my-service-dev',
             'my-service-dev-getTest'
+          ]);
+        expect(deleteFunctionStub.getCall(2).args)
+          .toEqual([
+            'my-service-dev',
+            'my-service-dev-ossTriggerTest'
           ]);
 
         expect(deleteServiceStub.calledAfter(deleteFunctionStub)).toEqual(true);
@@ -105,6 +94,8 @@ describe('removeFunctionsAndService', () => {
           'Removed function my-service-dev-postTest of service my-service-dev',
           'Removing function my-service-dev-getTest of service my-service-dev...',
           'Removed function my-service-dev-getTest of service my-service-dev',
+          'Removing function my-service-dev-ossTriggerTest of service my-service-dev...',
+          'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
           'Removing service my-service-dev...',
           'Removed service my-service-dev'
         ];
@@ -116,12 +107,8 @@ describe('removeFunctionsAndService', () => {
 
     it('should only remove existing functions', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({
-        serviceId: serviceId,
-        serviceName: 'my-service-dev'
-      }));
-      getFunctionsStub.returns(BbPromise.resolve([fullFunctions[0]]));
+      aliyunRemove.fcService = fullService;
+      aliyunRemove.fcFunctions = [fullFunctions[0]];
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
@@ -155,9 +142,8 @@ describe('removeFunctionsAndService', () => {
 
     it('should not remove service if it does not exist', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
+      aliyunRemove.fcService = undefined;
+      aliyunRemove.fcFunctions = [];
       deleteFunctionStub.returns(BbPromise.resolve());
       deleteServiceStub.returns(BbPromise.resolve());
 
