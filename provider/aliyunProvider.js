@@ -42,6 +42,10 @@ class AliyunProvider {
     utils.setDefaults.call(this);
   }
 
+  get PROJECT_DELAY() {
+    return PROJECT_DELAY;
+  }
+
   get key() {
     if (this[keySym]) {
       return this[keySym];
@@ -970,7 +974,7 @@ class AliyunProvider {
   }
 
   listTriggers(serviceName, functionName) {
-    return this.fcClient.listTriggers(serviceName, functionName);
+    return this.fcClient.listTriggers(serviceName, functionName).then((res) => res.triggers || []);
   }
 
   /**

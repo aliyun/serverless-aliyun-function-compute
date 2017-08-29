@@ -99,7 +99,7 @@
                     "oss:PutObject"
                   ],
                   "Resource": [
-                    "acs:oss:*:*:my-service-resource"
+                    "acs:oss:cn-shanghai:ttt:my-service-resource"
                   ]
                 }
               ]

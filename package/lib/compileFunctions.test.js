@@ -451,7 +451,7 @@ describe('CompileFunctions', () => {
           handler: 'index.ossTriggerHandler',
           events: [{
             oss: {
-              sourceArn: "acs:oss:*:*:my-service-resource",
+              sourceArn: "acs:oss:cn-shanghai:ttt:my-service-resource",
               triggerConfig: {
                 events: [
                   "oss:ObjectCreated:PostObject",

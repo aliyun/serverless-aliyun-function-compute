@@ -10,7 +10,7 @@ provider:
         - oss:GetObject
         - oss:PutObject
       Resource:
-        - acs:oss:*:*:my-service-resource
+        - acs:oss:cn-shanghai:${env:ALIYUN_ACCOUNT}:my-service-resource
 
 plugins:
   - serverless-aliyun-function-compute
@@ -53,7 +53,7 @@ functions:
     handler: index.ossTriggerHandler
     events:
       - oss:
-          sourceArn: acs:oss:*:*:my-service-resource
+          sourceArn: acs:oss:cn-shanghai:${env:ALIYUN_ACCOUNT}:my-service-resource
           triggerConfig: 
             events:
               - oss:ObjectCreated:PostObject

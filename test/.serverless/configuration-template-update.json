@@ -99,7 +99,7 @@
                     "oss:PutObject"
                   ],
                   "Resource": [
-                    "acs:oss:*:*:my-service-resource"
+                    "acs:oss:cn-shanghai:ttt:my-service-resource"
                   ]
                 }
               ]
@@ -290,7 +290,7 @@
     "sls_oss_my_service_dev_ossTriggerTest": {
       "Type": "ALIYUN::FC::Trigger",
       "Properties": {
-        "sourceArn": "acs:oss:*:*:my-service-resource",
+        "sourceArn": "acs:oss:cn-shanghai:ttt:my-service-resource",
         "triggerConfig": {
           "events": [
             "oss:ObjectCreated:PostObject",

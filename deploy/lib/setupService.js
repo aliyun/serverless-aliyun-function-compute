@@ -18,6 +18,10 @@ module.exports = {
     return BbPromise.bind(this)
       .then(this.createLogConfigIfNotExists)
       .then(this.setupExecRole)
+      .then(() => {
+        // HACK: must wait for a while for the ram policy to take effect
+        return this.provider.sleep(this.provider.PROJECT_DELAY)
+      })
       .then(this.checkForExistingService)
       .then(this.createServiceIfNotExists)
       .then(this.createBucketIfNotExists);

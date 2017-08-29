@@ -4,6 +4,8 @@ const fs = require('fs');
 
 const getFuncName = Symbol('getfuncname');
 
+process.env.ALIYUN_ACCOUNT = 'ttt';
+
 // mock of the serverless instance
 class Serverless {
   constructor() {

@@ -172,7 +172,7 @@ exports.execRole = {
               "oss:PutObject"
             ],
             "Resource": [
-              "acs:oss:*:*:my-service-resource"
+              "acs:oss:cn-shanghai:ttt:my-service-resource"
             ]
           }
         ]
@@ -296,7 +296,7 @@ exports.functionDefs = {
     handler: 'index.ossTriggerHandler',
     events: [{
       oss: {
-        sourceArn: "acs:oss:*:*:my-service-resource",
+        sourceArn: "acs:oss:cn-shanghai:ttt:my-service-resource",
         triggerConfig: {
           events: [
             "oss:ObjectCreated:PostObject",
@@ -409,11 +409,11 @@ exports.logs = [{
 exports.ramRoleStatements = [{
   Effect: 'Allow',
   Action: ['oss:GetObject', 'oss:PutObject'],
-  Resource: ['acs:oss:*:*:my-service-resource']
+  Resource: ['acs:oss:cn-shanghai:ttt:my-service-resource']
 }];
 
 exports.triggers = [{
-  sourceArn: "acs:oss:*:*:my-service-resource",
+  sourceArn: "acs:oss:cn-shanghai:ttt:my-service-resource",
   triggerConfig: {
     events: [
       "oss:ObjectCreated:PostObject",
@@ -431,7 +431,7 @@ exports.fullTriggers = [{
   createdTime: "2017-08-15T15:00:00.000+0000",
   invocationRole: "acs:ram::1234567890123456:role/sls-my-service-dev-invoke-role",
   lastModifiedTime: "2017-08-15T15:00:00.000+0000",
-  sourceArn: "acs:oss:*:*:my-service-resource",
+  sourceArn: "acs:oss:cn-shanghai:ttt:my-service-resource",
   triggerConfig: {
     events: [
       "oss:ObjectCreated:PostObject",
