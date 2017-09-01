@@ -748,7 +748,7 @@ class AliyunProvider {
     }).then(() => this.getLogIndex(projectName, storeName));
   }
 
-  getLogsIfAvailable(projectName, storeName, days, query) {
+  getLogsIfAvailable(projectName, storeName, days, query, count) {
     const from = new Date();
     const to = new Date(from);
     from.setDate(from.getDate() - days);
@@ -756,7 +756,8 @@ class AliyunProvider {
     const fullQuery = Object.keys(query)
       .map((key) => `${key}:${query[key]}`).join(' or ');
     return this.slsClient.getLogs(projectName, storeName, from, to, {
-      query: fullQuery
+      query: fullQuery,
+      line: count
     }).catch((err) => {
       if (err.code === 'IndexConfigNotExist' ||
         err.code === 'LogStoreNotExist' ||

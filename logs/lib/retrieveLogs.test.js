@@ -25,14 +25,6 @@ describe('DisplayServiceLogs', () => {
     serverless.config = {
       servicePath: path.join(__dirname, '..', '..', 'test')
     };
-    const options = {
-      stage: 'dev',
-      region: 'cn-shanghai',
-      function: 'postTest'
-    };
-    serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
-    serverless.pluginManager.setCliOptions(options);
-    aliyunLogs = new AliyunLogs(serverless, options);
   });
 
   describe('#retrieveLogs()', () => {
@@ -40,6 +32,14 @@ describe('DisplayServiceLogs', () => {
     let getLogsIfAvailableStub;
 
     beforeEach(() => {
+      const options = {
+        stage: 'dev',
+        region: 'cn-shanghai',
+        function: 'postTest'
+      };
+      serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+      serverless.pluginManager.setCliOptions(options);
+      aliyunLogs = new AliyunLogs(serverless, options);
       consoleLogStub = sinon.stub(aliyunLogs.serverless.cli, 'consoleLog').returns();
       getLogsIfAvailableStub = sinon.stub(aliyunLogs.provider, 'getLogsIfAvailable');
     });
@@ -67,10 +67,18 @@ describe('DisplayServiceLogs', () => {
       ];
       return aliyunLogs.retrieveLogs().then(() => {
         expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
+        expect(getLogsIfAvailableStub.calledOnce).toEqual(true);
+        expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
+          'sls-my-service-logs',
+          'my-service-dev',
+          1,
+          { functionName: 'my-service-dev-postTest' },
+          undefined
+        ]);
       });
     });
 
-    it('should print an logs if functions are not yet deployed', () => {
+    it('should print logs if functions are not yet deployed', () => {
       getLogsIfAvailableStub.returns(BbPromise.resolve([]));
 
       let expectedOutput = [
@@ -85,6 +93,57 @@ describe('DisplayServiceLogs', () => {
       ];
       return aliyunLogs.retrieveLogs().then(() => {
         expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
+      });
+    });
+  });
+
+  describe('#retrieveLogs() with --count', () => {
+    let consoleLogStub;
+    let getLogsIfAvailableStub;
+
+    beforeEach(() => {
+      const options = {
+        stage: 'dev',
+        region: 'cn-shanghai',
+        function: 'postTest',
+        count: 2
+      };
+      serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+      serverless.pluginManager.setCliOptions(options);
+      aliyunLogs = new AliyunLogs(serverless, options);
+      consoleLogStub = sinon.stub(aliyunLogs.serverless.cli, 'consoleLog').returns();
+      getLogsIfAvailableStub = sinon.stub(aliyunLogs.provider, 'getLogsIfAvailable');
+    });
+
+    afterEach(() => {
+      aliyunLogs.serverless.cli.consoleLog.restore();
+      aliyunLogs.provider.getLogsIfAvailable.restore();
+    });
+
+    it('should print relevant data on the console', () => {
+      getLogsIfAvailableStub.returns(BbPromise.resolve(logs.slice(0, 2)));
+
+      let expectedOutput = [
+        `${chalk.yellow.underline('Service Information')}`,
+        `${chalk.yellow('service:')} my-service`,
+        `${chalk.yellow('stage:')} dev`,
+        `${chalk.yellow('region:')} cn-shanghai`,
+        '',
+        `${chalk.yellow.underline('Logs')}`,
+        `  ${chalk.yellow('my-service-dev/my-service-dev-postTest')}`,
+        '  - 2017-08-18T10:18:26.000Z: 2017-08-18T10:18:26.131Z  [info] FunctionCompute nodejs runtime inited.\r',
+        '  - 2017-08-18T10:18:26.000Z: FC Invoke Start RequestId: 332425-41-143112-415219434\r',
+        ''
+      ];
+      return aliyunLogs.retrieveLogs().then(() => {
+        expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
+        expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
+          'sls-my-service-logs',
+          'my-service-dev',
+          1,
+          { functionName: 'my-service-dev-postTest' },
+          2
+        ]);
       });
     });
   });

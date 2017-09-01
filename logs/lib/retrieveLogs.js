@@ -17,7 +17,9 @@ module.exports = {
     const projectName = this.provider.getLogProjectName();
     const storeName = this.provider.getLogStoreName();
     const functionName = this.serverless.service.getFunction(this.options.function).name;
-    return this.provider.getLogsIfAvailable(projectName, storeName, 1, { functionName })
+    const count = this.options.count;
+
+    return this.provider.getLogsIfAvailable(projectName, storeName, 1, { functionName }, count)
       .then((logs) => {
         this.logs = logs;
       });
