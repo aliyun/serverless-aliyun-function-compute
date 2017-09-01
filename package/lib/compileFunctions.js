@@ -21,7 +21,7 @@ module.exports = {
   compileFunction(funcName, funcObject) {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     // Notice artifact is different
-    this.compileStorage(funcObject.artifact);
+    this.compileStorage(funcObject.package.artifact);
     this.compileFunctionAndEvent(funcName, funcObject);
     return BbPromise.resolve();
   },

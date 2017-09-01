@@ -555,7 +555,7 @@ describe('CompileFunctions', () => {
 
       const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
       const funcObject = _.cloneDeep(aliyunPackage.serverless.service.getFunction(functionName));
-      funcObject.artifact = '/tmp/getTest.zip';
+      funcObject.package = { artifact: '/tmp/getTest.zip' };
       return aliyunPackage.compileFunction(functionName, funcObject).then(() => {
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);

@@ -43,7 +43,9 @@ class Serverless {
         if (key === 'package:function') {
           const func = this.cliOptions.function;
           sls.cli.log(`Packaging function: ${func}...`)
-          sls.service.functions[func].artifact = `${func}.zip`;
+          sls.service.functions[func].package = {
+            artifact: `${func}.zip`
+          };
         }
       },
       setCliOptions(options) {
