@@ -13,6 +13,12 @@ This plugin enables Aliyun Function Compute support within the Serverless Framew
 
 ### Example
 
+You can install the following example via:
+
+```console
+serverless install --url https://github.com/aliyun/serverless-function-compute-examples/tree/master/aliyun-nodej
+```
+
 The structure of the project should look something like this:
 
 ```
@@ -25,7 +31,7 @@ The structure of the project should look something like this:
 `serverless.yml`:
 
 ```yaml
-service: my-service
+service: serverless-aliyun-hello-world
 
 provider:
   name: aliyun
@@ -54,9 +60,11 @@ functions:
 
 ```json
 {
-  "name": "my-service",
-  "version": "1.0.0",
-  "description": "Example service",
+  "name": "serverless-aliyun-hello-world",
+  "version": "0.1.0",
+  "description": "Hello World example for aliyun provider with Serverless Framework.",
+  "main": "index.js",
+  "license": "MIT",
   "devDependencies": {
     "serverless-aliyun-function-compute": "^1.0.0"
   }
@@ -71,7 +79,7 @@ functions:
 exports.hello = (event, context, callback) => {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({ message: 'Hello!' })
+    body: JSON.stringify({ message: 'Hello!' }),
   };
 
   callback(null, response);
