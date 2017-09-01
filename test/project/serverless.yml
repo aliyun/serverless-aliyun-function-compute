@@ -10,7 +10,7 @@ provider:
         - oss:GetObject
         - oss:PutObject
       Resource:
-        - acs:oss:cn-shanghai:${env:ALIYUN_ACCOUNT}:my-service-resource
+        - '*'
 
 plugins:
   - serverless-aliyun-function-compute

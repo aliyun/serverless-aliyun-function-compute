@@ -11,15 +11,14 @@ module.exports = (event, context, callback) => {
   // Create oss client.
   const client = new oss({
     region: ossRegion,
+    bucket: ossEvent.oss.bucket.name,    
     // Credentials can be retrieved from context
     accessKeyId: context.credentials.accessKeyId,
     accessKeySecret: context.credentials.accessKeySecret,
     stsToken: context.credentials.securityToken
   });
 
-  // Bucket name is from OSS event
-  client.useBucket(ossEvent.oss.bucket.name);
-  const ObjKey = ossEvent.oss.object.key;
+  const objKey = ossEvent.oss.object.key;
   console.log('Getting object: ', objKey)
   client.get(objKey).then(function(val) {
     const newKey = objKey.replace('source/', 'processed/');
