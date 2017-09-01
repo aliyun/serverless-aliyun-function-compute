@@ -988,8 +988,7 @@ class AliyunProvider {
     const triggerProps = Object.assign({}, trigger, {
       invocationRole: role.Arn
     });
-
-    return this.fcClient.createTrigger(
+    return this.fcClient.updateTrigger(
       serviceName, functionName, triggerName, triggerProps);
   }
 
