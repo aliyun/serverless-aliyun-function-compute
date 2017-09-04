@@ -49,7 +49,7 @@ class AliyunPackage {
         // TODO(joyeecheung): move the artifact to the path
         // specified by --package
         .then(function finishPackaging() {
-          this.serverless.cli.log('Finished Packaging.')
+          this.serverless.cli.log('Finished Packaging.');
         }),
     };
   }

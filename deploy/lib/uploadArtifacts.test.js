@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const fs = require('fs');
@@ -20,7 +22,7 @@ describe('UploadArtifacts', () => {
     serverless.service.package = {
       artifactFilePath: '/some-remote-file-path',
       artifact: 'artifact.zip'
-    }
+    };
     serverless.service.provider = {
       name: 'aliyun',
       credentials: path.join(__dirname, '..', '..', 'test', 'credentials')
@@ -37,7 +39,7 @@ describe('UploadArtifacts', () => {
     aliyunDeploy.provider.resetOssClient('test-bucket');    aliyunDeploy.templates = {
       create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
       update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
-    }
+    };
   });
 
   describe('#uploadArtifacts()', () => {
@@ -57,21 +59,21 @@ describe('UploadArtifacts', () => {
     it('should upload corresponding objects to deployment bucket', () => {
       uploadObjectStub.returns(BbPromise.resolve());
       return aliyunDeploy
-      .uploadArtifacts().then(() => {
-        expect(uploadObjectStub.calledOnce).toEqual(true);
-        expect(uploadObjectStub.calledWithExactly(
-          'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip',
-          '/projects/.serverless/my-service.zip'
-        )).toEqual(true);
-        const logs = [
-          'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
-          'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service'
-        ];
-        expect(consoleLogStub.callCount).toEqual(logs.length);
-        for (var i = 0; i < consoleLogStub.callCount; ++i) {
-          expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
-        }
-      });
+        .uploadArtifacts().then(() => {
+          expect(uploadObjectStub.calledOnce).toEqual(true);
+          expect(uploadObjectStub.calledWithExactly(
+            'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip',
+            '/projects/.serverless/my-service.zip'
+          )).toEqual(true);
+          const logs = [
+            'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
+            'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service'
+          ];
+          expect(consoleLogStub.callCount).toEqual(logs.length);
+          for (var i = 0; i < consoleLogStub.callCount; ++i) {
+            expect(consoleLogStub.calledWithExactly(logs[i])).toEqual(true);
+          }
+        });
     });
   });
 });

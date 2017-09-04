@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -69,7 +71,7 @@ describe('AliyunRemove', () => {
         setDefaultsStub = sinon.stub(aliyunRemove, 'setDefaults')
           .returns(BbPromise.resolve());
         getFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'getFunctionsAndService')
-            .returns(BbPromise.resolve());
+          .returns(BbPromise.resolve());
         removeEventsStub = sinon.stub(aliyunRemove, 'removeEvents')
           .returns(BbPromise.resolve());
         removeFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'removeFunctionsAndService')
@@ -255,8 +257,8 @@ describe('AliyunRemove', () => {
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       listTriggersStub
-      .withArgs('my-service-dev', 'my-service-dev-getTest')
-      .returns(BbPromise.resolve([]));
+        .withArgs('my-service-dev', 'my-service-dev-getTest')
+        .returns(BbPromise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
         .returns(BbPromise.resolve([]));
@@ -309,9 +311,9 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
- 
+
       getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([])); 
+      getFunctionsStub.returns(BbPromise.resolve([]));
 
       getApiGroupStub.returns(BbPromise.resolve(undefined));
       getApisStub.returns(BbPromise.resolve([]));
@@ -487,8 +489,8 @@ describe('AliyunRemove', () => {
       deleteApiGroupStub.returns(BbPromise.resolve());
 
       listTriggersStub
-      .withArgs('my-service-dev', 'my-service-dev-getTest')
-      .returns(BbPromise.resolve([]));
+        .withArgs('my-service-dev', 'my-service-dev-getTest')
+        .returns(BbPromise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
         .returns(BbPromise.resolve([]));

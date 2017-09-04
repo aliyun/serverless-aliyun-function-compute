@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const fs = require('fs');
@@ -36,7 +38,7 @@ describe('setupEvents', () => {
     aliyunDeploy = new AliyunDeploy(serverless, options);    aliyunDeploy.templates = {
       create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
       update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
-    }
+    };
   });
 
   describe('#setupEvents()', () => {
@@ -80,7 +82,7 @@ describe('setupEvents', () => {
 
     beforeEach(() => {
       setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole')
-        .returns(BbPromise.resolve(fullRole));;
+        .returns(BbPromise.resolve(fullRole));
     });
 
     afterEach(() => {

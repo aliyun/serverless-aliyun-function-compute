@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const fs = require('fs');
@@ -33,7 +35,7 @@ describe('setupRole', () => {
     aliyunDeploy = new AliyunDeploy(serverless, options);    aliyunDeploy.templates = {
       create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
       update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
-    }
+    };
   });
 
   describe('#setupRole()', () => {
@@ -55,7 +57,7 @@ describe('setupRole', () => {
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
     });
 
-    afterEach(() => {      
+    afterEach(() => {
       aliyunDeploy.provider.getRole.restore();
       aliyunDeploy.provider.createRole.restore();
       aliyunDeploy.provider.getPoliciesForRole.restore();

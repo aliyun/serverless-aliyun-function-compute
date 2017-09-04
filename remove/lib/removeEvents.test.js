@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -313,9 +315,9 @@ describe('removeApisIfNeeded', () => {
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
         .returns(BbPromise.resolve([]));
-        listTriggersStub
-          .withArgs('my-service-dev', 'my-service-dev-postTest')
-          .returns(BbPromise.resolve([]));
+      listTriggersStub
+        .withArgs('my-service-dev', 'my-service-dev-postTest')
+        .returns(BbPromise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
         .returns(BbPromise.resolve(fullTriggers));
@@ -337,13 +339,13 @@ describe('removeApisIfNeeded', () => {
             'my-service-dev-ossTriggerTest', 'sls_oss_my_service_dev_ossTriggerTest'
           ]);
 
-          const logs = [
-            'Removing trigger sls_oss_my_service_dev_ossTriggerTest...',
-            'Removed trigger sls_oss_my_service_dev_ossTriggerTest'
-          ];
-          for (var i = 0; i < consoleLogStub.callCount; ++i) {
-            expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
-          }
+        const logs = [
+          'Removing trigger sls_oss_my_service_dev_ossTriggerTest...',
+          'Removed trigger sls_oss_my_service_dev_ossTriggerTest'
+        ];
+        for (var i = 0; i < consoleLogStub.callCount; ++i) {
+          expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
+        }
       });
     });
 

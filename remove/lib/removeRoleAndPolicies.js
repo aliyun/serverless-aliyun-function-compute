@@ -31,7 +31,7 @@ module.exports = {
 
   removePolicyIfExists(roleName, roleSym, policySym) {
     if (!this[roleSym] || !this[policySym].length) {
-        return;
+      return;
     }
     const role = this[roleSym];
     const policies = this[policySym];
@@ -42,12 +42,12 @@ module.exports = {
         this.serverless.cli.log(`Detached RAM policy ${policyName} from ${roleName}`);
         return;
       });
-    })
+    });
   },
 
   removeRoleIfExists(roleName, roleSym, policySym) {
     if (!this[roleSym]) {
-        return;
+      return;
     }
     this.serverless.cli.log(`Removing RAM role ${roleName}...`);
     return this.provider.deleteRole(roleName)

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
@@ -39,7 +39,7 @@ class AliyunDeployFunction {
       'deploy:function:initialize': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.setDefaults),
-        // .then(this.setDefaults)  // TODO: verify this.options.function
+      // .then(this.setDefaults)  // TODO: verify this.options.function
 
       'deploy:function:packageFunction': () => BbPromise.bind(this)
         .then(this.packageFunction)
@@ -63,7 +63,7 @@ class AliyunDeployFunction {
       .then(this.initializeTemplates)
       .then(this.compileFunctionToTemplate)
       .then(this.mergeServiceResources)
-      .then(this.updateTemplates)
+      .then(this.updateTemplates);
   }
 
   initializeTemplates() {

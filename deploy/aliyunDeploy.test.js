@@ -1,3 +1,5 @@
+/*global beforeEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -44,7 +46,7 @@ describe('AliyunDeploy', () => {
     beforeEach(() => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       aliyunDeploy = new AliyunDeploy(serverless, options);
-    })
+    });
 
     it('should set the serverless instance', () => {
       expect(aliyunDeploy.serverless).toEqual(serverless);
@@ -353,9 +355,9 @@ describe('AliyunDeploy', () => {
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
         .returns(BbPromise.resolve(functions[1]));
-        getFunctionStub
-          .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
-          .returns(BbPromise.resolve(functions[2]));
+      getFunctionStub
+        .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
+        .returns(BbPromise.resolve(functions[2]));
       updateFunctionStub.returns(BbPromise.resolve());
       createFunctionStub.returns(BbPromise.resolve());
 

@@ -41,7 +41,7 @@ module.exports = {
     }
 
     return BbPromise.map(role.Policies,
-      (policy) => this.createPolicyIfNeeded(policy))
+      (policy) => this.createPolicyIfNeeded(policy));
   },
 
   createPolicyIfNeeded(policy) {
@@ -89,7 +89,7 @@ module.exports = {
         }).then(() => {
           this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
         });
-      })
+      });
     });
   },
 };

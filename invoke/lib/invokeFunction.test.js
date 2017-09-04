@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -114,7 +116,7 @@ describe('InvokeFunction', () => {
             'my-service-dev',
             'my-service-dev-getTest',
             undefined)
-          ).toEqual(true);
+        ).toEqual(true);
         const logs = [
           'Invoking my-service-dev-getTest of my-service-dev',
           response
@@ -138,7 +140,7 @@ describe('InvokeFunction', () => {
             'my-service-dev',
             'my-service-dev-getTest',
             {a: 'b'})
-          ).toEqual(true);
+        ).toEqual(true);
         const logs = [
           'Invoking my-service-dev-getTest of my-service-dev with { a: \'b\' }',
           response
@@ -162,7 +164,7 @@ describe('InvokeFunction', () => {
             'my-service-dev',
             'my-service-dev-getTest',
             'test')
-          ).toEqual(true);
+        ).toEqual(true);
         const logs = [
           'Invoking my-service-dev-getTest of my-service-dev with \'test\'',
           response
@@ -186,7 +188,7 @@ describe('InvokeFunction', () => {
             'my-service-dev',
             'my-service-dev-getTest',
             { foo: 'bar' })
-          ).toEqual(true);
+        ).toEqual(true);
         const logs = [
           'Invoking my-service-dev-getTest of my-service-dev with { foo: \'bar\' }',
           response

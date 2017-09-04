@@ -21,7 +21,7 @@ module.exports = {
   },
 
   getObjectsToRemove() {
-    if (!this.bucket) return BbPromise.resolve();
+    if (!this.bucket) {return BbPromise.resolve();}
     const bucketName = this.bucket.name;
     this.provider.resetOssClient(bucketName);
     const prefix = this.provider.getArtifactDirectoryPrefix();

@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -32,7 +34,7 @@ describe('AliyunPackage', () => {
       credentials: path.join(__dirname, '..', 'test', 'credentials'),
       runtime: 'nodejs6',
       ramRoleStatements
-    }
+    };
     options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -138,7 +140,7 @@ describe('AliyunPackage', () => {
         const dir = path.dirname(filename);
         if (!fs.existsSync(dir)) { fs.mkdirSync(dir); }
         fs.writeFileSync(filename, JSON.stringify(data, null, 2), 'utf8');
-      }
+      };
     });
 
     afterEach(() => {
@@ -173,7 +175,7 @@ describe('AliyunPackage', () => {
             fs.readFileSync(path.join(serverlessPath, updateName), 'utf8')
           );
 
-          const testSlsPath = path.join(__dirname, '..', 'test', '.serverless')
+          const testSlsPath = path.join(__dirname, '..', 'test', '.serverless');
           const createExpected = JSON.parse(
             fs.readFileSync(path.join(testSlsPath, createName), 'utf8')
           );
@@ -196,6 +198,6 @@ describe('AliyunPackage', () => {
             expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
           }
         });
-    })
+    });
   });
 });

@@ -40,7 +40,7 @@ module.exports = {
     return BbPromise.bind(this)
       .then(this.getApiGroup)
       .then(this.getApis)
-      .then(this.getVerboseApiInfo)
+      .then(this.getVerboseApiInfo);
   },
 
   getApiGroup() {
@@ -71,7 +71,7 @@ module.exports = {
     return BbPromise.map(this.apis, (api, index) => {
       return this.provider.getApi(this.apiGroup, api).then((verboseApi) => {
         Object.assign(this.apis[index], verboseApi);
-      })
+      });
     });
   },
 
@@ -118,7 +118,7 @@ module.exports = {
         const path = req.RequestPath;
 
         message += `- ${chalk.yellow(api.ApiName)} (${deployed})\n`;
-        message += `  ${method} ${protocol}://${domain}${path}\n`
+        message += `  ${method} ${protocol}://${domain}${path}\n`;
       });
     } else {
       message += 'There are no endpoints yet\n';

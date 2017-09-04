@@ -19,7 +19,7 @@ module.exports = (event, context, callback) => {
   });
 
   const objKey = ossEvent.oss.object.key;
-  console.log('Getting object: ', objKey)
+  console.log('Getting object: ', objKey);
   client.get(objKey).then(function(val) {
     const newKey = objKey.replace('source/', 'processed/');
     return client.put(newKey, val.content).then(function (val) {
