@@ -21,8 +21,8 @@ module.exports = {
   checkExistingFunctions() {
     return BbPromise.all(this.functions.map((func) => {
       return this.provider.getFunction(func.service, func.name)
-      .then(
-        (foundFunction) => this.functionMap.set(func.name, !!foundFunction));
+        .then(
+          (foundFunction) => this.functionMap.set(func.name, !!foundFunction));
     }));
   },
 
@@ -41,15 +41,15 @@ module.exports = {
           this.serverless.cli.log(`Failed to update function ${func.name}!`);
           throw err;
         });
-    } else {
-      this.serverless.cli.log(`Creating function ${func.name}...`);
-      return this.provider.createFunction(func.service, func.name, func)
-        .then(() => {
-          this.serverless.cli.log(`Created function ${func.name}`);
-        }, (err) => {
-          this.serverless.cli.log(`Failed to create function ${func.name}!`);
-          throw err;
-        });
-    }
+    } 
+    this.serverless.cli.log(`Creating function ${func.name}...`);
+    return this.provider.createFunction(func.service, func.name, func)
+      .then(() => {
+        this.serverless.cli.log(`Created function ${func.name}`);
+      }, (err) => {
+        this.serverless.cli.log(`Failed to create function ${func.name}!`);
+        throw err;
+      });
+    
   }
 };

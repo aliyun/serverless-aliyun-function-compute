@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const AliyunProvider = require('./provider/aliyunProvider');
 const AliyunPackage = require('./package/aliyunPackage');

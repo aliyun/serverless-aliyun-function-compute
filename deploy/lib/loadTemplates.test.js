@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const fs = require('fs');
@@ -31,13 +33,13 @@ describe('UploadArtifacts', () => {
   describe('#loadTemplates()', () => {
     it('should make the templates accessible', () => {
       const create = fs.readFileSync(
-            path.join(servicePath, '.serverless', 'configuration-template-create.json'), 'utf8');
+        path.join(servicePath, '.serverless', 'configuration-template-create.json'), 'utf8');
       const update = fs.readFileSync(
-            path.join(servicePath, '.serverless', 'configuration-template-update.json'), 'utf8');
+        path.join(servicePath, '.serverless', 'configuration-template-update.json'), 'utf8');
       const templates = {
         create: JSON.parse(create),
         update: JSON.parse(update)
-      }
+      };
       return aliyunDeploy.loadTemplates().then(() => {
         expect(aliyunDeploy.templates).toEqual(templates);
       });

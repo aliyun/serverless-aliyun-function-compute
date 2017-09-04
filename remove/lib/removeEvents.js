@@ -32,7 +32,7 @@ module.exports = {
     return BbPromise.bind(this)
       .then(this.getApiGroup)
       .then(this.getApis)
-      .then(this.getDeployedApis)
+      .then(this.getDeployedApis);
   },
 
   getApiGroup() {

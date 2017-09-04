@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -30,7 +32,7 @@ describe('PrepareDeployment', () => {
   describe('#prepareDeployment()', () => {
     it('should load the core configuration template into the serverless instance', () => {
       const expectedCompiledConfiguration = require(
-      path.join(__dirname, '..', '..', 'test', '.serverless','configuration-template-create.json'));
+        path.join(__dirname, '..', '..', 'test', '.serverless','configuration-template-create.json'));
 
       return aliyunPackage.prepareDeployment().then(() => {
         expect(serverless.service.provider

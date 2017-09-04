@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const fs = require('fs');
@@ -74,7 +76,7 @@ describe('setupFunctions', () => {
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
     });
 
-    afterEach(() => {      
+    afterEach(() => {
       aliyunDeploy.provider.getFunction.restore();
       aliyunDeploy.provider.updateFunction.restore();
       aliyunDeploy.provider.createFunction.restore();

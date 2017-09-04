@@ -20,7 +20,7 @@ module.exports = {
       .then(this.setupExecRole)
       .then(() => {
         // HACK: must wait for a while for the ram policy to take effect
-        return this.provider.sleep(this.provider.PROJECT_DELAY)
+        return this.provider.sleep(this.provider.PROJECT_DELAY);
       })
       .then(this.checkForExistingService)
       .then(this.createServiceIfNotExists)
@@ -31,14 +31,14 @@ module.exports = {
     const role = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Properties;
     return BbPromise.bind(this)
       .then(() => this.setupRole(role))
-      .then((execRole) => this.execRole = execRole)
+      .then((execRole) => this.execRole = execRole);
   },
 
   createLogConfigIfNotExists() {
     return BbPromise.bind(this)
       .then(this.createLogProjectIfNotExists)
       .then(this.createLogStoreIfNotExists)
-      .then(this.createLogIndexIfNotExists)
+      .then(this.createLogIndexIfNotExists);
   },
 
   createLogProjectIfNotExists() {
@@ -146,8 +146,8 @@ module.exports = {
           .then(() => {
             this.serverless.cli.log(`Created bucket ${bucket.BucketName}`);
           });
-    }).then((foundBucket) => {
-      this.provider.resetOssClient(bucket.BucketName);
-    });
+      }).then((foundBucket) => {
+        this.provider.resetOssClient(bucket.BucketName);
+      });
   }
 };

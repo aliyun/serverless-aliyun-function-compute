@@ -49,7 +49,7 @@ module.exports = {
         const func = `${serviceName}/${functionName}`;
         message += `  ${chalk.yellow(func)}\n`;
         logs.forEach((log) => {
-          const time = new Date(parseInt(log.__time__) * 1000)
+          const time = new Date(parseInt(log.__time__) * 1000);
           message += `  - ${time.toISOString()}: ${log.message}\n`;
         });
       });

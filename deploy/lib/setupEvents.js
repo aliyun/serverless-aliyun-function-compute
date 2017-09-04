@@ -81,7 +81,7 @@ module.exports = {
     return this.provider.createApiGroup(group)
       .then((createdGroup) => {
         this.apiGroup = createdGroup;
-          this.serverless.cli.log(`Created API group ${group.GroupName}`);
+        this.serverless.cli.log(`Created API group ${group.GroupName}`);
         return createdGroup;
       });
   },
@@ -126,17 +126,17 @@ module.exports = {
           this.serverless.cli.log(`Failed to update API ${api.ApiName}!`);
           throw err;
         });
-    } else {
-      this.serverless.cli.log(`Creating API ${api.ApiName}...`);
-      return this.provider.createApi(group, role, api)
-        .then((newApi) => {
-          this.serverless.cli.log(`Created API ${api.ApiName}`);
-          this.apiMap.set(api.ApiName, newApi);
-        }, (err) => {
-          this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
-          throw err;
-        });
-    }
+    } 
+    this.serverless.cli.log(`Creating API ${api.ApiName}...`);
+    return this.provider.createApi(group, role, api)
+      .then((newApi) => {
+        this.serverless.cli.log(`Created API ${api.ApiName}`);
+        this.apiMap.set(api.ApiName, newApi);
+      }, (err) => {
+        this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
+        throw err;
+      });
+    
   },
 
   deployApis() {
@@ -145,18 +145,18 @@ module.exports = {
       const apiProps = this.apiMap.get(api.ApiName);
       this.serverless.cli.log(`Deploying API ${api.ApiName}...`);
       return this.provider.deployApi(group, apiProps).then(
-      () => {
-        this.serverless.cli.log(`Deployed API ${api.ApiName}`);
-        const config = api.RequestConfig;
-        const func = api.ServiceConfig.FunctionComputeConfig;
-        this.serverless.cli.log(`${config.RequestHttpMethod} ` +
+        () => {
+          this.serverless.cli.log(`Deployed API ${api.ApiName}`);
+          const config = api.RequestConfig;
+          const func = api.ServiceConfig.FunctionComputeConfig;
+          this.serverless.cli.log(`${config.RequestHttpMethod} ` +
           `http://${this.apiGroup.SubDomain}${config.RequestPath} -> ` +
           `${func.ServiceName}.${func.FunctionName}`);
-      },
-      (err) => {
-        this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);
-        throw err;
-      });
+        },
+        (err) => {
+          this.serverless.cli.log(`Failed to deploy API ${api.ApiName}!`);
+          throw err;
+        });
     });
   },
 
@@ -167,9 +167,9 @@ module.exports = {
         trigger.serviceName, trigger.functionName, trigger.triggerName
       ).then((foundTrigger) => {
         if (foundTrigger) {
-          this.triggerMap.set(trigger.triggerName, foundTrigger)
+          this.triggerMap.set(trigger.triggerName, foundTrigger);
         }
-      })
+      });
     });
   },
 
@@ -197,16 +197,16 @@ module.exports = {
           this.serverless.cli.log(`Failed to update trigger ${triggerName}!`);
           throw err;
         });
-    } else {
-      this.serverless.cli.log(`Creating trigger ${triggerName}...`);
-      return this.provider.createTrigger(serviceName, functionName, trigger, role)
-        .then((newtrigger) => {
-          this.serverless.cli.log(`Created trigger ${triggerName}`);
-          this.triggerMap.set(triggerName, newtrigger);
-        }, (err) => {
-          this.serverless.cli.log(`Failed to create trigger ${triggerName}!`);
-          throw err;
-        });
-    }
+    } 
+    this.serverless.cli.log(`Creating trigger ${triggerName}...`);
+    return this.provider.createTrigger(serviceName, functionName, trigger, role)
+      .then((newtrigger) => {
+        this.serverless.cli.log(`Created trigger ${triggerName}`);
+        this.triggerMap.set(triggerName, newtrigger);
+      }, (err) => {
+        this.serverless.cli.log(`Failed to create trigger ${triggerName}!`);
+        throw err;
+      });
+    
   }
 };

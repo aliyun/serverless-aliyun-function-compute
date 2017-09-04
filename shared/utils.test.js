@@ -1,3 +1,5 @@
+/*global beforeEach, expect*/
+
 'use strict';
 
 const setDefaults = require('./utils');

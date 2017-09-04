@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use stict';
 
 const AliyunProvider = require('../../provider/aliyunProvider');
@@ -39,7 +41,7 @@ describe('MergeServiceResources', () => {
 
   it('should merge all the resources if provided', () => {
     serverless.service.provider.compiledConfigurationTemplate = {
-      "Resources": [
+      'Resources': [
         {
           name: 'resource1',
           type: 'type1',
@@ -63,7 +65,7 @@ describe('MergeServiceResources', () => {
     };
 
     const expectedResult = {
-      "Resources": [
+      'Resources': [
         {
           name: 'resource1',
           type: 'type1',

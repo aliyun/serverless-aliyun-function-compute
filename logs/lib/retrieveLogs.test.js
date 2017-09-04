@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');

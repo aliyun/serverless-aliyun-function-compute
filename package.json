@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint --fix deploy info invoke logs package provider remove shared test"
+    "lint": "eslint --fix deploy info invoke logs package provider remove shared test index.js"
   },
   "keywords": [
     "serverless",

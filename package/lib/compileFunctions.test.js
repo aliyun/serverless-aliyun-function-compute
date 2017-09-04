@@ -1,3 +1,5 @@
+/*global beforeEach, afterEach, expect*/
+
 'use strict';
 
 const sinon = require('sinon');
@@ -28,7 +30,7 @@ describe('CompileFunctions', () => {
       credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
       compiledConfigurationTemplate: _.cloneDeep(createTemplate),
       ramRoleStatements
-    }
+    };
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -64,18 +66,18 @@ describe('CompileFunctions', () => {
       };
 
       const compiledResources = {
-        "sls-my-service-dev-func1": {
-          "Type": "ALIYUN::FC::Function",
-          "Properties": {
-            "name": "my-service-dev-func1",
-            "service": "my-service-dev",
-            "handler": "index.func1",
-            "memorySize": 1024,
-            "timeout": 30,
-            "runtime": "nodejs6",
-            "code": {
-              "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
+        'sls-my-service-dev-func1': {
+          'Type': 'ALIYUN::FC::Function',
+          'Properties': {
+            'name': 'my-service-dev-func1',
+            'service': 'my-service-dev',
+            'handler': 'index.func1',
+            'memorySize': 1024,
+            'timeout': 30,
+            'runtime': 'nodejs6',
+            'code': {
+              'ossBucketName': 'sls-my-service',
+              'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
         }
@@ -104,18 +106,18 @@ describe('CompileFunctions', () => {
       aliyunPackage.serverless.service.provider.memorySize = 1024;
 
       const compiledResources = {
-        "sls-my-service-dev-func1": {
-          "Type": "ALIYUN::FC::Function",
-          "Properties": {
-            "name": "my-service-dev-func1",
-            "service": "my-service-dev",
-            "handler": "index.func1",
-            "memorySize": 1024,
-            "timeout": 30,
-            "runtime": "nodejs6",
-            "code": {
-              "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
+        'sls-my-service-dev-func1': {
+          'Type': 'ALIYUN::FC::Function',
+          'Properties': {
+            'name': 'my-service-dev-func1',
+            'service': 'my-service-dev',
+            'handler': 'index.func1',
+            'memorySize': 1024,
+            'timeout': 30,
+            'runtime': 'nodejs6',
+            'code': {
+              'ossBucketName': 'sls-my-service',
+              'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
         }
@@ -144,18 +146,18 @@ describe('CompileFunctions', () => {
       };
 
       const compiledResources = {
-        "sls-my-service-dev-func1": {
-          "Type": "ALIYUN::FC::Function",
-          "Properties": {
-            "name": "my-service-dev-func1",
-            "service": "my-service-dev",
-            "handler": "index.func1",
-            "memorySize": 128,
-            "timeout": 120,
-            "runtime": "nodejs6",
-            "code": {
-              "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
+        'sls-my-service-dev-func1': {
+          'Type': 'ALIYUN::FC::Function',
+          'Properties': {
+            'name': 'my-service-dev-func1',
+            'service': 'my-service-dev',
+            'handler': 'index.func1',
+            'memorySize': 128,
+            'timeout': 120,
+            'runtime': 'nodejs6',
+            'code': {
+              'ossBucketName': 'sls-my-service',
+              'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
         }
@@ -184,18 +186,18 @@ describe('CompileFunctions', () => {
       aliyunPackage.serverless.service.provider.timeout = 120;
 
       const compiledResources = {
-        "sls-my-service-dev-func1": {
-          "Type": "ALIYUN::FC::Function",
-          "Properties": {
-            "name": "my-service-dev-func1",
-            "service": "my-service-dev",
-            "handler": "index.func1",
-            "memorySize": 128,
-            "timeout": 120,
-            "runtime": "nodejs6",
-            "code": {
-              "ossBucketName": "sls-my-service",
-              "ossObjectName": "serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip"
+        'sls-my-service-dev-func1': {
+          'Type': 'ALIYUN::FC::Function',
+          'Properties': {
+            'name': 'my-service-dev-func1',
+            'service': 'my-service-dev',
+            'handler': 'index.func1',
+            'memorySize': 128,
+            'timeout': 120,
+            'runtime': 'nodejs6',
+            'code': {
+              'ossBucketName': 'sls-my-service',
+              'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
         }
@@ -251,11 +253,11 @@ describe('CompileFunctions', () => {
       }));
       expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement = [
         {
-          "Action": "sts:AssumeRole",
-          "Effect": "Allow",
-          "Principal": {
-            "Service": [
-              "apigateway.aliyuncs.com"
+          'Action': 'sts:AssumeRole',
+          'Effect': 'Allow',
+          'Principal': {
+            'Service': [
+              'apigateway.aliyuncs.com'
             ]
           }
         }
@@ -265,7 +267,7 @@ describe('CompileFunctions', () => {
         expect(consoleLogStub.calledTwice).toEqual(true);
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
 
@@ -278,25 +280,25 @@ describe('CompileFunctions', () => {
               path: '/baz',
               method: 'post',
               BodyFormat: 'FORM',
-              "RequestParameters": [{
-                "ApiParameterName": "foo",
-                "ParameterType": "String",
-                "Location": "Body",
-                "Required": "OPTIONAL",
-                "isHide": false,
-                "DefaultValue": "bar",
-                "DemoValue": "bar",
-                "Description": "foo"
+              'RequestParameters': [{
+                'ApiParameterName': 'foo',
+                'ParameterType': 'String',
+                'Location': 'Body',
+                'Required': 'OPTIONAL',
+                'isHide': false,
+                'DefaultValue': 'bar',
+                'DemoValue': 'bar',
+                'Description': 'foo'
               }],
-              "ServiceParameters": [{
-                "ServiceParameterName": "foo",
-                "Type": "String",
-                "Location": "Body",
-                "ParameterCatalog": "REQUEST"
+              'ServiceParameters': [{
+                'ServiceParameterName': 'foo',
+                'Type': 'String',
+                'Location': 'Body',
+                'ParameterCatalog': 'REQUEST'
               }],
-              "ServiceParametersMap": [{
-                "ServiceParameterName": "foo",
-                "RequestParameterName": "foo"
+              'ServiceParametersMap': [{
+                'ServiceParameterName': 'foo',
+                'RequestParameterName': 'foo'
               }]
             },
           }],
@@ -318,11 +320,11 @@ describe('CompileFunctions', () => {
       expect(Object.keys(expected).length).toBe(6);
       expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement = [
         {
-          "Action": "sts:AssumeRole",
-          "Effect": "Allow",
-          "Principal": {
-            "Service": [
-              "apigateway.aliyuncs.com"
+          'Action': 'sts:AssumeRole',
+          'Effect': 'Allow',
+          'Principal': {
+            'Service': [
+              'apigateway.aliyuncs.com'
             ]
           }
         }
@@ -333,7 +335,7 @@ describe('CompileFunctions', () => {
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
 
@@ -363,32 +365,32 @@ describe('CompileFunctions', () => {
       _.pull(expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement[0].Principal.Service, 'oss.aliyuncs.com');
 
       Object.assign(expected.sls_http_my_service_dev_getTest.Properties, {
-        "RequestConfig": {
-          "RequestProtocol": "HTTP",
-          "RequestHttpMethod": "GET",
-          "RequestPath": "/test/[id]",
-          "BodyFormat": "FORM",
-          "PostBodyDescription": ""
+        'RequestConfig': {
+          'RequestProtocol': 'HTTP',
+          'RequestHttpMethod': 'GET',
+          'RequestPath': '/test/[id]',
+          'BodyFormat': 'FORM',
+          'PostBodyDescription': ''
         },
-        "RequestParameters": [{
-          "ApiParameterName": "id",
-          "ParameterType": "Number",
-          "Location": "Path",
-          "Required": "REQUIRED",
-          "isHide": false,
-          "DefaultValue": undefined,
-          "DemoValue": undefined,
-          "Description": ""
+        'RequestParameters': [{
+          'ApiParameterName': 'id',
+          'ParameterType': 'Number',
+          'Location': 'Path',
+          'Required': 'REQUIRED',
+          'isHide': false,
+          'DefaultValue': undefined,
+          'DemoValue': undefined,
+          'Description': ''
         }],
-        "ServiceParameters": [{
-          "ServiceParameterName": "id",
-          "Type": "Number",
-          "Location": "Path",
-          "ParameterCatalog": "REQUEST"
+        'ServiceParameters': [{
+          'ServiceParameterName': 'id',
+          'Type': 'Number',
+          'Location': 'Path',
+          'ParameterCatalog': 'REQUEST'
         }],
-        "ServiceParametersMap": [{
-          "ServiceParameterName": "id",
-          "RequestParameterName": "id"
+        'ServiceParametersMap': [{
+          'ServiceParameterName': 'id',
+          'RequestParameterName': 'id'
         }]
       });
       return aliyunPackage.compileFunctions().then(() => {
@@ -396,7 +398,7 @@ describe('CompileFunctions', () => {
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
 
@@ -420,23 +422,23 @@ describe('CompileFunctions', () => {
       _.pull(expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement[0].Principal.Service, 'oss.aliyuncs.com');
 
       Object.assign(expected.sls_http_my_service_dev_getTest.Properties, {
-        "RequestConfig": {
-          "RequestProtocol": "HTTP",
-          "RequestHttpMethod": "GET",
-          "RequestPath": "/test",
-          "BodyFormat": "",
-          "PostBodyDescription": ""
+        'RequestConfig': {
+          'RequestProtocol': 'HTTP',
+          'RequestHttpMethod': 'GET',
+          'RequestPath': '/test',
+          'BodyFormat': '',
+          'PostBodyDescription': ''
         },
-        "RequestParameters": [],
-        "ServiceParameters": [],
-        "ServiceParametersMap": []
+        'RequestParameters': [],
+        'ServiceParameters': [],
+        'ServiceParametersMap': []
       });
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
   });
@@ -451,13 +453,13 @@ describe('CompileFunctions', () => {
           handler: 'index.ossTriggerHandler',
           events: [{
             oss: {
-              sourceArn: "acs:oss:cn-shanghai:ttt:my-service-resource",
+              sourceArn: 'acs:oss:cn-shanghai:ttt:my-service-resource',
               triggerConfig: {
                 events: [
-                  "oss:ObjectCreated:PostObject",
-                  "oss:ObjectCreated:PutObject"
+                  'oss:ObjectCreated:PostObject',
+                  'oss:ObjectCreated:PutObject'
                 ],
-                filter: { key: { prefix: "source/" } }
+                filter: { key: { prefix: 'source/' } }
               }
             },
           }]
@@ -469,11 +471,11 @@ describe('CompileFunctions', () => {
       }));
       expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement = [
         {
-          "Action": "sts:AssumeRole",
-          "Effect": "Allow",
-          "Principal": {
-            "Service": [
-              "oss.aliyuncs.com"
+          'Action': 'sts:AssumeRole',
+          'Effect': 'Allow',
+          'Principal': {
+            'Service': [
+              'oss.aliyuncs.com'
             ]
           }
         }
@@ -484,7 +486,7 @@ describe('CompileFunctions', () => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
   });
@@ -502,7 +504,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
   });
@@ -543,11 +545,11 @@ describe('CompileFunctions', () => {
 
       expected['sls-fc-invoke-role'].Properties.AssumeRolePolicyDocument.Statement = [
         {
-          "Action": "sts:AssumeRole",
-          "Effect": "Allow",
-          "Principal": {
-            "Service": [
-              "apigateway.aliyuncs.com"
+          'Action': 'sts:AssumeRole',
+          'Effect': 'Allow',
+          'Principal': {
+            'Service': [
+              'apigateway.aliyuncs.com'
             ]
           }
         }
@@ -559,7 +561,7 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunction(functionName, funcObject).then(() => {
         for (const key in expected) {
           expect(actual).toHaveProperty(key, expected[key]);
-        };
+        }
       });
     });
   });
