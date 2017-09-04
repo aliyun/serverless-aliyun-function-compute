@@ -16,7 +16,7 @@ This plugin enables Aliyun Function Compute support within the Serverless Framew
 You can install the following example via:
 
 ```console
-serverless install --url https://github.com/aliyun/serverless-function-compute-examples/tree/master/aliyun-nodej
+serverless install --url https://github.com/aliyun/serverless-function-compute-examples/tree/master/aliyun-nodejs
 ```
 
 The structure of the project should look something like this:
