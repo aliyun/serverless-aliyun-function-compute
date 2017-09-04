@@ -4,7 +4,8 @@
   "description": "Provider plugin for the Serverless Framework v1.x which adds support for Aliyun Function Compute",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/jest"
+    "test": "jest",
+    "lint": "eslint --fix deploy info invoke logs package provider remove shared test"
   },
   "keywords": [
     "serverless",
@@ -28,6 +29,7 @@
     "ini": "^1.3.4"
   },
   "devDependencies": {
+    "eslint": "^4.6.1",
     "jest": "^20.0.4",
     "sinon": "^2.3.6"
   }
