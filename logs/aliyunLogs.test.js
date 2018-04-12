@@ -1,4 +1,4 @@
-/*global beforeEach, expect*/
+/*global beforeEach, afterEach, expect*/
 
 'use strict';
 

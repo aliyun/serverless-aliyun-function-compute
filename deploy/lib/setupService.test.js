@@ -2,9 +2,7 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
-const _ = require('lodash');
 
 const sinon = require('sinon');
 const BbPromise = require('bluebird');
@@ -20,7 +18,6 @@ const {
 describe('setupServices', () => {
   let serverless;
   let aliyunDeploy;
-  let templatePath;
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -40,7 +37,7 @@ describe('setupServices', () => {
     aliyunDeploy = new AliyunDeploy(serverless, options);    aliyunDeploy.templates = {
       create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
       update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
-    }
+    };
   });
 
   describe('#setupService()', () => {
@@ -71,15 +68,16 @@ describe('setupServices', () => {
       aliyunDeploy.createBucketIfNotExists.restore();
     });
 
-    it('should run promise chain', () => aliyunDeploy
-      .setupService().then(() => {
-        expect(createLogConfigIfNotExistsStub.calledOnce).toEqual(true);
-        expect(setupExecRoleStub.calledAfter(createLogConfigIfNotExistsStub)).toEqual(true);
-        expect(checkForExistingServiceStub.calledAfter(setupExecRoleStub)).toEqual(true);
-        expect(createServiceIfNotExistsStub.calledAfter(checkForExistingServiceStub));
-        expect(createBucketIfNotExistsStub.calledAfter(createServiceIfNotExistsStub));
-      }),
-    );
+    it('should run promise chain', () => {
+      aliyunDeploy
+        .setupService().then(() => {
+          expect(createLogConfigIfNotExistsStub.calledOnce).toEqual(true);
+          expect(setupExecRoleStub.calledAfter(createLogConfigIfNotExistsStub)).toEqual(true);
+          expect(checkForExistingServiceStub.calledAfter(setupExecRoleStub)).toEqual(true);
+          expect(createServiceIfNotExistsStub.calledAfter(checkForExistingServiceStub));
+          expect(createBucketIfNotExistsStub.calledAfter(createServiceIfNotExistsStub));
+        });
+    });
   });
 
   describe('#setupService()', () => {

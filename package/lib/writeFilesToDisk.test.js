@@ -45,13 +45,13 @@ describe('WriteFilesToDisk', () => {
       const createFilePath = path.join(
         aliyunPackage.serverless.config.servicePath,
         '.serverless',
-        'configuration-template-create.json',
+        'configuration-template-create.json'
       );
 
       return aliyunPackage.saveCreateTemplateFile().then(() => {
         expect(writeFileSyncStub.calledWithExactly(
           createFilePath,
-          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate,
+          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
         )).toEqual(true);
       });
     });
@@ -62,13 +62,13 @@ describe('WriteFilesToDisk', () => {
       const updateFilePath = path.join(
         aliyunPackage.serverless.config.servicePath,
         '.serverless',
-        'configuration-template-update.json',
+        'configuration-template-update.json'
       );
 
       return aliyunPackage.saveUpdateTemplateFile().then(() => {
         expect(writeFileSyncStub.calledWithExactly(
           updateFilePath,
-          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate,
+          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
         )).toEqual(true);
       });
     });

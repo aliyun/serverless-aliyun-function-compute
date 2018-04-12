@@ -8,7 +8,7 @@ const BbPromise = require('bluebird');
 
 module.exports = {
   saveCreateTemplateFile() {
-    const packagePath = 
+    const packagePath =
       path.join(this.serverless.config.servicePath || '.', '.serverless');
     const filePath = path.join(packagePath,'configuration-template-create.json');
 
@@ -19,7 +19,7 @@ module.exports = {
   },
 
   saveUpdateTemplateFile() {
-    const packagePath = 
+    const packagePath =
       path.join(this.serverless.config.servicePath || '.', '.serverless');
     const filePath = path.join(packagePath, 'configuration-template-update.json');
 

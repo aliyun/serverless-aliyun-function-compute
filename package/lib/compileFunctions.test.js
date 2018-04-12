@@ -85,9 +85,9 @@ describe('CompileFunctions', () => {
 
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in compiledResources) {
+        Object.keys(compiledResources).forEach((key) => {
           expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
-        }
+        });
       });
     });
 
@@ -125,9 +125,9 @@ describe('CompileFunctions', () => {
 
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in compiledResources) {
+        Object.keys(compiledResources).forEach((key) => {
           expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
-        }
+        });
       });
     });
 
@@ -165,9 +165,9 @@ describe('CompileFunctions', () => {
 
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in compiledResources) {
+        Object.keys(compiledResources).forEach((key) => {
           expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
-        }
+        });
       });
     });
 
@@ -205,9 +205,9 @@ describe('CompileFunctions', () => {
 
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in compiledResources) {
+        Object.keys(compiledResources).forEach((key) => {
           expect(aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources[key]).toEqual(compiledResources[key]);
-        }
+        });
       });
     });
   });
@@ -265,9 +265,9 @@ describe('CompileFunctions', () => {
       const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledTwice).toEqual(true);
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
 
@@ -333,9 +333,9 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledTwice).toEqual(true);
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
 
@@ -396,9 +396,9 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
 
@@ -436,9 +436,9 @@ describe('CompileFunctions', () => {
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
         const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
   });
@@ -484,9 +484,9 @@ describe('CompileFunctions', () => {
       const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
       return aliyunPackage.compileFunctions().then(() => {
         expect(consoleLogStub.calledOnce).toEqual(true);
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
   });
@@ -502,9 +502,9 @@ describe('CompileFunctions', () => {
       expect(Object.keys(expected).length).toBe(1);
       const actual = aliyunPackage.serverless.service.provider.compiledConfigurationTemplate.Resources;
       return aliyunPackage.compileFunctions().then(() => {
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
   });
@@ -559,9 +559,9 @@ describe('CompileFunctions', () => {
       const funcObject = _.cloneDeep(aliyunPackage.serverless.service.getFunction(functionName));
       funcObject.package = { artifact: '/tmp/getTest.zip' };
       return aliyunPackage.compileFunction(functionName, funcObject).then(() => {
-        for (const key in expected) {
+        Object.keys(expected).forEach((key) => {
           expect(actual).toHaveProperty(key, expected[key]);
-        }
+        });
       });
     });
   });

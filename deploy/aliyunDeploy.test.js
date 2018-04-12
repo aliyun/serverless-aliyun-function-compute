@@ -1,17 +1,16 @@
-/*global beforeEach, expect*/
+/*global beforeEach, afterEach, expect*/
 
 'use strict';
 
 const sinon = require('sinon');
 const BbPromise = require('bluebird');
 const path = require('path');
-const fs = require('fs');
 const {
-  apiGroup, apis, group, fullGroup, role,
+  fullGroup, role,
   fullRole, execRole, fullExecRole, fullApis,
-  functions, logIndex, fullLogIndex, logProject,
-  fullLogProject, logStore, fullLogStore, fullService,
-  triggers, fullTriggers
+  functions, fullLogIndex,
+  fullLogProject, fullLogStore, fullService,
+  fullTriggers
 } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');

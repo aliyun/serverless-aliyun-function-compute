@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-
 module.exports = {
   uploadArtifacts() {
     const objectId = this.provider.getStorageObjectId();
