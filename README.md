@@ -2,6 +2,8 @@
 
 This plugin enables Aliyun Function Compute support within the Serverless Framework.
 
+- [![Build Status](https://travis-ci.org/aliyun/serverless-aliyun-function-compute.svg?branch=master)](https://travis-ci.org/aliyun/serverless-aliyun-function-compute)
+
 ## Getting started
 
 ### Pre-requisites
