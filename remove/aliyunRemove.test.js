@@ -10,8 +10,8 @@ const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunRemove = require('./aliyunRemove');
 const Serverless = require('../test/serverless');
 const {
-  apiGroup, apis, group, fullGroup, role, fullRole, execRole,
-  fullExecRole, fullApis, functions, fullFunctions, bucket,
+  fullGroup, role, fullRole, execRole,
+  fullExecRole, fullApis, fullFunctions, bucket,
   objects, functionDefs, fullService, fullTriggers
 } = require('../test/data');
 
@@ -128,7 +128,6 @@ describe('AliyunRemove', () => {
 
     let deleteFunctionStub;
     let deleteServiceStub;
-    let removeRoleAndPoliciesStub;
 
     let getBucketStub;
     let getObjectsStub;
@@ -372,7 +371,6 @@ describe('AliyunRemove', () => {
 
     let deleteFunctionStub;
     let deleteServiceStub;
-    let removeRoleAndPoliciesStub;
 
     let getBucketStub;
     let getObjectsStub;

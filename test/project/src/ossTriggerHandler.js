@@ -1,6 +1,5 @@
 'use strict';
 
-const moment = require('moment');
 const oss = require('ali-oss').Wrapper;
 
 module.exports = (event, context, callback) => {
@@ -11,7 +10,7 @@ module.exports = (event, context, callback) => {
   // Create oss client.
   const client = new oss({
     region: ossRegion,
-    bucket: ossEvent.oss.bucket.name,    
+    bucket: ossEvent.oss.bucket.name,
     // Credentials can be retrieved from context
     accessKeyId: context.credentials.accessKeyId,
     accessKeySecret: context.credentials.accessKeySecret,

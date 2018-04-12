@@ -1,6 +1,6 @@
-/*global beforeEach, afterEach, expect*/
+/*global beforeEach, expect*/
 
-'use stict';
+'use strict';
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunPackage = require('../aliyunPackage');

@@ -2,8 +2,6 @@
 
 /* eslint no-use-before-define: 0 */
 
-const path = require('path');
-
 const _ = require('lodash');
 const BbPromise = require('bluebird');
 
@@ -14,7 +12,6 @@ module.exports = {
     const resources = deploymentTemplate.Resources;
 
     // resource: oss bucket
-    const bucketName = this.provider.getDeploymentBucketName();
     const bucketId = this.provider.getStorageBucketId();
     resources[bucketId] = this.provider.getStorageBucketResource();
 

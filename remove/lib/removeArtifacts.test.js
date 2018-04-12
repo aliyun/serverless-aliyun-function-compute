@@ -9,7 +9,7 @@ const BbPromise = require('bluebird');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
-const { fullGroup, fullApis, bucket, objects } = require('../../test/data');
+const { bucket, objects } = require('../../test/data');
 
 describe('removeArtifacts', () => {
   let serverless;

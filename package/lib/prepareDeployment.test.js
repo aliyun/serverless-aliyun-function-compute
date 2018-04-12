@@ -1,8 +1,7 @@
-/*global beforeEach, afterEach, expect*/
+/*global beforeEach, expect*/
 
 'use strict';
 
-const sinon = require('sinon');
 const path = require('path');
 
 const AliyunProvider = require('../../provider/aliyunProvider');

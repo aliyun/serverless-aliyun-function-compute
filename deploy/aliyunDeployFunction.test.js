@@ -1,17 +1,15 @@
-/*global beforeEach, expect*/
+/*global beforeEach, afterEach, expect*/
 
 'use strict';
 
 const sinon = require('sinon');
 const BbPromise = require('bluebird');
 const path = require('path');
-const fs = require('fs');
 const {
-  apiGroup, apis, group, fullGroup, role, fullRole,
+  fullGroup, role, fullRole,
   fullApis, functions, fullExecRole, execRole, functionDefs,
-  logIndex, fullLogIndex, logProject, fullLogProject, logStore,
-  fullLogStore, directory, fullService,
-  triggers, fullTriggers
+  fullLogIndex, fullLogProject,
+  fullLogStore, directory, fullService
 } = require('../test/data');
 
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -21,7 +19,6 @@ const Serverless = require('../test/serverless');
 describe('AliyunDeployFunction', () => {
   let serverless;
   let aliyunDeployFunction;
-  const servicePath = path.join(__dirname, '..', 'test');
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -158,8 +155,6 @@ describe('AliyunDeployFunction', () => {
     let deployApiStub;
 
     let getTriggerStub;
-    let updateTriggerStub;
-    let createTriggerStub;
 
     const options = {
       stage: 'dev',
@@ -204,8 +199,8 @@ describe('AliyunDeployFunction', () => {
       deployApiStub = sinon.stub(aliyunDeployFunction.provider, 'deployApi');
 
       getTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'getTrigger');
-      updateTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'updateTrigger');
-      createTriggerStub = sinon.stub(aliyunDeployFunction.provider, 'createTrigger');
+      sinon.stub(aliyunDeployFunction.provider, 'updateTrigger');
+      sinon.stub(aliyunDeployFunction.provider, 'createTrigger');
 
       sinon.stub(aliyunDeployFunction.provider, 'getArtifactDirectoryName').returns(directory);
     });

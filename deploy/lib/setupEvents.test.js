@@ -2,7 +2,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 
 const sinon = require('sinon');
@@ -12,8 +11,8 @@ const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
 const Serverless = require('../../test/serverless');
 const {
-  apiGroup, apis, group, fullGroup, role, fullRole, fullApis,
-  functions, triggers, fullTriggers
+  apiGroup, apis, fullGroup, role, fullRole, fullApis,
+  triggers, fullTriggers
 } = require('../../test/data');
 
 describe('setupEvents', () => {

@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const _ = require('lodash');
 
 const BbPromise = require('bluebird');
@@ -63,7 +61,6 @@ module.exports = {
     const group = groupResource.Properties;
 
     const groupName = group.GroupName;
-    const groupDesc = group.Description;
 
     return this.provider.getApiGroup(groupName)
       .then((foundGroup) => {
@@ -126,7 +123,7 @@ module.exports = {
           this.serverless.cli.log(`Failed to update API ${api.ApiName}!`);
           throw err;
         });
-    } 
+    }
     this.serverless.cli.log(`Creating API ${api.ApiName}...`);
     return this.provider.createApi(group, role, api)
       .then((newApi) => {
@@ -136,7 +133,7 @@ module.exports = {
         this.serverless.cli.log(`Failed to create API ${api.ApiName}!`);
         throw err;
       });
-    
+
   },
 
   deployApis() {
@@ -197,7 +194,7 @@ module.exports = {
           this.serverless.cli.log(`Failed to update trigger ${triggerName}!`);
           throw err;
         });
-    } 
+    }
     this.serverless.cli.log(`Creating trigger ${triggerName}...`);
     return this.provider.createTrigger(serviceName, functionName, trigger, role)
       .then((newtrigger) => {
@@ -207,6 +204,6 @@ module.exports = {
         this.serverless.cli.log(`Failed to create trigger ${triggerName}!`);
         throw err;
       });
-    
+
   }
 };

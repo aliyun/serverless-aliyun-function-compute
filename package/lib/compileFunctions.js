@@ -30,15 +30,13 @@ module.exports = {
     const objectId = this.provider.getStorageObjectId();
     const resources = this.resources;
 
-    const bucketName = this.provider.getDeploymentBucketName();
-
     const fileName = artifact.split(path.sep).pop();
     const directory = this.provider.getArtifactDirectoryName();
     const artifactFilePath = `${directory}/${fileName}`;
     this.serverless.service.package.artifactFilePath = artifactFilePath;
     this.serverless.service.package.artifactDirectoryName = directory;
 
-    const packagePath = 
+    const packagePath =
       path.join(this.serverless.config.servicePath || '.', '.serverless');
     const filePath = path.join(packagePath, fileName);
 
@@ -96,7 +94,6 @@ module.exports = {
 
   compileEvents(funcObject) {
     const resources = this.resources;
-    const agLogicalId = this.provider.getApiGroupLogicalId();
 
     funcObject.events.forEach((event) => {
       const eventType = Object.keys(event)[0];

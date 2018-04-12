@@ -109,9 +109,7 @@ describe('removeRoleAndPolicies', () => {
     });
   });
 
-
   describe('#removeRoleAndPolicies()', () => {
-    let consoleLogStub;
     let getRoleStub;
     let getPoliciesForRoleStub;
     let detachPolicyFromRoleStub;
@@ -125,7 +123,7 @@ describe('removeRoleAndPolicies', () => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       serverless.pluginManager.setCliOptions(options);
       aliyunRemove = new AliyunRemove(serverless, options);
-      consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
+      sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
       getRoleStub = sinon.stub(aliyunRemove.provider, 'getRole');
       getPoliciesForRoleStub = sinon.stub(aliyunRemove.provider, 'getPoliciesForRole');
       detachPolicyFromRoleStub = sinon.stub(aliyunRemove.provider, 'detachPolicyFromRole');

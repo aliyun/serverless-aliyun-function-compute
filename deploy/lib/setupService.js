@@ -1,8 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-
 const BbPromise = require('bluebird');
 
 module.exports = {
@@ -137,7 +134,7 @@ module.exports = {
 
     return this.provider.getBucket(bucket.BucketName)
       .then((foundBucket) => {
-        if (foundBucket) { 
+        if (foundBucket) {
           this.serverless.cli.log(`Bucket ${bucket.BucketName} already exists.`);
           return foundBucket;
         }

@@ -1,5 +1,3 @@
-/*global beforeEach, expect*/
-
 'use strict';
 
 const path = require('path');
@@ -8,7 +6,6 @@ const os = require('os');
 const ini = require('ini');
 const co = require('co');
 
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 
 const FCClient = require('@alicloud/fc');
@@ -674,7 +671,6 @@ class AliyunProvider {
   }
 
   addRamRoleStatementsToExecRole(resource, statement) {
-    const service = this.getServiceName();
     const execRolePolicy = this.getExecRolePolicyName();
     const policy = resource.Properties.Policies.find(
       (policy) => policy.PolicyName === execRolePolicy);

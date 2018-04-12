@@ -2,7 +2,6 @@
 
 const chalk = require('chalk');
 const BbPromise = require('bluebird');
-const _ = require('lodash');
 
 module.exports = {
   displayServiceInfo() {

@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const _ = require('lodash');
 
 const BbPromise = require('bluebird');
@@ -41,7 +39,7 @@ module.exports = {
           this.serverless.cli.log(`Failed to update function ${func.name}!`);
           throw err;
         });
-    } 
+    }
     this.serverless.cli.log(`Creating function ${func.name}...`);
     return this.provider.createFunction(func.service, func.name, func)
       .then(() => {
@@ -50,6 +48,6 @@ module.exports = {
         this.serverless.cli.log(`Failed to create function ${func.name}!`);
         throw err;
       });
-    
+
   }
 };
