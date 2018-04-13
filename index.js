@@ -5,9 +5,9 @@ const AliyunPackage = require('./package/aliyunPackage');
 const AliyunDeploy = require('./deploy/aliyunDeploy');
 const AliyunDeployFunction = require('./deploy/aliyunDeployFunction');
 const AliyunRemove = require('./remove/aliyunRemove');
-const AliyunInvoke= require('./invoke/aliyunInvoke');
-const AliyunLogs= require('./logs/aliyunLogs');
-const AliyunInfo= require('./info/aliyunInfo');
+const AliyunInvoke = require('./invoke/aliyunInvoke');
+const AliyunLogs = require('./logs/aliyunLogs');
+const AliyunInfo = require('./info/aliyunInfo');
 
 class AliyunIndex {
   constructor(serverless, options) {
