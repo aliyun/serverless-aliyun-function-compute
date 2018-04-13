@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
@@ -60,10 +59,10 @@ describe('removeRoleAndPolicies', () => {
     });
 
     it('should remove existing role and policies', () => {
-      getRoleStub.returns(BbPromise.resolve(fullRole));
-      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(fullRole));
+      getPoliciesForRoleStub.returns(Promise.resolve(role.Policies));
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
       return aliyunRemove.removeRoleAndPolicies(roleName).then(() => {
         expect(getRoleStub.calledOnce).toEqual(true);
@@ -90,10 +89,10 @@ describe('removeRoleAndPolicies', () => {
     });
 
     it('should skip non-existing role and policies', () => {
-      getRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve());
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
       return aliyunRemove.removeRoleAndPolicies(roleName).then(() => {
         expect(getRoleStub.calledWithExactly(roleName)).toEqual(true);
@@ -139,10 +138,10 @@ describe('removeRoleAndPolicies', () => {
     });
 
     it('should not do anything if there is no --remove-roles', () => {
-      getRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve());
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
       return aliyunRemove.removeRoleAndPolicies(roleName).then(() => {
         expect(getRoleStub.called).toEqual(false);

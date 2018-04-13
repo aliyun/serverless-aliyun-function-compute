@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 const chalk = require('chalk');
 
 const path = require('path');
@@ -64,14 +63,14 @@ describe('DisplayServiceInfo', () => {
 
     it('should print relevant data on the console', () => {
       const serviceId = new Date().getTime().toString(16);
-      getServiceStub.returns(BbPromise.resolve({
+      getServiceStub.returns(Promise.resolve({
         serviceId: serviceId,
         serviceName: 'my-service-dev'
       }));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      getApiStub.onCall(0).returns(BbPromise.resolve(
+      getFunctionsStub.returns(Promise.resolve(fullFunctions));
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve(fullApis));
+      getApiStub.onCall(0).returns(Promise.resolve(
         Object.assign({}, apis[0], {
           DeployedInfos: {
             DeployedInfo: [{
@@ -81,7 +80,7 @@ describe('DisplayServiceInfo', () => {
             }]
           }
         })));
-      getApiStub.onCall(1).returns(BbPromise.resolve(
+      getApiStub.onCall(1).returns(Promise.resolve(
         Object.assign({}, apis[1], {
           DeployedInfos: {
             DeployedInfo: [{ DeployedStatus: 'NONDEPLOYED', StageName: 'PRE' }]
@@ -116,11 +115,11 @@ describe('DisplayServiceInfo', () => {
     });
 
     it('should print an info if functions are not yet deployed', () => {
-      getServiceStub.returns(BbPromise.resolve());
-      getFunctionsStub.returns(BbPromise.resolve([]));
-      getApiGroupStub.returns(BbPromise.resolve());
-      getApisStub.returns(BbPromise.resolve([]));
-      getApiStub.returns(BbPromise.resolve());
+      getServiceStub.returns(Promise.resolve());
+      getFunctionsStub.returns(Promise.resolve([]));
+      getApiGroupStub.returns(Promise.resolve());
+      getApisStub.returns(Promise.resolve([]));
+      getApiStub.returns(Promise.resolve());
 
       let expectedOutput = [
         `${chalk.yellow.underline('Service Information')}`,

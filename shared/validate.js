@@ -27,7 +27,7 @@ module.exports = {
     if (!this.serverless.config.servicePath) {
       throw new Error('This command can only be run inside a service directory');
     }
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   validateServiceName() {
@@ -43,7 +43,7 @@ module.exports = {
         `The name of your service ${serviceName} is invalid. A service` +
         ' name should not be longer than 128 characters');
     }
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   validateHandlers() {
@@ -79,7 +79,7 @@ module.exports = {
         throw new Error(errorMessage);
       }
     });
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   validateEventsProperty () {

@@ -15,7 +15,7 @@ module.exports = {
   removeFunctions() {
     if (!this.fcFunctions.length) {
       this.serverless.cli.log(`No functions to remove.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     const serviceName = this.fcService.serviceName;
@@ -31,7 +31,7 @@ module.exports = {
   removeServiceIfExists() {
     if (!this.fcService) {
       this.serverless.cli.log(`No services to remove.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const serviceName = this.fcService.serviceName;
     this.serverless.cli.log(`Removing service ${serviceName}...`);

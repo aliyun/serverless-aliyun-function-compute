@@ -5,7 +5,6 @@
 const path = require('path');
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
@@ -66,12 +65,12 @@ describe('setupRole', () => {
     });
 
     it('should set up role with system policies', () => {
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.returns(BbPromise.resolve(fullRole));
-      getPolicyStub.returns(BbPromise.resolve(undefined));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(undefined));
+      createRoleStub.returns(Promise.resolve(fullRole));
+      getPolicyStub.returns(Promise.resolve(undefined));
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -110,12 +109,12 @@ describe('setupRole', () => {
     });
 
     it('should update role with system policies', () => {
-      getRoleStub.returns(BbPromise.resolve(fullRole));
-      createRoleStub.returns(BbPromise.resolve(fullRole));
-      getPolicyStub.returns(BbPromise.resolve(undefined));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(fullRole));
+      createRoleStub.returns(Promise.resolve(fullRole));
+      getPolicyStub.returns(Promise.resolve(undefined));
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -150,12 +149,12 @@ describe('setupRole', () => {
     });
 
     it('should skip attached policies', () => {
-      getRoleStub.returns(BbPromise.resolve(fullRole));
-      createRoleStub.returns(BbPromise.resolve(fullRole));
-      getPolicyStub.returns(BbPromise.resolve(undefined));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve(role.Policies));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(fullRole));
+      createRoleStub.returns(Promise.resolve(fullRole));
+      getPolicyStub.returns(Promise.resolve(undefined));
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve(role.Policies));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -184,12 +183,12 @@ describe('setupRole', () => {
     });
 
     it('should set up role with custom policies', () => {
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.returns(BbPromise.resolve(fullExecRole));
-      getPolicyStub.returns(BbPromise.resolve(undefined));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(undefined));
+      createRoleStub.returns(Promise.resolve(fullExecRole));
+      getPolicyStub.returns(Promise.resolve(undefined));
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupRole(execRole).then((completedRole) => {
         expect(completedRole).toEqual(fullExecRole);
@@ -235,15 +234,15 @@ describe('setupRole', () => {
     });
 
     it('should not recreate existing policies', () => {
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.returns(BbPromise.resolve(fullExecRole));
-      getPolicyStub.returns(BbPromise.resolve({
+      getRoleStub.returns(Promise.resolve(undefined));
+      createRoleStub.returns(Promise.resolve(fullExecRole));
+      getPolicyStub.returns(Promise.resolve({
         PolicyType: 'Custom',
         PolicyName: execRole.Policies[0].PolicyName
       }));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupRole(execRole).then((completedRole) => {
         expect(completedRole).toEqual(fullExecRole);

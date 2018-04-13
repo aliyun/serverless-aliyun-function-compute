@@ -5,7 +5,6 @@
 const path = require('path');
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
@@ -47,11 +46,11 @@ describe('setupEvents', () => {
 
     beforeEach(() => {
       setupInvokeRoleStub = sinon.stub(aliyunDeploy, 'setupInvokeRole')
-        .returns(BbPromise.resolve(role));
+        .returns(Promise.resolve(role));
       createApisIfNeededStub = sinon.stub(aliyunDeploy, 'createApisIfNeeded')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       createTriggersIfNeededStub = sinon.stub(aliyunDeploy, 'createTriggersIfNeeded')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -81,7 +80,7 @@ describe('setupEvents', () => {
 
     beforeEach(() => {
       setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole')
-        .returns(BbPromise.resolve(fullRole));
+        .returns(Promise.resolve(fullRole));
     });
 
     afterEach(() => {
@@ -133,13 +132,13 @@ describe('setupEvents', () => {
     });
 
     it('should set up apis property from scratch', () => {
-      getApiGroupStub.returns(BbPromise.resolve(undefined));
-      createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve([]));
-      updateApiStub.returns(BbPromise.resolve());
-      createApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
-      createApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
-      deployApiStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(undefined));
+      createApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve([]));
+      updateApiStub.returns(Promise.resolve());
+      createApiStub.onCall(0).returns(Promise.resolve(fullApis[0]));
+      createApiStub.onCall(1).returns(Promise.resolve(fullApis[1]));
+      deployApiStub.returns(Promise.resolve());
 
       return aliyunDeploy.createApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
@@ -198,13 +197,13 @@ describe('setupEvents', () => {
     });
 
     it('should update apis properly', () => {
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      createApiGroupStub.returns(BbPromise.resolve());
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      createApiStub.returns(BbPromise.resolve());
-      updateApiStub.onCall(0).returns(BbPromise.resolve(fullApis[0]));
-      updateApiStub.onCall(1).returns(BbPromise.resolve(fullApis[1]));
-      deployApiStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      createApiGroupStub.returns(Promise.resolve());
+      getApisStub.returns(Promise.resolve(fullApis));
+      createApiStub.returns(Promise.resolve());
+      updateApiStub.onCall(0).returns(Promise.resolve(fullApis[0]));
+      updateApiStub.onCall(1).returns(Promise.resolve(fullApis[1]));
+      deployApiStub.returns(Promise.resolve());
 
       return aliyunDeploy.createApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
@@ -292,9 +291,9 @@ describe('setupEvents', () => {
     });
 
     it('should set up triggers from scratch', () => {
-      getTriggerStub.returns(BbPromise.resolve());
-      updateTriggerStub.returns(BbPromise.resolve());
-      createTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
+      getTriggerStub.returns(Promise.resolve());
+      updateTriggerStub.returns(Promise.resolve());
+      createTriggerStub.returns(Promise.resolve(fullTriggers[0]));
 
       return aliyunDeploy.createTriggersIfNeeded().then(() => {
         const trigger = triggers[0];
@@ -325,9 +324,9 @@ describe('setupEvents', () => {
     });
 
     it('should update triggers properly', () => {
-      getTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
-      updateTriggerStub.returns(BbPromise.resolve(fullTriggers[0]));
-      createTriggerStub.returns(BbPromise.resolve());
+      getTriggerStub.returns(Promise.resolve(fullTriggers[0]));
+      updateTriggerStub.returns(Promise.resolve(fullTriggers[0]));
+      createTriggerStub.returns(Promise.resolve());
 
       return aliyunDeploy.createTriggersIfNeeded().then(() => {
         const trigger = triggers[0];

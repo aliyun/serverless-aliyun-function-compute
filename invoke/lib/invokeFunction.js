@@ -38,12 +38,12 @@ module.exports = {
 
   printResult(result) {
     this.serverless.cli.log(result);
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   handleError(err) {
     this.serverless.cli.log(err);
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   getDataFromInput(input) {

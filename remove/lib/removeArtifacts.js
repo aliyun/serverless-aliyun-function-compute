@@ -21,7 +21,7 @@ module.exports = {
   },
 
   getObjectsToRemove() {
-    if (!this.bucket) {return BbPromise.resolve();}
+    if (!this.bucket) {return Promise.resolve();}
     const bucketName = this.bucket.name;
     this.provider.resetOssClient(bucketName);
     const prefix = this.provider.getArtifactDirectoryPrefix();
@@ -33,7 +33,7 @@ module.exports = {
   removeObjects() {
     if (!this.objects.length) {
       this.serverless.cli.log(`No artifacts to remove.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     const bucketName = this.bucket.name;
@@ -47,7 +47,7 @@ module.exports = {
   removeBucket() {
     if (!this.bucket) {
       this.serverless.cli.log(`No buckets to remove.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     const bucketName = this.bucket.name;

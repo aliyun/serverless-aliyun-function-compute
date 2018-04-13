@@ -5,7 +5,6 @@
 const path = require('path');
 
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 
 module.exports = {
   compileFunctions() {
@@ -15,7 +14,7 @@ module.exports = {
       const funcObject = this.serverless.service.getFunction(functionName);
       this.compileFunctionAndEvent(functionName, funcObject);
     });
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   compileFunction(funcName, funcObject) {
@@ -23,7 +22,7 @@ module.exports = {
     // Notice artifact is different
     this.compileStorage(funcObject.package.artifact);
     this.compileFunctionAndEvent(funcName, funcObject);
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   compileStorage(artifact) {

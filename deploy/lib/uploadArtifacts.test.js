@@ -5,7 +5,6 @@
 const path = require('path');
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
@@ -56,7 +55,7 @@ describe('UploadArtifacts', () => {
     });
 
     it('should upload corresponding objects to deployment bucket', () => {
-      uploadObjectStub.returns(BbPromise.resolve());
+      uploadObjectStub.returns(Promise.resolve());
       return aliyunDeploy
         .uploadArtifacts().then(() => {
           expect(uploadObjectStub.calledOnce).toEqual(true);

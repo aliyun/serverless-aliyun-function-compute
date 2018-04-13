@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 const path = require('path');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
@@ -41,9 +40,9 @@ describe('InvokeFunction', () => {
     beforeEach(() => {
       invokeStub = sinon.stub(aliyunInvoke, 'invoke');
       printResultStub = sinon.stub(aliyunInvoke, 'printResult')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       handleErrorStub = sinon.stub(aliyunInvoke, 'handleError')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -54,7 +53,7 @@ describe('InvokeFunction', () => {
 
     it('should run promise chain when invocation succeeds', () => {
       const data = { test: 'ok' };
-      invokeStub.returns(BbPromise.resolve(data));
+      invokeStub.returns(Promise.resolve(data));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeStub.calledOnce).toEqual(true);
         expect(printResultStub.calledAfter(invokeStub)).toEqual(true);
@@ -66,7 +65,7 @@ describe('InvokeFunction', () => {
 
     it('should run promise chain when invocation fails', () => {
       const err = new Error();
-      invokeStub.returns(BbPromise.reject(err));
+      invokeStub.returns(Promise.reject(err));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeStub.calledOnce).toEqual(true);
         expect(handleErrorStub.calledAfter(invokeStub));
@@ -108,7 +107,7 @@ describe('InvokeFunction', () => {
 
     it('should invoke the provided function without data option', () => {
       aliyunInvoke.options.function = 'getTest';
-      invokeFunctionStub.returns(BbPromise.resolve(response));
+      invokeFunctionStub.returns(Promise.resolve(response));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeFunctionStub.calledOnce).toEqual(true);
         expect(
@@ -131,7 +130,7 @@ describe('InvokeFunction', () => {
     it('should invoke the provided function with JSON data', () => {
       aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.data = '{"a": "b"}';
-      invokeFunctionStub.returns(BbPromise.resolve(response));
+      invokeFunctionStub.returns(Promise.resolve(response));
 
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeFunctionStub.calledOnce).toEqual(true);
@@ -155,7 +154,7 @@ describe('InvokeFunction', () => {
     it('should invoke the provided function with string data', () => {
       aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.data = 'test';
-      invokeFunctionStub.returns(BbPromise.resolve(response));
+      invokeFunctionStub.returns(Promise.resolve(response));
 
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeFunctionStub.calledOnce).toEqual(true);
@@ -179,7 +178,7 @@ describe('InvokeFunction', () => {
     it('should invoke the provided function with data in path', () => {
       aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.path = path.join(__dirname, '..', '..',  'test', 'invokeData.json');
-      invokeFunctionStub.returns(BbPromise.resolve(response));
+      invokeFunctionStub.returns(Promise.resolve(response));
 
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeFunctionStub.calledOnce).toEqual(true);

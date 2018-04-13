@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
@@ -59,10 +58,10 @@ describe('removeArtifacts', () => {
     });
 
     it('should remove existing bucket and objects', () => {
-      getBucketStub.returns(BbPromise.resolve(bucket));
-      getObjectsStub.returns(BbPromise.resolve(objects));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(bucket));
+      getObjectsStub.returns(Promise.resolve(objects));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(getBucketStub.calledOnce).toEqual(true);
@@ -95,10 +94,10 @@ describe('removeArtifacts', () => {
     });
 
     it('should only remove existing objects', () => {
-      getBucketStub.returns(BbPromise.resolve(bucket));
-      getObjectsStub.returns(BbPromise.resolve([objects[0]]));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(bucket));
+      getObjectsStub.returns(Promise.resolve([objects[0]]));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(deleteObjectsStub.calledOnce).toEqual(true);
@@ -121,10 +120,10 @@ describe('removeArtifacts', () => {
     });
 
     it('should not remove any objects if there is none', () => {
-      getBucketStub.returns(BbPromise.resolve(bucket));
-      getObjectsStub.returns(BbPromise.resolve([]));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(bucket));
+      getObjectsStub.returns(Promise.resolve([]));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(deleteObjectsStub.called).toEqual(false);
@@ -144,10 +143,10 @@ describe('removeArtifacts', () => {
     });
 
     it('should not remove the bucket if there is not any', () => {
-      getBucketStub.returns(BbPromise.resolve(undefined));
-      getObjectsStub.returns(BbPromise.resolve([]));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(undefined));
+      getObjectsStub.returns(Promise.resolve([]));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(deleteObjectsStub.called).toEqual(false);

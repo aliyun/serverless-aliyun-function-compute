@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 const path = require('path');
 const {
   fullGroup, role, fullRole,
@@ -73,21 +72,21 @@ describe('AliyunDeployFunction', () => {
 
       beforeEach(() => {
         validateStub = sinon.stub(aliyunDeployFunction, 'validate')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunDeployFunction, 'setDefaults')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         packageFunctionStub = sinon.stub(aliyunDeployFunction, 'packageFunction')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         compileTemplatesStub = sinon.stub(aliyunDeployFunction, 'compileTemplates')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setupServiceStub = sinon.stub(aliyunDeployFunction, 'setupService')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         uploadArtifactsStub = sinon.stub(aliyunDeployFunction, 'uploadArtifacts')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setupFunctionsStub = sinon.stub(aliyunDeployFunction, 'setupFunctions')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setupEventsStub = sinon.stub(aliyunDeployFunction, 'setupEvents')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
       });
 
       afterEach(() => {
@@ -245,38 +244,38 @@ describe('AliyunDeployFunction', () => {
     });
 
     it('should set up service from scratch', () => {
-      getLogProjectStub.returns(BbPromise.resolve(undefined));
-      createLogProjectStub.returns(BbPromise.resolve(fullLogProject));
-      getLogStoreStub.returns(BbPromise.resolve(undefined));
-      createLogStoreStub.returns(BbPromise.resolve(fullLogStore));
-      getLogIndexStub.returns(BbPromise.resolve(undefined));
-      createLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+      getLogProjectStub.returns(Promise.resolve(undefined));
+      createLogProjectStub.returns(Promise.resolve(fullLogProject));
+      getLogStoreStub.returns(Promise.resolve(undefined));
+      createLogStoreStub.returns(Promise.resolve(fullLogStore));
+      getLogIndexStub.returns(Promise.resolve(undefined));
+      createLogIndexStub.returns(Promise.resolve(fullLogIndex));
 
-      getRoleStub.returns(BbPromise.resolve(undefined));
-      createRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
-      createRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
-      getPolicyStub.returns(BbPromise.resolve(undefined));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve(undefined));
+      createRoleStub.onCall(0).returns(Promise.resolve(fullExecRole));
+      createRoleStub.onCall(1).returns(Promise.resolve(fullRole));
+      getPolicyStub.returns(Promise.resolve(undefined));
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      createServiceStub.returns(BbPromise.resolve(fullService));
-      getBucketStub.returns(BbPromise.resolve(undefined));
-      createBucketStub.returns(BbPromise.resolve());
-      uploadObjectStub.returns(BbPromise.resolve());
-      getFunctionStub.returns(BbPromise.resolve(undefined));
-      updateFunctionStub.returns(BbPromise.resolve());
-      createFunctionStub.returns(BbPromise.resolve());
+      getServiceStub.returns(Promise.resolve(undefined));
+      createServiceStub.returns(Promise.resolve(fullService));
+      getBucketStub.returns(Promise.resolve(undefined));
+      createBucketStub.returns(Promise.resolve());
+      uploadObjectStub.returns(Promise.resolve());
+      getFunctionStub.returns(Promise.resolve(undefined));
+      updateFunctionStub.returns(Promise.resolve());
+      createFunctionStub.returns(Promise.resolve());
 
-      getApiGroupStub.returns(BbPromise.resolve(undefined));
-      createApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve([]));
-      updateApiStub.returns(BbPromise.resolve());
-      createApiStub.returns(BbPromise.resolve(fullApis[1]));
-      deployApiStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(undefined));
+      createApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve([]));
+      updateApiStub.returns(Promise.resolve());
+      createApiStub.returns(Promise.resolve(fullApis[1]));
+      deployApiStub.returns(Promise.resolve());
 
-      getTriggerStub.returns(BbPromise.resolve());
+      getTriggerStub.returns(Promise.resolve());
 
       const logs = [
         'Packaging function: postTest...',
@@ -324,50 +323,50 @@ describe('AliyunDeployFunction', () => {
     });
 
     it('should handle existing service ', () => {
-      getLogProjectStub.returns(BbPromise.resolve(fullLogProject));
-      createLogProjectStub.returns(BbPromise.resolve());
-      getLogStoreStub.returns(BbPromise.resolve(fullLogStore));
-      createLogStoreStub.returns(BbPromise.resolve());
-      getLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
-      createLogIndexStub.returns(BbPromise.resolve());
+      getLogProjectStub.returns(Promise.resolve(fullLogProject));
+      createLogProjectStub.returns(Promise.resolve());
+      getLogStoreStub.returns(Promise.resolve(fullLogStore));
+      createLogStoreStub.returns(Promise.resolve());
+      getLogIndexStub.returns(Promise.resolve(fullLogIndex));
+      createLogIndexStub.returns(Promise.resolve());
 
-      getRoleStub.onCall(0).returns(BbPromise.resolve(fullExecRole));
-      getRoleStub.onCall(1).returns(BbPromise.resolve(fullRole));
-      createRoleStub.returns(BbPromise.resolve());
-      getPolicyStub.returns(BbPromise.resolve({
+      getRoleStub.onCall(0).returns(Promise.resolve(fullExecRole));
+      getRoleStub.onCall(1).returns(Promise.resolve(fullRole));
+      createRoleStub.returns(Promise.resolve());
+      getPolicyStub.returns(Promise.resolve({
         PolicyType: 'Custom',
         PolicyName: execRole.Policies[0].PolicyName
       }));
-      createPolicyStub.returns(BbPromise.resolve({}));
-      getPoliciesForRoleStub.onCall(0).returns(BbPromise.resolve(execRole.Policies));
-      getPoliciesForRoleStub.onCall(1).returns(BbPromise.resolve(role.Policies));
-      attachPolicyToRoleStub.returns(BbPromise.resolve());
+      createPolicyStub.returns(Promise.resolve({}));
+      getPoliciesForRoleStub.onCall(0).returns(Promise.resolve(execRole.Policies));
+      getPoliciesForRoleStub.onCall(1).returns(Promise.resolve(role.Policies));
+      attachPolicyToRoleStub.returns(Promise.resolve());
 
-      getServiceStub.returns(BbPromise.resolve(fullService));
-      createServiceStub.returns(BbPromise.resolve(fullService));
-      getBucketStub.returns(BbPromise.resolve({
+      getServiceStub.returns(Promise.resolve(fullService));
+      createServiceStub.returns(Promise.resolve(fullService));
+      getBucketStub.returns(Promise.resolve({
         name: 'sls-my-service',
         region: 'cn-shanghai'
       }));
-      createBucketStub.returns(BbPromise.resolve());
-      uploadObjectStub.returns(BbPromise.resolve());
+      createBucketStub.returns(Promise.resolve());
+      uploadObjectStub.returns(Promise.resolve());
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
-        .returns(BbPromise.resolve(functions[0]));
+        .returns(Promise.resolve(functions[0]));
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
-        .returns(BbPromise.resolve(functions[1]));
-      updateFunctionStub.returns(BbPromise.resolve());
-      createFunctionStub.returns(BbPromise.resolve());
+        .returns(Promise.resolve(functions[1]));
+      updateFunctionStub.returns(Promise.resolve());
+      createFunctionStub.returns(Promise.resolve());
 
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      createApiGroupStub.returns(BbPromise.resolve());
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      createApiStub.returns(BbPromise.resolve());
-      updateApiStub.returns(BbPromise.resolve(fullApis[1]));
-      deployApiStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      createApiGroupStub.returns(Promise.resolve());
+      getApisStub.returns(Promise.resolve(fullApis));
+      createApiStub.returns(Promise.resolve());
+      updateApiStub.returns(Promise.resolve(fullApis[1]));
+      deployApiStub.returns(Promise.resolve());
 
-      getTriggerStub.returns(BbPromise.resolve());
+      getTriggerStub.returns(Promise.resolve());
 
       const logs = [
         'Packaging function: postTest...',

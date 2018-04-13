@@ -5,7 +5,6 @@
 const path = require('path');
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
@@ -42,9 +41,9 @@ describe('setupFunctions', () => {
 
     beforeEach(() => {
       checkExistingFunctionsStub = sinon.stub(aliyunDeploy, 'checkExistingFunctions')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       createOrUpdateFunctionsStub = sinon.stub(aliyunDeploy, 'createOrUpdateFunctions')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -86,16 +85,16 @@ describe('setupFunctions', () => {
     it('should create and update functions according to the templates', () => {
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
-        .returns(BbPromise.resolve(functions[0]));
+        .returns(Promise.resolve(functions[0]));
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
-        .returns(BbPromise.resolve(undefined));
+        .returns(Promise.resolve(undefined));
       getFunctionStub
         .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
-        .returns(BbPromise.resolve(undefined));
+        .returns(Promise.resolve(undefined));
 
-      updateFunctionStub.returns(BbPromise.resolve());
-      createFunctionStub.returns(BbPromise.resolve());
+      updateFunctionStub.returns(Promise.resolve());
+      createFunctionStub.returns(Promise.resolve());
       return aliyunDeploy.setupFunctions().then(() => {
         expect(getFunctionStub.callCount).toEqual(3);
         expect(getFunctionStub.calledWithExactly('my-service-dev', 'my-service-dev-postTest')).toEqual(true);

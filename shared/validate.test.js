@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const validate = require('./validate');
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -33,11 +32,11 @@ describe('Validate', () => {
 
     beforeEach(() => {
       validateServicePathStub = sinon.stub(aliyunCommand, 'validateServicePath')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       validateServiceNameStub = sinon.stub(aliyunCommand, 'validateServiceName')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       validateHandlersStub = sinon.stub(aliyunCommand, 'validateHandlers')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {

@@ -58,6 +58,6 @@ module.exports = {
     }
 
     this.serverless.cli.consoleLog(message);
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };

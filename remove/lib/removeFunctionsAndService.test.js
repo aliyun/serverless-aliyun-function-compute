@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
@@ -46,7 +45,7 @@ describe('removeFunctionsAndService', () => {
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
-      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
+      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(Promise.resolve());
       aliyunRemove.fcService = undefined;
       aliyunRemove.fcFunctions = [];
     });
@@ -62,8 +61,8 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
       aliyunRemove.fcService = fullService;
       aliyunRemove.fcFunctions = fullFunctions;
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
       return aliyunRemove.removeFunctionsAndService().then(() => {
         expect(deleteFunctionStub.callCount).toEqual(3);
@@ -111,8 +110,8 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
       aliyunRemove.fcService = fullService;
       aliyunRemove.fcFunctions = [fullFunctions[0]];
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
       return aliyunRemove.removeFunctionsAndService().then(() => {
         expect(deleteFunctionStub.calledOnce).toEqual(true);
@@ -146,8 +145,8 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
       aliyunRemove.fcService = undefined;
       aliyunRemove.fcFunctions = [];
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
       return aliyunRemove.removeFunctionsAndService().then(() => {
         expect(deleteFunctionStub.called).toEqual(false);

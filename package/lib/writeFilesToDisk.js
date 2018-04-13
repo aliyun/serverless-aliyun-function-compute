@@ -4,8 +4,6 @@
 
 const path = require('path');
 
-const BbPromise = require('bluebird');
-
 module.exports = {
   saveCreateTemplateFile() {
     const packagePath =
@@ -15,7 +13,7 @@ module.exports = {
     this.serverless.utils.writeFileSync(filePath,
       this.serverless.service.provider.compiledConfigurationTemplate);
 
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 
   saveUpdateTemplateFile() {
@@ -26,6 +24,6 @@ module.exports = {
     this.serverless.utils.writeFileSync(filePath,
       this.serverless.service.provider.compiledConfigurationTemplate);
 
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };

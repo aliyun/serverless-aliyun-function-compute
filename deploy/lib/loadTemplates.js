@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-const BbPromise = require('bluebird');
 
 module.exports = {
   loadTemplates() {
@@ -15,6 +14,6 @@ module.exports = {
       update: this.serverless.utils.readFileSync(updateFilePath)
     };
 
-    return BbPromise.resolve();
+    return Promise.resolve();
   }
 };
