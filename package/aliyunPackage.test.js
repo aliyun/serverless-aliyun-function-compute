@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 const fs = require('fs');
 
@@ -76,21 +75,21 @@ describe('AliyunPackage', () => {
 
       beforeEach(() => {
         cleanupServerlessDirStub = sinon.stub(aliyunPackage, 'cleanupServerlessDir')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         validateStub = sinon.stub(aliyunPackage, 'validate')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunPackage, 'setDefaults')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         prepareDeploymentStub = sinon.stub(aliyunPackage, 'prepareDeployment')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         saveCreateTemplateFileStub = sinon.stub(aliyunPackage, 'saveCreateTemplateFile')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         compileFunctionsStub = sinon.stub(aliyunPackage, 'compileFunctions')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         mergeServiceResourcesStub = sinon.stub(aliyunPackage, 'mergeServiceResources')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         saveUpdateTemplateFileStub = sinon.stub(aliyunPackage, 'saveUpdateTemplateFile')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
       });
 
       afterEach(() => {

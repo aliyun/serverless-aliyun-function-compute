@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
@@ -54,8 +53,8 @@ describe('removeFunctionsAndService', () => {
 
     it('should get existing functions and service', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getServiceStub.returns(BbPromise.resolve(fullService));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+      getServiceStub.returns(Promise.resolve(fullService));
+      getFunctionsStub.returns(Promise.resolve(fullFunctions));
 
       return aliyunRemove.getFunctionsAndService().then(() => {
         expect(getServiceStub.calledOnce).toEqual(true);
@@ -72,8 +71,8 @@ describe('removeFunctionsAndService', () => {
 
     it('should handle non-existing service', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
+      getServiceStub.returns(Promise.resolve(undefined));
+      getFunctionsStub.returns(Promise.resolve([]));
 
       return aliyunRemove.getFunctionsAndService().then(() => {
         expect(getServiceStub.calledOnce).toEqual(true);

@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 const path = require('path');
 
 const AliyunProvider = require('../provider/aliyunProvider');
@@ -67,17 +66,17 @@ describe('AliyunRemove', () => {
 
       beforeEach(() => {
         validateStub = sinon.stub(aliyunRemove, 'validate')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunRemove, 'setDefaults')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         getFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'getFunctionsAndService')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         removeEventsStub = sinon.stub(aliyunRemove, 'removeEvents')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         removeFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'removeFunctionsAndService')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         removeArtifactsStub = sinon.stub(aliyunRemove, 'removeArtifacts')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
       });
 
       afterEach(() => {
@@ -245,43 +244,43 @@ describe('AliyunRemove', () => {
 
       aliyunRemove.serverless.service.functions = functionDefs;
 
-      getServiceStub.returns(BbPromise.resolve(fullService));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+      getServiceStub.returns(Promise.resolve(fullService));
+      getFunctionsStub.returns(Promise.resolve(fullFunctions));
 
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      getDeployedApisStub.returns(BbPromise.resolve(fullApis));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve(fullApis));
+      getDeployedApisStub.returns(Promise.resolve(fullApis));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
-        .returns(BbPromise.resolve(fullTriggers));
-      deleteTriggerStub.returns(BbPromise.resolve());
+        .returns(Promise.resolve(fullTriggers));
+      deleteTriggerStub.returns(Promise.resolve());
 
-      getRoleStub.withArgs(role.RoleName).returns(BbPromise.resolve(fullRole));
-      getRoleStub.withArgs(execRole.RoleName).returns(BbPromise.resolve(fullExecRole));
+      getRoleStub.withArgs(role.RoleName).returns(Promise.resolve(fullRole));
+      getRoleStub.withArgs(execRole.RoleName).returns(Promise.resolve(fullExecRole));
 
-      getPoliciesForRoleStub.withArgs(role.RoleName).returns(BbPromise.resolve(role.Policies));
-      getPoliciesForRoleStub.withArgs(execRole.RoleName).returns(BbPromise.resolve(execRole.Policies));
+      getPoliciesForRoleStub.withArgs(role.RoleName).returns(Promise.resolve(role.Policies));
+      getPoliciesForRoleStub.withArgs(execRole.RoleName).returns(Promise.resolve(execRole.Policies));
 
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
-      getBucketStub.returns(BbPromise.resolve(bucket));
-      getObjectsStub.returns(BbPromise.resolve(objects));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(bucket));
+      getObjectsStub.returns(Promise.resolve(objects));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
@@ -311,31 +310,31 @@ describe('AliyunRemove', () => {
 
       aliyunRemove.serverless.service.functions = functionDefs;
 
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
+      getServiceStub.returns(Promise.resolve(undefined));
+      getFunctionsStub.returns(Promise.resolve([]));
 
-      getApiGroupStub.returns(BbPromise.resolve(undefined));
-      getApisStub.returns(BbPromise.resolve([]));
-      getDeployedApisStub.returns(BbPromise.resolve([]));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(undefined));
+      getApisStub.returns(Promise.resolve([]));
+      getDeployedApisStub.returns(Promise.resolve([]));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
-      listTriggersStub.returns(BbPromise.resolve([]));
-      deleteTriggerStub.returns(BbPromise.resolve());
+      listTriggersStub.returns(Promise.resolve([]));
+      deleteTriggerStub.returns(Promise.resolve());
 
-      getRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve());
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
-      getBucketStub.returns(BbPromise.resolve(undefined));
-      getObjectsStub.returns(BbPromise.resolve([]));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(undefined));
+      getObjectsStub.returns(Promise.resolve([]));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
@@ -476,39 +475,39 @@ describe('AliyunRemove', () => {
 
       aliyunRemove.serverless.service.functions = functionDefs;
 
-      getServiceStub.returns(BbPromise.resolve(fullService));
-      getFunctionsStub.returns(BbPromise.resolve(fullFunctions));
+      getServiceStub.returns(Promise.resolve(fullService));
+      getFunctionsStub.returns(Promise.resolve(fullFunctions));
 
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      getDeployedApisStub.returns(BbPromise.resolve(fullApis));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve(fullApis));
+      getDeployedApisStub.returns(Promise.resolve(fullApis));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
-        .returns(BbPromise.resolve(fullTriggers));
-      deleteTriggerStub.returns(BbPromise.resolve());
+        .returns(Promise.resolve(fullTriggers));
+      deleteTriggerStub.returns(Promise.resolve());
 
-      getRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve());
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve());
+      getPoliciesForRoleStub.returns(Promise.resolve());
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
-      getBucketStub.returns(BbPromise.resolve(bucket));
-      getObjectsStub.returns(BbPromise.resolve(objects));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(bucket));
+      getObjectsStub.returns(Promise.resolve(objects));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())
@@ -542,31 +541,31 @@ describe('AliyunRemove', () => {
 
       aliyunRemove.serverless.service.functions = functionDefs;
 
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      getFunctionsStub.returns(BbPromise.resolve([]));
+      getServiceStub.returns(Promise.resolve(undefined));
+      getFunctionsStub.returns(Promise.resolve([]));
 
-      getApiGroupStub.returns(BbPromise.resolve(undefined));
-      getApisStub.returns(BbPromise.resolve([]));
-      getDeployedApisStub.returns(BbPromise.resolve([]));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(undefined));
+      getApisStub.returns(Promise.resolve([]));
+      getDeployedApisStub.returns(Promise.resolve([]));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
-      listTriggersStub.returns(BbPromise.resolve([]));
-      deleteTriggerStub.returns(BbPromise.resolve());
+      listTriggersStub.returns(Promise.resolve([]));
+      deleteTriggerStub.returns(Promise.resolve());
 
-      getRoleStub.returns(BbPromise.resolve());
-      getPoliciesForRoleStub.returns(BbPromise.resolve([]));
-      detachPolicyFromRoleStub.returns(BbPromise.resolve());
-      deleteRoleStub.returns(BbPromise.resolve());
+      getRoleStub.returns(Promise.resolve());
+      getPoliciesForRoleStub.returns(Promise.resolve([]));
+      detachPolicyFromRoleStub.returns(Promise.resolve());
+      deleteRoleStub.returns(Promise.resolve());
 
-      deleteFunctionStub.returns(BbPromise.resolve());
-      deleteServiceStub.returns(BbPromise.resolve());
+      deleteFunctionStub.returns(Promise.resolve());
+      deleteServiceStub.returns(Promise.resolve());
 
-      getBucketStub.returns(BbPromise.resolve(undefined));
-      getObjectsStub.returns(BbPromise.resolve([]));
-      deleteObjectsStub.returns(BbPromise.resolve());
-      deleteBucketStub.returns(BbPromise.resolve());
+      getBucketStub.returns(Promise.resolve(undefined));
+      getObjectsStub.returns(Promise.resolve([]));
+      deleteObjectsStub.returns(Promise.resolve());
+      deleteBucketStub.returns(Promise.resolve());
 
       return aliyunRemove.hooks['before:remove:remove']()
         .then(() => aliyunRemove.hooks['remove:remove']())

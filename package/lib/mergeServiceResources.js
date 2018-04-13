@@ -3,20 +3,19 @@
 /* eslint no-use-before-define: 0 */
 
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 
 module.exports = {
   mergeServiceResources() {
     const resources = this.serverless.service.resources;
 
-    if ((typeof resources === 'undefined') || _.isEmpty(resources)) {return BbPromise.resolve();}
+    if ((typeof resources === 'undefined') || _.isEmpty(resources)) {return Promise.resolve();}
 
     _.mergeWith(
       this.serverless.service.provider.compiledConfigurationTemplate,
       { Resources: resources && resources.resources },
       mergeCustomizer);
 
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };
 

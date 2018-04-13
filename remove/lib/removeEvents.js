@@ -45,7 +45,7 @@ module.exports = {
 
   getApis() {
     if (!this.apiGroup) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const groupId = this.apiGroup.GroupId;
 
@@ -57,7 +57,7 @@ module.exports = {
 
   getDeployedApis() {
     if (!this.apiGroup || !this.apis.length) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const groupId = this.apiGroup.GroupId;
     return this.provider.getDeployedApis({ GroupId: groupId }).then((deployedApis) => {
@@ -110,7 +110,7 @@ module.exports = {
   removeTriggersIfNeeded() {
     if (!this.fcService || !this.fcFunctions.length) {
       this.serverless.cli.log(`No triggers to remove.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     const serviceName = this.fcService.serviceName;

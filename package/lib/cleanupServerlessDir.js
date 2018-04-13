@@ -1,6 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
 const path = require('path');
 const fse = require('fs-extra');
 
@@ -14,6 +13,6 @@ module.exports = {
       }
     }
 
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };

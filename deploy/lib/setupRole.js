@@ -42,7 +42,7 @@ module.exports = {
 
   createPolicyIfNeeded(policy) {
     if (policy.PolicyType === 'System') {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const policyName = policy.PolicyName;
     return this.provider.getPolicy(policyName, 'Custom')

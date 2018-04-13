@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 const chalk = require('chalk');
 
 const path = require('path');
@@ -52,7 +51,7 @@ describe('DisplayServiceLogs', () => {
     });
 
     it('should print relevant data on the console', () => {
-      getLogsIfAvailableStub.returns(BbPromise.resolve(logs));
+      getLogsIfAvailableStub.returns(Promise.resolve(logs));
 
       let expectedOutput = [
         `${chalk.yellow.underline('Service Information')}`,
@@ -81,7 +80,7 @@ describe('DisplayServiceLogs', () => {
     });
 
     it('should print logs if functions are not yet deployed', () => {
-      getLogsIfAvailableStub.returns(BbPromise.resolve([]));
+      getLogsIfAvailableStub.returns(Promise.resolve([]));
 
       let expectedOutput = [
         `${chalk.yellow.underline('Service Information')}`,
@@ -123,7 +122,7 @@ describe('DisplayServiceLogs', () => {
     });
 
     it('should print relevant data on the console', () => {
-      getLogsIfAvailableStub.returns(BbPromise.resolve(logs.slice(0, 2)));
+      getLogsIfAvailableStub.returns(Promise.resolve(logs.slice(0, 2)));
 
       let expectedOutput = [
         `${chalk.yellow.underline('Service Information')}`,

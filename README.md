@@ -29,6 +29,10 @@ The structure of the project should look something like this:
 └── serverless.yml
 ```
 
+```yaml
+$ serverless plugin install --name serverless-aliyun-function-compute
+```
+
 `serverless.yml`:
 
 ```yaml

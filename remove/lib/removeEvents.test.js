@@ -4,7 +4,6 @@
 
 const sinon = require('sinon');
 const path = require('path');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
@@ -43,11 +42,11 @@ describe('removeApisIfNeeded', () => {
 
     beforeEach(() => {
       removeApisIfNeededStub = sinon.stub(aliyunRemove, 'removeApisIfNeeded')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       removeTriggersIfNeededStub = sinon.stub(aliyunRemove, 'removeTriggersIfNeeded')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       removeInvokeRoleStub = sinon.stub(aliyunRemove, 'removeInvokeRole')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -78,7 +77,7 @@ describe('removeApisIfNeeded', () => {
     let removeRoleAndPoliciesStub;
 
     beforeEach(() => {
-      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(BbPromise.resolve());
+      removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -130,12 +129,12 @@ describe('removeApisIfNeeded', () => {
 
     it('should remove existing events', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      getDeployedApisStub.returns(BbPromise.resolve(fullApis));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve(fullApis));
+      getDeployedApisStub.returns(Promise.resolve(fullApis));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(getApiGroupStub.calledOnce).toEqual(true);
@@ -191,12 +190,12 @@ describe('removeApisIfNeeded', () => {
 
     it('should only abolish deployed apis', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve(fullApis));
-      getDeployedApisStub.returns(BbPromise.resolve([fullApis[0]]));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve(fullApis));
+      getDeployedApisStub.returns(Promise.resolve([fullApis[0]]));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.calledAfter(getDeployedApisStub)).toEqual(true);
@@ -233,12 +232,12 @@ describe('removeApisIfNeeded', () => {
 
     it('should only delete existing apis', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getApiGroupStub.returns(BbPromise.resolve(fullGroup));
-      getApisStub.returns(BbPromise.resolve([fullApis[0]]));
-      getDeployedApisStub.returns(BbPromise.resolve([]));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(fullGroup));
+      getApisStub.returns(Promise.resolve([fullApis[0]]));
+      getDeployedApisStub.returns(Promise.resolve([]));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.called).toEqual(false);
@@ -265,12 +264,12 @@ describe('removeApisIfNeeded', () => {
 
     it('should not do anything if no apis have been setup before', () => {
       aliyunRemove.serverless.service.functions = functionDefs;
-      getApiGroupStub.returns(BbPromise.resolve(undefined));
-      getApisStub.returns(BbPromise.resolve([]));
-      getDeployedApisStub.returns(BbPromise.resolve([]));
-      abolishApiStub.returns(BbPromise.resolve());
-      deleteApiStub.returns(BbPromise.resolve());
-      deleteApiGroupStub.returns(BbPromise.resolve());
+      getApiGroupStub.returns(Promise.resolve(undefined));
+      getApisStub.returns(Promise.resolve([]));
+      getDeployedApisStub.returns(Promise.resolve([]));
+      abolishApiStub.returns(Promise.resolve());
+      deleteApiStub.returns(Promise.resolve());
+      deleteApiGroupStub.returns(Promise.resolve());
 
       return aliyunRemove.removeApisIfNeeded().then(() => {
         expect(abolishApiStub.called).toEqual(false);
@@ -314,14 +313,14 @@ describe('removeApisIfNeeded', () => {
 
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-getTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-postTest')
-        .returns(BbPromise.resolve([]));
+        .returns(Promise.resolve([]));
       listTriggersStub
         .withArgs('my-service-dev', 'my-service-dev-ossTriggerTest')
-        .returns(BbPromise.resolve(fullTriggers));
-      deleteTriggerStub.returns(BbPromise.resolve());
+        .returns(Promise.resolve(fullTriggers));
+      deleteTriggerStub.returns(Promise.resolve());
 
       return aliyunRemove.removeTriggersIfNeeded().then(() => {
         expect(listTriggersStub.callCount).toEqual(fullFunctions.length);
@@ -354,8 +353,8 @@ describe('removeApisIfNeeded', () => {
       aliyunRemove.fcService = undefined;
       aliyunRemove.fcFunctions = [];
 
-      listTriggersStub.returns(BbPromise.resolve([]));
-      deleteTriggerStub.returns(BbPromise.resolve());
+      listTriggersStub.returns(Promise.resolve([]));
+      deleteTriggerStub.returns(Promise.resolve());
 
       return aliyunRemove.removeTriggersIfNeeded().then(() => {
         expect(listTriggersStub.called).toEqual(false);

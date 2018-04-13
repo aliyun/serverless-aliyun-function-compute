@@ -5,7 +5,6 @@
 const path = require('path');
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunDeploy = require('../aliyunDeploy');
@@ -49,15 +48,15 @@ describe('setupServices', () => {
 
     beforeEach(() => {
       createLogConfigIfNotExistsStub = sinon.stub(aliyunDeploy, 'createLogConfigIfNotExists')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       setupExecRoleStub = sinon.stub(aliyunDeploy, 'setupExecRole')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       checkForExistingServiceStub = sinon.stub(aliyunDeploy, 'checkForExistingService')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       createServiceIfNotExistsStub = sinon.stub(aliyunDeploy, 'createServiceIfNotExists')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
       createBucketIfNotExistsStub = sinon.stub(aliyunDeploy, 'createBucketIfNotExists')
-        .returns(BbPromise.resolve());
+        .returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -130,19 +129,19 @@ describe('setupServices', () => {
     });
 
     it('should set up service from scratch', () => {
-      setupRoleStub.returns(BbPromise.resolve(fullExecRole));
-      getServiceStub.returns(BbPromise.resolve(undefined));
-      createServiceStub.returns(BbPromise.resolve(fullService));
-      getBucketStub.returns(BbPromise.resolve(undefined));
-      createBucketStub.returns(BbPromise.resolve());
+      setupRoleStub.returns(Promise.resolve(fullExecRole));
+      getServiceStub.returns(Promise.resolve(undefined));
+      createServiceStub.returns(Promise.resolve(fullService));
+      getBucketStub.returns(Promise.resolve(undefined));
+      createBucketStub.returns(Promise.resolve());
       resetOssClientStub.returns();
 
-      getLogProjectStub.returns(BbPromise.resolve(undefined));
-      createLogProjectStub.returns(BbPromise.resolve(fullLogProject));
-      getLogStoreStub.returns(BbPromise.resolve(undefined));
-      createLogStoreStub.returns(BbPromise.resolve(fullLogStore));
-      getLogIndexStub.returns(BbPromise.resolve(undefined));
-      createLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
+      getLogProjectStub.returns(Promise.resolve(undefined));
+      createLogProjectStub.returns(Promise.resolve(fullLogProject));
+      getLogStoreStub.returns(Promise.resolve(undefined));
+      createLogStoreStub.returns(Promise.resolve(fullLogStore));
+      getLogIndexStub.returns(Promise.resolve(undefined));
+      createLogIndexStub.returns(Promise.resolve(fullLogIndex));
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);
@@ -217,21 +216,21 @@ describe('setupServices', () => {
     });
 
     it('should handle existing service ', () => {
-      setupRoleStub.returns(BbPromise.resolve(fullExecRole));
-      getServiceStub.returns(BbPromise.resolve(fullService));
-      createServiceStub.returns(BbPromise.resolve(fullService));
-      getBucketStub.returns(BbPromise.resolve({
+      setupRoleStub.returns(Promise.resolve(fullExecRole));
+      getServiceStub.returns(Promise.resolve(fullService));
+      createServiceStub.returns(Promise.resolve(fullService));
+      getBucketStub.returns(Promise.resolve({
         name: 'sls-my-service',
         region: 'cn-shanghai'
       }));
-      createBucketStub.returns(BbPromise.resolve());
+      createBucketStub.returns(Promise.resolve());
       resetOssClientStub.returns();
-      getLogProjectStub.returns(BbPromise.resolve(fullLogProject));
-      createLogProjectStub.returns(BbPromise.resolve());
-      getLogStoreStub.returns(BbPromise.resolve(fullLogStore));
-      createLogStoreStub.returns(BbPromise.resolve());
-      getLogIndexStub.returns(BbPromise.resolve(fullLogIndex));
-      createLogIndexStub.returns(BbPromise.resolve());
+      getLogProjectStub.returns(Promise.resolve(fullLogProject));
+      createLogProjectStub.returns(Promise.resolve());
+      getLogStoreStub.returns(Promise.resolve(fullLogStore));
+      createLogStoreStub.returns(Promise.resolve());
+      getLogIndexStub.returns(Promise.resolve(fullLogIndex));
+      createLogIndexStub.returns(Promise.resolve());
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);

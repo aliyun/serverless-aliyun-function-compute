@@ -27,7 +27,7 @@ module.exports = {
 
   getFunctions() {
     if (!this.fcService) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const serviceName = this.fcService.serviceName;
     return this.provider.getFunctions(serviceName).then((functions) => {
@@ -52,7 +52,7 @@ module.exports = {
 
   getApis() {
     if (!this.apiGroup) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const groupId = this.apiGroup.GroupId;
 
@@ -64,7 +64,7 @@ module.exports = {
 
   getVerboseApiInfo() {
     if (!this.apiGroup || !this.apis.length) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     return BbPromise.map(this.apis, (api, index) => {
@@ -79,7 +79,7 @@ module.exports = {
     data.service = this.serverless.service.service;
     data.stage = this.options.stage;
     data.region = this.options.region;
-    return BbPromise.resolve(data);
+    return Promise.resolve(data);
   },
 
   printInfo(data) {
@@ -126,6 +126,6 @@ module.exports = {
     // TODO(joyeecheung): display triggers
 
     this.serverless.cli.consoleLog(message);
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };

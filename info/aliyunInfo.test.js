@@ -3,7 +3,6 @@
 'use strict';
 
 const sinon = require('sinon');
-const BbPromise = require('bluebird');
 
 const AliyunProvider = require('../provider/aliyunProvider');
 const AliyunInfo = require('./aliyunInfo');
@@ -45,11 +44,11 @@ describe('AliyunInfo', () => {
 
       beforeEach(() => {
         validateStub = sinon.stub(aliyunInfo, 'validate')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunInfo, 'setDefaults')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
         displayServiceInfoStub = sinon.stub(aliyunInfo, 'displayServiceInfo')
-          .returns(BbPromise.resolve());
+          .returns(Promise.resolve());
       });
 
       afterEach(() => {

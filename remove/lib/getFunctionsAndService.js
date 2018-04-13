@@ -21,7 +21,7 @@ module.exports = {
 
   getFunctions() {
     if (!this.fcService) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const serviceName = this.fcService.serviceName;
     return this.provider.getFunctions(serviceName).then((functions) => {

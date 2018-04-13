@@ -5,7 +5,7 @@ const BbPromise = require('bluebird');
 module.exports = {
   removeRoleAndPolicies(roleName) {
     if (!this.options['remove-roles']) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
     const roleSym = Symbol(roleName);
     const policySym = Symbol(roleName + '-policies');

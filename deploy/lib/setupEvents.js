@@ -32,7 +32,7 @@ module.exports = {
 
   createApisIfNeeded() {
     if (!this.apis.length) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     return BbPromise.bind(this)
@@ -44,7 +44,7 @@ module.exports = {
 
   createTriggersIfNeeded() {
     if (!this.triggers.length) {
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     return BbPromise.bind(this)
@@ -56,7 +56,7 @@ module.exports = {
     const groupResource = this.templates.update.Resources[this.provider.getApiGroupLogicalId()];
 
     if (!groupResource) {
-      return BbPromise.resolve();  // No API needed
+      return Promise.resolve();  // No API needed
     }
     const group = groupResource.Properties;
 

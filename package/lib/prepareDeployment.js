@@ -3,7 +3,6 @@
 /* eslint no-use-before-define: 0 */
 
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 
 module.exports = {
   prepareDeployment() {
@@ -47,6 +46,6 @@ module.exports = {
     resources[serviceId] = this.provider.getServiceResource();
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
-    return BbPromise.resolve();
+    return Promise.resolve();
   },
 };

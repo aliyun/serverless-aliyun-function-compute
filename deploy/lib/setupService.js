@@ -114,7 +114,7 @@ module.exports = {
 
     if (foundService) {
       this.serverless.cli.log(`Service ${service.name} already exists.`);
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
