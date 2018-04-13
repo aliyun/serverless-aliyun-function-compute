@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const displayServiceInfo = require('./lib/displayServiceInfo');
@@ -20,15 +18,17 @@ class AliyunInfo {
     );
 
     this.hooks = {
-      'before:info:info': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:info:info': async () => {
+        await this.validate();
+        await this.setDefaults();
+      },
 
       // 'deploy:deploy': () => BbPromise.bind(this)
       //   .then(this.displayServiceInfo),
 
-      'info:info': () => BbPromise.bind(this)
-        .then(this.displayServiceInfo),
+      'info:info': async () => {
+        await this.displayServiceInfo();
+      },
     };
   }
 }
