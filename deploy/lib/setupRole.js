@@ -3,13 +3,13 @@
 const BbPromise = require('bluebird');
 
 module.exports = {
-  setupRole(role) {
+  async setupRole(role) {
     const roleSym = Symbol('role');
 
-    return this.createRoleIfNotExists(role, roleSym)
-      .then(() => this.createPoliciesIfNeeded(role, roleSym))
-      .then(() => this.attachPoliciesIfNeeded(role, roleSym))
-      .then(() => this[roleSym]);
+    await this.createRoleIfNotExists(role, roleSym);
+    await this.createPoliciesIfNeeded(role, roleSym);
+    await this.attachPoliciesIfNeeded(role, roleSym);
+    return this[roleSym];
   },
 
   createRoleIfNotExists(role, roleSym) {
