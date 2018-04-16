@@ -681,13 +681,15 @@ class AliyunProvider {
     }
   }
 
-  getLogProject(projectName) {
-    return this.slsClient.getProject(projectName).catch((err) => {
+  async getLogProject(projectName) {
+    try {
+      return await this.slsClient.getProject(projectName);
+    } catch (err) {
       if (err.code === 'ProjectNotExist') {
         return undefined;
       }
       throw err;
-    });
+    }
   }
 
   sleep(timeout) {
@@ -696,67 +698,72 @@ class AliyunProvider {
     });
   }
 
-  createLogProject(projectName, project) {
-    return this.slsClient.createProject(projectName, {
+  async createLogProject(projectName, project) {
+    await this.slsClient.createProject(projectName, {
       description: project.description
-    })
-      .then(this.sleep(PROJECT_DELAY))
-      .then(() => this.getLogProject(projectName));
+    });
+    await this.sleep(PROJECT_DELAY);
+    return this.getLogProject(projectName);
   }
 
   /**
    * @param {string} projectName
    * @return {logstores: [], total: number, count: number}
    */
-  getLogStoresForProject(projectName) {
-    return this.slsClient.listLogstore(projectName)
-      .then((res) => res.logstores);
+  async getLogStoresForProject(projectName) {
+    const res = await this.slsClient.listLogstore(projectName);
+    return res.logstores;
   }
 
-  getLogStore(projectName, storeName) {
-    return this.slsClient.getLogStore(projectName, storeName)
-      .catch((err) => {
-        if (err.code === 'LogStoreNotExist') {
-          return undefined;
-        }
-        throw err;
-      });
+  async getLogStore(projectName, storeName) {
+    try {
+      return await this.slsClient.getLogStore(projectName, storeName)
+    } catch (err) {
+      if (err.code === 'LogStoreNotExist') {
+        return undefined;
+      }
+      throw err;
+    }
   }
 
-  createLogStore(projectName, storeName, store) {
-    return this.slsClient.createLogStore(projectName, storeName, store)
-      .then(this.getLogStore(projectName, storeName));
+  async createLogStore(projectName, storeName, store) {
+    await this.slsClient.createLogStore(projectName, storeName, store);
+    return this.getLogStore(projectName, storeName);
   }
 
-  getLogIndex(projectName, storeName) {
-    return this.slsClient.getIndexConfig(projectName, storeName)
-      .catch((err) => {
-        if (err.code === 'IndexConfigNotExist') {
-          return undefined;
-        }
-        throw err;
-      });
+  async getLogIndex(projectName, storeName) {
+    try {
+      return await this.slsClient.getIndexConfig(projectName, storeName);
+    } catch (err) {
+      if (err.code === 'IndexConfigNotExist') {
+        return undefined;
+      }
+      throw err;
+    }
   }
 
-  createLogIndex(projectName, storeName, index) {
-    return this.slsClient.createIndex(projectName, storeName, {
+  async createLogIndex(projectName, storeName, index) {
+    await this.slsClient.createIndex(projectName, storeName, {
       ttl: index.ttl,
       keys: index.keys,
       line: index.line
-    }).then(() => this.getLogIndex(projectName, storeName));
+    });
+    await this.getLogIndex(projectName, storeName);
   }
 
-  getLogsIfAvailable(projectName, storeName, days, query, count) {
+  async getLogsIfAvailable(projectName, storeName, days, query, count) {
     const from = new Date();
     const to = new Date(from);
     from.setDate(from.getDate() - days);
 
     const fullQuery = Object.keys(query)
       .map((key) => `${key}:${query[key]}`).join(' or ');
-    return this.slsClient.getLogs(projectName, storeName, from, to, {
-      query: fullQuery,
-      line: count
-    }).catch((err) => {
+    try {
+      return await this.slsClient.getLogs(projectName, storeName, from, to, {
+        query: fullQuery,
+        line: count
+      });
+    } catch (err) {
       if (err.code === 'IndexConfigNotExist' ||
         err.code === 'LogStoreNotExist' ||
         err.code === 'ProjectNotExist') {
@@ -764,7 +771,6 @@ class AliyunProvider {
       }
       throw err;
     }
-    );
   }
 
   /**
@@ -840,12 +846,13 @@ class AliyunProvider {
    * @param {string} serviceName
    * @return {ServiceResponse}
    */
-  getService(serviceName) {
-    return this.fcClient.getService(serviceName)
-      .catch((err) => {
-        if (err.code === 'ServiceNotFound') {return undefined;}
-        throw err;
-      });
+  async getService(serviceName) {
+    try {
+      return await this.fcClient.getService(serviceName);
+    } catch (err) {
+      if (err.code === 'ServiceNotFound') {return undefined;}
+      throw err;
+    }
   }
 
   /**
@@ -877,12 +884,15 @@ class AliyunProvider {
    * @param {string} functionName
    * @return {FunctionResponse}
    */
-  getFunction(serviceName, functionName) {
-    return this.fcClient.getFunction(serviceName, functionName)
-      .catch((err) => {
-        if (err.code === 'FunctionNotFound') {return undefined;}
-        throw err;
-      });
+  async getFunction(serviceName, functionName) {
+    try {
+      return await this.fcClient.getFunction(serviceName, functionName);
+    } catch (err) {
+      if (err.code === 'FunctionNotFound') {
+        return undefined;
+      }
+      throw err;
+    }
   }
 
   /**
@@ -914,12 +924,11 @@ class AliyunProvider {
    * @return {{functionName: string, functionId: string}}
    * TODO(joyeecheung): paging
    */
-  getFunctions(serviceName) {
-    return this.fcClient.listFunctions(serviceName).then((res) => {
-      const functions = res.functions;
-      if (!functions) {return [];}
-      return functions;
-    });
+  async getFunctions(serviceName) {
+    const res = await this.fcClient.listFunctions(serviceName);
+    const functions = res.functions;
+    if (!functions) {return [];}
+    return functions;
   }
 
   /**
@@ -972,8 +981,9 @@ class AliyunProvider {
       });
   }
 
-  listTriggers(serviceName, functionName) {
-    return this.fcClient.listTriggers(serviceName, functionName).then((res) => res.triggers || []);
+  async listTriggers(serviceName, functionName) {
+    const res = await this.fcClient.listTriggers(serviceName, functionName);
+    return res.triggers || [];
   }
 
   /**
@@ -1008,19 +1018,19 @@ class AliyunProvider {
    * @return {{GroupId: string, GroupName: string, SubDomain: string}}
    * https://help.aliyun.com/document_detail/43616.html
    */
-  getApiGroup(groupName) {
+  async getApiGroup(groupName) {
     // TODO(joyeecheung): pagination
-    return this.agClient.describeApiGroups({
+    const res = await this.agClient.describeApiGroups({
       GroupName: groupName
-    }).then((res) => {
-      if (res.TotalCount === 0) {
-        return undefined;
-      }
-      const groups = res.ApiGroupAttributes.ApiGroupAttribute;
-      const group = groups.find(
-        (item) => item.GroupName === groupName);
-      return group;
     });
+
+    if (res.TotalCount === 0) {
+      return undefined;
+    }
+    const groups = res.ApiGroupAttributes.ApiGroupAttribute;
+    const group = groups.find(
+      (item) => item.GroupName === groupName);
+    return group;
   }
 
   /**
@@ -1045,16 +1055,18 @@ class AliyunProvider {
    * @return {{RoleId: string, RoleName: string, Arn: string}}
    * https://help.aliyun.com/document_detail/28711.html
    */
-  getRole(roleName) {
-    return this.ramClient.getRole({
-      RoleName: roleName
-    }).then(
-      (res) => res.Role,
-      (err) => {
-        if (err.name === 'EntityNotExist.RoleError') {return undefined;}
-        throw err;
+  async getRole(roleName) {
+    try {
+      const res = await this.ramClient.getRole({
+        RoleName: roleName
+      });
+      return res.Role;
+    } catch (err) {
+      if (err.name === 'EntityNotExist.RoleError') {
+        return undefined;
       }
-    );
+      throw err;
+    }
   }
 
   deleteRole(roleName) {
@@ -1068,22 +1080,24 @@ class AliyunProvider {
    * @return {{RoleId: string, RoleName: string, Arn: string}}
    * https://help.aliyun.com/document_detail/28710.html
    */
-  createRole(role) {
-    return this.ramClient.createRole({
+  async createRole(role) {
+    const res = await this.ramClient.createRole({
       RoleName: role.RoleName,
       Description: role.Description,
       AssumeRolePolicyDocument: JSON.stringify(role.AssumeRolePolicyDocument)
-    }).then((res) => res.Role);
+    });
+    return res.Role;
   }
 
   /**
    * @param {string} roleName
    * @return {{PolicyName: string}[]}
    */
-  getPoliciesForRole(roleName) {
-    return this.ramClient.listPoliciesForRole({
+  async getPoliciesForRole(roleName) {
+    const res = await this.ramClient.listPoliciesForRole({
       RoleName: roleName
-    }).then((res) => res.Policies.Policy);
+    });
+    return res.Policies.Policy;
   }
 
   /**
@@ -1091,17 +1105,19 @@ class AliyunProvider {
    * @param {string} policyName
    * @param {'Custom' | 'System' } policyType
    */
-  getPolicy(policyName, policyType) {
-    return this.ramClient.getPolicy({
-      PolicyName: policyName,
-      PolicyType: policyType
-    }).then(
-      (res) => res.Policy,
-      (err) => {
-        if (err.name === 'EntityNotExist.PolicyError') {return undefined;}
-        throw err;
+  async getPolicy(policyName, policyType) {
+    try {
+      const res = await this.ramClient.getPolicy({
+        PolicyName: policyName,
+        PolicyType: policyType
+      });
+      return res.Policy;
+    } catch (err) {
+      if (err.name === 'EntityNotExist.PolicyError') {
+        return undefined;
       }
-    );
+      throw err;
+    }
   }
 
   /**
@@ -1146,17 +1162,17 @@ class AliyunProvider {
    * @returns {{GroupId: string, ApiName: string, ApiId: string}[]}
    * https://help.aliyun.com/document_detail/43626.html
    */
-  getApis(props) {
+  async getApis(props) {
     const query = Object.assign({}, props, { PageSize: 50 });
-    return this.agClient.describeApis(query)
-      .then((res) => {
-        if (!res.ApiSummarys) {return [];}
-        const apis = res.ApiSummarys.ApiSummary;
-        if (res.TotalCount > apis.length) {
-          // TODO(joyeecheung): pagination
-        }
-        return apis;
-      });
+    const res = await this.agClient.describeApis(query);
+    if (!res.ApiSummarys) {
+      return [];
+    }
+    const apis = res.ApiSummarys.ApiSummary;
+    if (res.TotalCount > apis.length) {
+      // TODO(joyeecheung): pagination
+    }
+    return apis;
   }
 
   /**
@@ -1228,21 +1244,23 @@ class AliyunProvider {
    * @param {{GroupId: string}} props
    * @returns {{GroupId: string, ApiName: string, ApiId: string}[]}
    */
-  getDeployedApis(props) {
+  async getDeployedApis(props) {
     const query = {
       GroupId: props.GroupId,
       StageName: 'RELEASE',  // TODO(joyeecheung): should be based on this.options.stage?
       PageSize: 50  // TODO(joyeecheung): pagination
     };
-    return this.agClient.describeDeployedApis(query)
-      .then((res) => {
-        if (!res.DeployedApis) {return [];}
-        const apis = res.DeployedApis.DeployedApiItem;
-        if (res.TotalCount > apis.length) {
-          // TODO(joyeecheung): pagination
-        }
-        return apis.filter((item) => item.RegionId === this.options.region);
-      });
+    const res = await this.agClient.describeDeployedApis(query);
+    if (!res.DeployedApis) {
+      return [];
+    }
+    const apis = res.DeployedApis.DeployedApiItem;
+    if (res.TotalCount > apis.length) {
+      // TODO(joyeecheung): pagination
+    }
+    return apis.filter((item) => {
+      item.RegionId === this.options.region;
+    });
   }
 
   abolishApi(group, api) {

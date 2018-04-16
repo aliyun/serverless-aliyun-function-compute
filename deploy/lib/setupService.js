@@ -66,27 +66,23 @@ module.exports = {
     this.logStore = createdStore;
   },
 
-  createLogIndexIfNotExists() {
+  async createLogIndexIfNotExists() {
     if (!this.logProject || !this.logStore) {
       return;
     }
     const projectName = this.logProjectSpec.projectName;
     const storeName = this.logStoreSpec.storeName;
-    return this.provider.getLogIndex(projectName, storeName)
-      .then((logIndex) => {
-        if (logIndex) {
-          this.serverless.cli.log(`Log store ${projectName}/${storeName} already has an index.`);
-          this.logIndex = logIndex;
-          return;
-        }
+    const logIndex = await this.provider.getLogIndex(projectName, storeName);
+    if (logIndex) {
+      this.serverless.cli.log(`Log store ${projectName}/${storeName} already has an index.`);
+      this.logIndex = logIndex;
+      return;
+    }
 
-        this.serverless.cli.log(`Creating log index for ${projectName}/${storeName}...`);
-        return this.provider.createLogIndex(projectName, storeName, this.logIndexSpec)
-          .then((createdIndex) => {
-            this.serverless.cli.log(`Created log index for ${projectName}/${storeName}`);
-            this.logIndex = createdIndex;
-          });
-      });
+    this.serverless.cli.log(`Creating log index for ${projectName}/${storeName}...`);
+    const createdIndex = await this.provider.createLogIndex(projectName, storeName, this.logIndexSpec);
+    this.serverless.cli.log(`Created log index for ${projectName}/${storeName}`);
+    this.logIndex = createdIndex;
   },
 
   checkForExistingService() {
