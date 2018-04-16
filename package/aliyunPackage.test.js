@@ -89,7 +89,7 @@ describe('AliyunPackage', () => {
         mergeServiceResourcesStub = sinon.stub(aliyunPackage, 'mergeServiceResources')
           .returns();
         saveUpdateTemplateFileStub = sinon.stub(aliyunPackage, 'saveUpdateTemplateFile')
-          .returns(Promise.resolve());
+          .returns();
       });
 
       afterEach(() => {

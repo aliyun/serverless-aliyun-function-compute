@@ -49,7 +49,7 @@ class AliyunPackage {
 
       'package:finalize': async () => {
         this.mergeServiceResources();
-        await this.saveUpdateTemplateFile();
+        this.saveUpdateTemplateFile();
         // TODO(joyeecheung): move the artifact to the path
         // specified by --package
         this.serverless.cli.log('Finished Packaging.');
