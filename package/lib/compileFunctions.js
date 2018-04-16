@@ -14,7 +14,6 @@ module.exports = {
       const funcObject = this.serverless.service.getFunction(functionName);
       this.compileFunctionAndEvent(functionName, funcObject);
     });
-    return;
   },
 
   compileFunction(funcName, funcObject) {

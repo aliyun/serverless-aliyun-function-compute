@@ -58,7 +58,7 @@ class AliyunDeployFunction {
   }
 
   async compileTemplates() {
-    await this.prepareDeployment();
+    this.prepareDeployment();
     await this.initializeTemplates();
     await this.compileFunctionToTemplate();
     await this.mergeServiceResources();
