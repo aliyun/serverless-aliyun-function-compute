@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const prepareDeployment = require('../package/lib/prepareDeployment');
@@ -35,20 +33,23 @@ class AliyunDeployFunction {
     );
 
     this.hooks = {
-      'deploy:function:initialize': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'deploy:function:initialize': async () => {
+        await this.validate();
+        await this.setDefaults();
       // .then(this.setDefaults)  // TODO: verify this.options.function
+      },
 
-      'deploy:function:packageFunction': () => BbPromise.bind(this)
-        .then(this.packageFunction)
-        .then(this.compileTemplates),
+      'deploy:function:packageFunction': async () => {
+        await this.packageFunction();
+        await this.compileTemplates();
+      },
 
-      'deploy:function:deploy': () => BbPromise.bind(this)
-        .then(this.setupService)
-        .then(this.uploadArtifacts)
-        .then(this.setupFunctions)
-        .then(this.setupEvents)
+      'deploy:function:deploy': async () => {
+        await this.setupService();
+        await this.uploadArtifacts();
+        await this.setupFunctions();
+        await this.setupEvents();
+      },
     };
   }
 
@@ -56,13 +57,12 @@ class AliyunDeployFunction {
     return this.serverless.pluginManager.spawn('package:function');
   }
 
-  compileTemplates() {
-    return BbPromise.bind(this)
-      .then(this.prepareDeployment)
-      .then(this.initializeTemplates)
-      .then(this.compileFunctionToTemplate)
-      .then(this.mergeServiceResources)
-      .then(this.updateTemplates);
+  async compileTemplates() {
+    await this.prepareDeployment();
+    await this.initializeTemplates();
+    await this.compileFunctionToTemplate();
+    await this.mergeServiceResources();
+    await this.updateTemplates();
   }
 
   initializeTemplates() {

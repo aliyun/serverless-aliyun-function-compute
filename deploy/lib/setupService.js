@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 module.exports = {
   async setupService() {
     this.logProjectSpec = this.templates.create.Resources[this.provider.getLogProjectId()].Properties;
