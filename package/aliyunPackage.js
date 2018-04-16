@@ -46,14 +46,13 @@ class AliyunPackage {
         this.compileFunctions();
       },
 
-      'package:finalize': () => BbPromise.bind(this)
-        .then(this.mergeServiceResources)
-        .then(this.saveUpdateTemplateFile)
+      'package:finalize': async () => {
+        this.mergeServiceResources();
+        await this.saveUpdateTemplateFile();
         // TODO(joyeecheung): move the artifact to the path
         // specified by --package
-        .then(function finishPackaging() {
-          this.serverless.cli.log('Finished Packaging.');
-        }),
+        this.serverless.cli.log('Finished Packaging.');
+      },
     };
   }
 }

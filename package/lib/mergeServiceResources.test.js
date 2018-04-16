@@ -24,19 +24,18 @@ describe('MergeServiceResources', () => {
     aliyunPackage = new AliyunPackage(serverless, options);
   });
 
-  it('should resolve if service resources are not defined', () => aliyunPackage
-    .mergeServiceResources().then(() => {
-      expect(serverless.service.provider
-        .compiledConfigurationTemplate).toEqual({});
-    }));
+  it('should resolve if service resources are not defined', () => {
+    aliyunPackage.mergeServiceResources();
+    expect(serverless.service.provider.compiledConfigurationTemplate)
+      .toEqual({});
+  });
 
   it('should resolve if service resources is empty', () => {
     serverless.service.resources = {};
 
-    return aliyunPackage.mergeServiceResources().then(() => {
-      expect(serverless.service.provider
-        .compiledConfigurationTemplate).toEqual({});
-    });
+    aliyunPackage.mergeServiceResources();
+    expect(serverless.service.provider
+      .compiledConfigurationTemplate).toEqual({});
   });
 
   it('should merge all the resources if provided', () => {
@@ -83,9 +82,8 @@ describe('MergeServiceResources', () => {
       ]
     };
 
-    return aliyunPackage.mergeServiceResources().then(() => {
-      expect(serverless.service.provider.compiledConfigurationTemplate)
-        .toEqual(expectedResult);
-    });
+    aliyunPackage.mergeServiceResources();
+    expect(serverless.service.provider.compiledConfigurationTemplate)
+      .toEqual(expectedResult);
   });
 });

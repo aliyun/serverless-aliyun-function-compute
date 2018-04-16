@@ -46,6 +46,5 @@ module.exports = {
     resources[serviceId] = this.provider.getServiceResource();
 
     this.serverless.service.provider.compiledConfigurationTemplate = deploymentTemplate;
-    return Promise.resolve();
   },
 };

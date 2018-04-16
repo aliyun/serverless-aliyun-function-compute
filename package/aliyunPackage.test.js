@@ -87,7 +87,7 @@ describe('AliyunPackage', () => {
         compileFunctionsStub = sinon.stub(aliyunPackage, 'compileFunctions')
           .returns(Promise.resolve());
         mergeServiceResourcesStub = sinon.stub(aliyunPackage, 'mergeServiceResources')
-          .returns(Promise.resolve());
+          .returns();
         saveUpdateTemplateFileStub = sinon.stub(aliyunPackage, 'saveUpdateTemplateFile')
           .returns(Promise.resolve());
       });
