@@ -44,10 +44,9 @@ describe('CleanupServerlessDir', () => {
 
       pathExistsSyncStub.returns();
 
-      return aliyunPackage.cleanupServerlessDir().then(() => {
-        expect(pathExistsSyncStub.calledOnce).toEqual(false);
-        expect(removeSyncStub.calledOnce).toEqual(false);
-      });
+      aliyunPackage.cleanupServerlessDir();
+      expect(pathExistsSyncStub.calledOnce).toEqual(false);
+      expect(removeSyncStub.calledOnce).toEqual(false);
     });
 
     it('should remove the .serverless directory if it exists', () => {
@@ -57,10 +56,9 @@ describe('CleanupServerlessDir', () => {
 
       pathExistsSyncStub.returns(true);
 
-      return aliyunPackage.cleanupServerlessDir().then(() => {
-        expect(pathExistsSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
-        expect(removeSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
-      });
+      aliyunPackage.cleanupServerlessDir();
+      expect(pathExistsSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
+      expect(removeSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
     });
 
     it('should not remove the .serverless directory if does not exist', () => {
@@ -70,10 +68,9 @@ describe('CleanupServerlessDir', () => {
 
       pathExistsSyncStub.returns(false);
 
-      return aliyunPackage.cleanupServerlessDir().then(() => {
-        expect(pathExistsSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
-        expect(removeSyncStub.calledWithExactly(serverlessDirPath)).toEqual(false);
-      });
+      aliyunPackage.cleanupServerlessDir();
+      expect(pathExistsSyncStub.calledWithExactly(serverlessDirPath)).toEqual(true);
+      expect(removeSyncStub.calledWithExactly(serverlessDirPath)).toEqual(false);
     });
   });
 });

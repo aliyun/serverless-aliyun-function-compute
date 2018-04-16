@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const retrieveLogs = require('./lib/retrieveLogs');
@@ -20,12 +18,14 @@ class AliyunLogs {
     );
 
     this.hooks = {
-      'before:logs:logs': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:logs:logs': async () => {
+        this.validate();
+        this.setDefaults();
+      },
 
-      'logs:logs': () => BbPromise.bind(this)
-        .then(this.retrieveLogs),
+      'logs:logs': async () => {
+        await this.retrieveLogs();
+      },
     };
   }
 }

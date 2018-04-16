@@ -47,7 +47,7 @@ describe('AliyunLogs', () => {
         validateStub = sinon.stub(aliyunLogs, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunLogs, 'setDefaults')
-          .returns(Promise.resolve());
+          .returns();
         retrieveLogsStub = sinon.stub(aliyunLogs, 'retrieveLogs')
           .returns(Promise.resolve());
       });

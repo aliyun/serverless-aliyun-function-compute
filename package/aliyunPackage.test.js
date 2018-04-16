@@ -75,21 +75,21 @@ describe('AliyunPackage', () => {
 
       beforeEach(() => {
         cleanupServerlessDirStub = sinon.stub(aliyunPackage, 'cleanupServerlessDir')
-          .returns(Promise.resolve());
+          .returns();
         validateStub = sinon.stub(aliyunPackage, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunPackage, 'setDefaults')
-          .returns(Promise.resolve());
+          .returns();
         prepareDeploymentStub = sinon.stub(aliyunPackage, 'prepareDeployment')
-          .returns(Promise.resolve());
+          .returns();
         saveCreateTemplateFileStub = sinon.stub(aliyunPackage, 'saveCreateTemplateFile')
-          .returns(Promise.resolve());
+          .returns();
         compileFunctionsStub = sinon.stub(aliyunPackage, 'compileFunctions')
           .returns(Promise.resolve());
         mergeServiceResourcesStub = sinon.stub(aliyunPackage, 'mergeServiceResources')
-          .returns(Promise.resolve());
+          .returns();
         saveUpdateTemplateFileStub = sinon.stub(aliyunPackage, 'saveUpdateTemplateFile')
-          .returns(Promise.resolve());
+          .returns();
       });
 
       afterEach(() => {

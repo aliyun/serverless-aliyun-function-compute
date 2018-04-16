@@ -8,14 +8,14 @@ module.exports = {
   mergeServiceResources() {
     const resources = this.serverless.service.resources;
 
-    if ((typeof resources === 'undefined') || _.isEmpty(resources)) {return Promise.resolve();}
+    if ((typeof resources === 'undefined') || _.isEmpty(resources)) {return;}
 
     _.mergeWith(
       this.serverless.service.provider.compiledConfigurationTemplate,
       { Resources: resources && resources.resources },
       mergeCustomizer);
 
-    return Promise.resolve();
+    return;
   },
 };
 

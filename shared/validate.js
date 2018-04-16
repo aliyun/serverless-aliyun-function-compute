@@ -1,14 +1,12 @@
 'use strict';
 
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 
 module.exports = {
   validate() {
-    return BbPromise.bind(this)
-      .then(this.validateServicePath)
-      .then(this.validateServiceName)
-      .then(this.validateHandlers);
+    this.validateServicePath();
+    this.validateServiceName();
+    this.validateHandlers();
   },
 
   validateApiGroupName() {
@@ -27,7 +25,7 @@ module.exports = {
     if (!this.serverless.config.servicePath) {
       throw new Error('This command can only be run inside a service directory');
     }
-    return Promise.resolve();
+    return;
   },
 
   validateServiceName() {
@@ -43,7 +41,7 @@ module.exports = {
         `The name of your service ${serviceName} is invalid. A service` +
         ' name should not be longer than 128 characters');
     }
-    return Promise.resolve();
+    return;
   },
 
   validateHandlers() {
@@ -79,7 +77,7 @@ module.exports = {
         throw new Error(errorMessage);
       }
     });
-    return Promise.resolve();
+    return;
   },
 
   validateEventsProperty () {

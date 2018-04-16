@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const getFunctionsAndService = require('./lib/getFunctionsAndService');
@@ -28,15 +26,17 @@ class AliyunRemove {
     );
 
     this.hooks = {
-      'before:remove:remove': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:remove:remove': async () => {
+        this.validate();
+        this.setDefaults();
+      },
 
-      'remove:remove': () => BbPromise.bind(this)
-        .then(this.getFunctionsAndService)
-        .then(this.removeEvents)
-        .then(this.removeFunctionsAndService)
-        .then(this.removeArtifacts)
+      'remove:remove': async () => {
+        await this.getFunctionsAndService();
+        await this.removeEvents();
+        await this.removeFunctionsAndService();
+        await this.removeArtifacts();
+      }
     };
   }
 }

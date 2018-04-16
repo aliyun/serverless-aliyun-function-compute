@@ -12,8 +12,6 @@ module.exports = {
 
     this.serverless.utils.writeFileSync(filePath,
       this.serverless.service.provider.compiledConfigurationTemplate);
-
-    return Promise.resolve();
   },
 
   saveUpdateTemplateFile() {
@@ -23,7 +21,5 @@ module.exports = {
 
     this.serverless.utils.writeFileSync(filePath,
       this.serverless.service.provider.compiledConfigurationTemplate);
-
-    return Promise.resolve();
   },
 };

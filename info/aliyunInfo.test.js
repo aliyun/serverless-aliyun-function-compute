@@ -46,7 +46,7 @@ describe('AliyunInfo', () => {
         validateStub = sinon.stub(aliyunInfo, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunInfo, 'setDefaults')
-          .returns(Promise.resolve());
+          .returns();
         displayServiceInfoStub = sinon.stub(aliyunInfo, 'displayServiceInfo')
           .returns(Promise.resolve());
       });

@@ -1,13 +1,15 @@
 'use strict';
 
-const BbPromise = require('bluebird');
 const util = require('util');
 
 module.exports = {
-  invokeFunction() {
-    return BbPromise.bind(this)
-      .then(this.invoke)
-      .then(this.printResult, this.handleError);
+  async invokeFunction() {
+    try {
+      const result = await this.invoke();
+      this.serverless.cli.log(result);
+    } catch (ex) {
+      this.serverless.cli.log(ex);
+    }
   },
 
   invoke() {
@@ -34,16 +36,6 @@ module.exports = {
     );
 
     return this.provider.invokeFunction(serviceName, functionName, data);
-  },
-
-  printResult(result) {
-    this.serverless.cli.log(result);
-    return Promise.resolve();
-  },
-
-  handleError(err) {
-    this.serverless.cli.log(err);
-    return Promise.resolve();
   },
 
   getDataFromInput(input) {

@@ -1,28 +1,24 @@
 'use strict';
 
 const chalk = require('chalk');
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 
 module.exports = {
-  retrieveLogs() {
+  async retrieveLogs() {
     this.logs = [];
 
-    return BbPromise.bind(this)
-      .then(this.getLogs)
-      .then(this.displayLogs);
+    const data = await this.getLogs();
+    this.displayLogs(data);
   },
 
-  getLogs() {
+  async getLogs() {
     const projectName = this.provider.getLogProjectName();
     const storeName = this.provider.getLogStoreName();
     const functionName = this.serverless.service.getFunction(this.options.function).name;
     const count = this.options.count;
 
-    return this.provider.getLogsIfAvailable(projectName, storeName, 1, { functionName }, count)
-      .then((logs) => {
-        this.logs = logs;
-      });
+    this.logs = await this.provider.getLogsIfAvailable(projectName, storeName, 1, { functionName }, count);
+    return this.logs;
   },
 
   displayLogs(data) {
@@ -58,6 +54,5 @@ module.exports = {
     }
 
     this.serverless.cli.consoleLog(message);
-    return Promise.resolve();
   },
 };

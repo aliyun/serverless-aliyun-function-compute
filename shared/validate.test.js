@@ -32,11 +32,11 @@ describe('Validate', () => {
 
     beforeEach(() => {
       validateServicePathStub = sinon.stub(aliyunCommand, 'validateServicePath')
-        .returns(Promise.resolve());
+        .returns();
       validateServiceNameStub = sinon.stub(aliyunCommand, 'validateServiceName')
-        .returns(Promise.resolve());
+        .returns();
       validateHandlersStub = sinon.stub(aliyunCommand, 'validateHandlers')
-        .returns(Promise.resolve());
+        .returns();
     });
 
     afterEach(() => {
@@ -45,12 +45,12 @@ describe('Validate', () => {
       aliyunCommand.validateHandlers.restore();
     });
 
-    it('should run promise chain', () => aliyunCommand
-      .validate().then(() => {
-        expect(validateServicePathStub.calledOnce).toEqual(true);
-        expect(validateServiceNameStub.calledAfter(validateServicePathStub));
-        expect(validateHandlersStub.calledAfter(validateServiceNameStub));
-      }));
+    it('should run ok', () => {
+      aliyunCommand.validate();
+      expect(validateServicePathStub.calledOnce).toEqual(true);
+      expect(validateServiceNameStub.calledAfter(validateServicePathStub));
+      expect(validateHandlersStub.calledAfter(validateServiceNameStub));
+    });
   });
 
   describe('#validateServicePath()', () => {

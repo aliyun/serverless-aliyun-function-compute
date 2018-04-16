@@ -1,9 +1,7 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 module.exports = {
-  setupService() {
+  async setupService() {
     this.logProjectSpec = this.templates.create.Resources[this.provider.getLogProjectId()].Properties;
     this.logStoreSpec = this.templates.create.Resources[this.provider.getLogStoreId()].Properties;
     this.logIndexSpec = this.templates.create.Resources[this.provider.getLogIndexId()].Properties;
@@ -12,72 +10,60 @@ module.exports = {
     this.logStore = undefined;
     this.logIndex = undefined;
 
-    return BbPromise.bind(this)
-      .then(this.createLogConfigIfNotExists)
-      .then(this.setupExecRole)
-      .then(() => {
-        // HACK: must wait for a while for the ram policy to take effect
-        return this.provider.sleep(this.provider.PROJECT_DELAY);
-      })
-      .then(this.checkForExistingService)
-      .then(this.createServiceIfNotExists)
-      .then(this.createBucketIfNotExists);
+    await this.createLogConfigIfNotExists();
+    await this.setupExecRole();
+    // HACK: must wait for a while for the ram policy to take effect
+    await this.provider.sleep(this.provider.PROJECT_DELAY);
+    const foundService = await this.checkForExistingService();
+    await this.createServiceIfNotExists(foundService);
+    await this.createBucketIfNotExists();
   },
 
-  setupExecRole() {
+  async setupExecRole() {
     const role = this.templates.create.Resources[this.provider.getExecRoleLogicalId()].Properties;
-    return BbPromise.bind(this)
-      .then(() => this.setupRole(role))
-      .then((execRole) => this.execRole = execRole);
+    this.execRole = await this.setupRole(role);
   },
 
-  createLogConfigIfNotExists() {
-    return BbPromise.bind(this)
-      .then(this.createLogProjectIfNotExists)
-      .then(this.createLogStoreIfNotExists)
-      .then(this.createLogIndexIfNotExists);
+  async createLogConfigIfNotExists() {
+    await this.createLogProjectIfNotExists();
+    await this.createLogStoreIfNotExists();
+    await this.createLogIndexIfNotExists();
   },
 
-  createLogProjectIfNotExists() {
+  async createLogProjectIfNotExists() {
     const projectName = this.logProjectSpec.projectName;
-    return this.provider.getLogProject(projectName)
-      .then((logProject) => {
-        if (logProject) {
-          this.serverless.cli.log(`Log project ${projectName} already exists.`);
-          this.logProject = logProject;
-          return;
-        }
+    const logProject = await this.provider.getLogProject(projectName);
+    if (logProject) {
+      this.serverless.cli.log(`Log project ${projectName} already exists.`);
+      this.logProject = logProject;
+      return;
+    }
 
-        this.serverless.cli.log(`Creating log project ${projectName}...`);
-        return this.provider.createLogProject(projectName, this.logProjectSpec)
-          .then((createdProject) => {
-            this.serverless.cli.log(`Created log project ${projectName}`);
-            this.logProject = createdProject;
-          });
-      });
+    this.serverless.cli.log(`Creating log project ${projectName}...`);
+    const createdProject = await this.provider.createLogProject(projectName, this.logProjectSpec);
+    this.serverless.cli.log(`Created log project ${projectName}`);
+    this.logProject = createdProject;
   },
 
-  createLogStoreIfNotExists() {
+  async createLogStoreIfNotExists() {
     if (!this.logProject) {
       return;
     }
     const projectName = this.logProjectSpec.projectName;
     const storeName = this.logStoreSpec.storeName;
-    return this.provider.getLogStore(projectName, storeName)
-      .then((logStore) => {
-        if (logStore) {
-          this.serverless.cli.log(`Log store ${projectName}/${storeName} already exists.`);
-          this.logStore = logStore;
-          return;
-        }
+    const logStore = await this.provider.getLogStore(projectName, storeName);
 
-        this.serverless.cli.log(`Creating log store ${projectName}/${storeName}...`);
-        return this.provider.createLogStore(projectName, storeName, this.logStoreSpec)
-          .then((createdStore) => {
-            this.serverless.cli.log(`Created log store ${projectName}/${storeName}`);
-            this.logStore = createdStore;
-          });
-      });
+    if (logStore) {
+      this.serverless.cli.log(`Log store ${projectName}/${storeName} already exists.`);
+      this.logStore = logStore;
+      return;
+    }
+
+    this.serverless.cli.log(`Creating log store ${projectName}/${storeName}...`);
+    const createdStore = await this.provider.createLogStore(projectName, storeName, this.logStoreSpec);
+
+    this.serverless.cli.log(`Created log store ${projectName}/${storeName}`);
+    this.logStore = createdStore;
   },
 
   createLogIndexIfNotExists() {
@@ -109,12 +95,12 @@ module.exports = {
     return this.provider.getService(service.name);
   },
 
-  createServiceIfNotExists(foundService) {
+  async createServiceIfNotExists(foundService) {
     const service = this.templates.create.Resources[this.provider.getServiceId()].Properties;
 
     if (foundService) {
       this.serverless.cli.log(`Service ${service.name} already exists.`);
-      return Promise.resolve();
+      return;
     }
 
     this.serverless.cli.log(`Creating service ${service.name}...`);
@@ -123,28 +109,22 @@ module.exports = {
     const spec = Object.assign({
       role: this.execRole.Arn
     }, service);
-    return this.provider.createService(service.name, spec)
-      .then((createdService) => {
-        this.serverless.cli.log(`Created service ${service.name}`);
-      });
+    await this.provider.createService(service.name, spec);
+    this.serverless.cli.log(`Created service ${service.name}`);
   },
 
-  createBucketIfNotExists() {
+  async createBucketIfNotExists() {
     const bucket = this.templates.create.Resources[this.provider.getStorageBucketId()].Properties;
 
-    return this.provider.getBucket(bucket.BucketName)
-      .then((foundBucket) => {
-        if (foundBucket) {
-          this.serverless.cli.log(`Bucket ${bucket.BucketName} already exists.`);
-          return foundBucket;
-        }
-        this.serverless.cli.log(`Creating bucket ${bucket.BucketName}...`);
-        return this.provider.createBucket(bucket.BucketName)
-          .then(() => {
-            this.serverless.cli.log(`Created bucket ${bucket.BucketName}`);
-          });
-      }).then((foundBucket) => {
-        this.provider.resetOssClient(bucket.BucketName);
-      });
+    const foundBucket = await this.provider.getBucket(bucket.BucketName);
+    if (foundBucket) {
+      this.serverless.cli.log(`Bucket ${bucket.BucketName} already exists.`);
+    } else {
+      this.serverless.cli.log(`Creating bucket ${bucket.BucketName}...`);
+      await this.provider.createBucket(bucket.BucketName);
+      this.serverless.cli.log(`Created bucket ${bucket.BucketName}`);
+    }
+
+    this.provider.resetOssClient(bucket.BucketName);
   }
 };

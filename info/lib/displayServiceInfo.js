@@ -1,77 +1,63 @@
 'use strict';
 
 const chalk = require('chalk');
-const BbPromise = require('bluebird');
 
 module.exports = {
-  displayServiceInfo() {
+  async displayServiceInfo() {
     this.fcService = undefined;
     this.fcFunctions = [];
     this.apiGroup = undefined;
     this.apis = [];
 
-    return BbPromise.bind(this)
-      .then(this.getService)
-      .then(this.getFunctions)
-      .then(this.getApiInfo)
-      .then(this.gatherData)
-      .then(this.printInfo);
+    await this.getService();
+    await this.getFunctions();
+    await this.getApiInfo();
+    const data = this.gatherData();
+    this.printInfo(data);
   },
 
-  getService() {
+  async getService() {
     const serviceName = this.provider.getServiceName();
-    return this.provider.getService(serviceName).then((service) => {
-      this.fcService = service;
-    });
+    this.fcService = await this.provider.getService(serviceName);
   },
 
-  getFunctions() {
+  async getFunctions() {
     if (!this.fcService) {
-      return Promise.resolve();
+      return;
     }
     const serviceName = this.fcService.serviceName;
-    return this.provider.getFunctions(serviceName).then((functions) => {
-      this.fcFunctions = functions;
-    });
+    this.fcFunctions = await this.provider.getFunctions(serviceName);
   },
 
-  getApiInfo() {
-    return BbPromise.bind(this)
-      .then(this.getApiGroup)
-      .then(this.getApis)
-      .then(this.getVerboseApiInfo);
+  async getApiInfo() {
+    await this.getApiGroup();
+    await this.getApis();
+    await this.getVerboseApiInfo();
   },
 
-  getApiGroup() {
+  async getApiGroup() {
     const groupName = this.provider.getApiGroupName();
-    return this.provider.getApiGroup(groupName).then((group) => {
-      this.apiGroup = group;
-      return group;
-    });
+    this.apiGroup = await this.provider.getApiGroup(groupName);
   },
 
-  getApis() {
+  async getApis() {
     if (!this.apiGroup) {
-      return Promise.resolve();
+      return;
     }
     const groupId = this.apiGroup.GroupId;
 
-    return this.provider.getApis({GroupId:  groupId}).then((apis) => {
-      this.apis = apis;
-      return apis;
-    });
+    this.apis = await this.provider.getApis({GroupId:  groupId});
   },
 
-  getVerboseApiInfo() {
+  async getVerboseApiInfo() {
     if (!this.apiGroup || !this.apis.length) {
-      return Promise.resolve();
+      return;
     }
 
-    return BbPromise.map(this.apis, (api, index) => {
-      return this.provider.getApi(this.apiGroup, api).then((verboseApi) => {
-        Object.assign(this.apis[index], verboseApi);
-      });
-    });
+    return Promise.all(this.apis.map(async (api, index) => {
+      const verboseApi = await this.provider.getApi(this.apiGroup, api);
+      Object.assign(this.apis[index], verboseApi);
+    }));
   },
 
   gatherData() {
@@ -79,7 +65,7 @@ module.exports = {
     data.service = this.serverless.service.service;
     data.stage = this.options.stage;
     data.region = this.options.region;
-    return Promise.resolve(data);
+    return data;
   },
 
   printInfo(data) {
@@ -126,6 +112,6 @@ module.exports = {
     // TODO(joyeecheung): display triggers
 
     this.serverless.cli.consoleLog(message);
-    return Promise.resolve();
+    return;
   },
 };

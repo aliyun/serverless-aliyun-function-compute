@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const cleanupServerlessDir = require('./lib/cleanupServerlessDir');
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
@@ -29,28 +27,32 @@ class AliyunPackage {
       saveUpdateTemplateFile);
 
     this.hooks = {
-      'package:cleanup': () => BbPromise.bind(this)
-        .then(this.cleanupServerlessDir),
+      'package:cleanup': async () => {
+        // TODO: change to async method
+        this.cleanupServerlessDir();
+      },
 
-      'before:package:initialize': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:package:initialize': async () => {
+        this.validate();
+        this.setDefaults();
+      },
 
-      'package:initialize': () => BbPromise.bind(this)
-        .then(this.prepareDeployment)
-        .then(this.saveCreateTemplateFile),
+      'package:initialize': async () => {
+        await this.prepareDeployment();
+        this.saveCreateTemplateFile();
+      },
 
-      'package:compileFunctions': () => BbPromise.bind(this)
-        .then(this.compileFunctions),
+      'package:compileFunctions': async () => {
+        this.compileFunctions();
+      },
 
-      'package:finalize': () => BbPromise.bind(this)
-        .then(this.mergeServiceResources)
-        .then(this.saveUpdateTemplateFile)
+      'package:finalize': async () => {
+        this.mergeServiceResources();
+        this.saveUpdateTemplateFile();
         // TODO(joyeecheung): move the artifact to the path
         // specified by --package
-        .then(function finishPackaging() {
-          this.serverless.cli.log('Finished Packaging.');
-        }),
+        this.serverless.cli.log('Finished Packaging.');
+      },
     };
   }
 }

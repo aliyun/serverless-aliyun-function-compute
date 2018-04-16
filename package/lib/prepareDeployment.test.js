@@ -33,10 +33,9 @@ describe('PrepareDeployment', () => {
       const expectedCompiledConfiguration = require(
         path.join(__dirname, '..', '..', 'test', '.serverless','configuration-template-create.json'));
 
-      return aliyunPackage.prepareDeployment().then(() => {
-        expect(serverless.service.provider
-          .compiledConfigurationTemplate).toEqual(expectedCompiledConfiguration);
-      });
+      aliyunPackage.prepareDeployment();
+      expect(serverless.service.provider.compiledConfigurationTemplate)
+        .toEqual(expectedCompiledConfiguration);
     });
   });
 });

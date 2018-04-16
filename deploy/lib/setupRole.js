@@ -1,91 +1,82 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 module.exports = {
-  setupRole(role) {
+  async setupRole(role) {
     const roleSym = Symbol('role');
 
-    return this.createRoleIfNotExists(role, roleSym)
-      .then(() => this.createPoliciesIfNeeded(role, roleSym))
-      .then(() => this.attachPoliciesIfNeeded(role, roleSym))
-      .then(() => this[roleSym]);
+    await this.createRoleIfNotExists(role, roleSym);
+    await this.createPoliciesIfNeeded(role, roleSym);
+    await this.attachPoliciesIfNeeded(role, roleSym);
+    return this[roleSym];
   },
 
-  createRoleIfNotExists(role, roleSym) {
-    return this.provider.getRole(role.RoleName)
-      .then((foundRole) => {
-        if (foundRole) {
-          // TODO: update if AssumeRolePolicyDocument is different/smaller
-          this[roleSym] = foundRole;
-          this.serverless.cli.log(`RAM role ${role.RoleName} exists.`);
-          return;
-        }
-
-        this.serverless.cli.log(`Creating RAM role ${role.RoleName}...`);
-        return this.provider.createRole(role)
-          .then((createdRole) => {
-            this.serverless.cli.log(`Created RAM role ${role.RoleName}`);
-            this[roleSym] = createdRole;
-          });
-      });
+  async createRoleIfNotExists(role, roleSym) {
+    const foundRole = await this.provider.getRole(role.RoleName);
+    if (foundRole) {
+      // TODO: update if AssumeRolePolicyDocument is different/smaller
+      this[roleSym] = foundRole;
+      this.serverless.cli.log(`RAM role ${role.RoleName} exists.`);
+      return;
+    }
+    this.serverless.cli.log(`Creating RAM role ${role.RoleName}...`);
+    const createdRole = this.provider.createRole(role);
+    this.serverless.cli.log(`Created RAM role ${role.RoleName}`);
+    this[roleSym] = createdRole;
   },
 
-  createPoliciesIfNeeded(role, roleSym) {
+  async createPoliciesIfNeeded(role, roleSym) {
     if (!this[roleSym]) {
       return;
     }
 
-    return BbPromise.map(role.Policies,
-      (policy) => this.createPolicyIfNeeded(policy));
+    for (var i = 0; i < role.Policies.length; i++) {
+      const policy = role.Policies[i];
+      await this.createPolicyIfNeeded(policy);
+    }
   },
 
-  createPolicyIfNeeded(policy) {
+  async createPolicyIfNeeded(policy) {
     if (policy.PolicyType === 'System') {
-      return Promise.resolve();
+      return;
     }
     const policyName = policy.PolicyName;
-    return this.provider.getPolicy(policyName, 'Custom')
-      .then((foundPolicy) => {
-        if (foundPolicy) {
-          // TODO: Update if PolicyDocument is different
-          this.serverless.cli.log(`RAM policy ${policyName} exists.`);
-          return;
-        }
+    const foundPolicy = await this.provider.getPolicy(policyName, 'Custom');
+    if (foundPolicy) {
+      // TODO: Update if PolicyDocument is different
+      this.serverless.cli.log(`RAM policy ${policyName} exists.`);
+      return;
+    }
 
-        this.serverless.cli.log(`Creating RAM policy ${policyName}...`);
-        return this.provider.createPolicy(policy)
-          .then((createdPolicy) => {
-            this.serverless.cli.log(`Created RAM policy ${policyName}`);
-          });
-      });
+    this.serverless.cli.log(`Creating RAM policy ${policyName}...`);
+    await this.provider.createPolicy(policy);
+    this.serverless.cli.log(`Created RAM policy ${policyName}`);
   },
 
-  attachPoliciesIfNeeded(role, roleSym) {
+  async attachPoliciesIfNeeded(role, roleSym) {
     if (!this[roleSym]) {
       return;
     }
     const roleName = role.RoleName;
 
-    return this.provider.getPoliciesForRole(roleName).then((attached) => {
-      return BbPromise.map(role.Policies, (policyProps) => {
-        const policyName = policyProps.PolicyName;
-        const policy = attached.find(
-          (item) => item.PolicyName === policyName
-        );
-        if (policy) {
-          this.serverless.cli.log(`RAM policy ${policyName} has been attached to ${roleName}.`);
-          return;
-        }
+    const attached = await this.provider.getPoliciesForRole(roleName);
 
-        this.serverless.cli.log(`Attaching RAM policy ${policyName} to ${roleName}...`);
-        return this.provider.attachPolicyToRole(role, {
-          PolicyName: policyName,
-          PolicyType: policyProps.PolicyType || 'Custom'
-        }).then(() => {
-          this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
-        });
+    await Promise.all(role.Policies.map(async (policyProps) => {
+      const policyName = policyProps.PolicyName;
+      const policy = attached.find(
+        (item) => item.PolicyName === policyName
+      );
+
+      if (policy) {
+        this.serverless.cli.log(`RAM policy ${policyName} has been attached to ${roleName}.`);
+        return;
+      }
+
+      this.serverless.cli.log(`Attaching RAM policy ${policyName} to ${roleName}...`);
+      await this.provider.attachPolicyToRole(role, {
+        PolicyName: policyName,
+        PolicyType: policyProps.PolicyType || 'Custom'
       });
-    });
+      this.serverless.cli.log(`Attached RAM policy ${policyName} to ${roleName}`);
+    }));
   },
 };

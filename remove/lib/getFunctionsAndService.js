@@ -1,31 +1,24 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 module.exports = {
-  getFunctionsAndService() {
+  async getFunctionsAndService() {
     this.fcService = undefined;
     this.fcFunctions = [];
 
-    return BbPromise.bind(this)
-      .then(this.getService)
-      .then(this.getFunctions);
+    await this.getService();
+    await this.getFunctions();
   },
 
-  getService() {
+  async getService() {
     const serviceName = this.provider.getServiceName();
-    return this.provider.getService(serviceName).then((service) => {
-      this.fcService = service;
-    });
+    this.fcService = await this.provider.getService(serviceName);
   },
 
-  getFunctions() {
+  async getFunctions() {
     if (!this.fcService) {
-      return Promise.resolve();
+      return;
     }
     const serviceName = this.fcService.serviceName;
-    return this.provider.getFunctions(serviceName).then((functions) => {
-      this.fcFunctions = functions;
-    });
+    this.fcFunctions = await this.provider.getFunctions(serviceName);
   }
 };

@@ -34,21 +34,13 @@ describe('InvokeFunction', () => {
 
   describe('#invokeFunction()', () => {
     let invokeStub;
-    let printResultStub;
-    let handleErrorStub;
 
     beforeEach(() => {
       invokeStub = sinon.stub(aliyunInvoke, 'invoke');
-      printResultStub = sinon.stub(aliyunInvoke, 'printResult')
-        .returns(Promise.resolve());
-      handleErrorStub = sinon.stub(aliyunInvoke, 'handleError')
-        .returns(Promise.resolve());
     });
 
     afterEach(() => {
       aliyunInvoke.invoke.restore();
-      aliyunInvoke.printResult.restore();
-      aliyunInvoke.handleError.restore();
     });
 
     it('should run promise chain when invocation succeeds', () => {
@@ -56,10 +48,6 @@ describe('InvokeFunction', () => {
       invokeStub.returns(Promise.resolve(data));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeStub.calledOnce).toEqual(true);
-        expect(printResultStub.calledAfter(invokeStub)).toEqual(true);
-        expect(printResultStub.calledOnce).toEqual(true);
-        expect(printResultStub.calledWithExactly(data)).toEqual(true);
-        expect(handleErrorStub.called).toEqual(false);
       });
     });
 
@@ -68,11 +56,6 @@ describe('InvokeFunction', () => {
       invokeStub.returns(Promise.reject(err));
       return aliyunInvoke.invokeFunction().then(() => {
         expect(invokeStub.calledOnce).toEqual(true);
-        expect(handleErrorStub.calledAfter(invokeStub));
-        expect(handleErrorStub.calledAfter(invokeStub)).toEqual(true);
-        expect(handleErrorStub.calledOnce).toEqual(true);
-        expect(handleErrorStub.calledWithExactly(err)).toEqual(true);
-        expect(printResultStub.called).toEqual(false);
       });
     });
   });
