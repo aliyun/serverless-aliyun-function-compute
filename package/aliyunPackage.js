@@ -42,8 +42,9 @@ class AliyunPackage {
         .then(this.prepareDeployment)
         .then(this.saveCreateTemplateFile),
 
-      'package:compileFunctions': () => BbPromise.bind(this)
-        .then(this.compileFunctions),
+      'package:compileFunctions': async () => {
+        this.compileFunctions();
+      },
 
       'package:finalize': () => BbPromise.bind(this)
         .then(this.mergeServiceResources)

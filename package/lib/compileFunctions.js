@@ -14,7 +14,7 @@ module.exports = {
       const funcObject = this.serverless.service.getFunction(functionName);
       this.compileFunctionAndEvent(functionName, funcObject);
     });
-    return Promise.resolve();
+    return;
   },
 
   compileFunction(funcName, funcObject) {
@@ -22,7 +22,6 @@ module.exports = {
     // Notice artifact is different
     this.compileStorage(funcObject.package.artifact);
     this.compileFunctionAndEvent(funcName, funcObject);
-    return Promise.resolve();
   },
 
   compileStorage(artifact) {
