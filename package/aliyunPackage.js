@@ -29,8 +29,10 @@ class AliyunPackage {
       saveUpdateTemplateFile);
 
     this.hooks = {
-      'package:cleanup': () => BbPromise.bind(this)
-        .then(this.cleanupServerlessDir),
+      'package:cleanup': async () => {
+        // TODO: change to async method
+        this.cleanupServerlessDir();
+      },
 
       'before:package:initialize': () => BbPromise.bind(this)
         .then(this.validate)

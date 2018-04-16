@@ -75,7 +75,7 @@ describe('AliyunPackage', () => {
 
       beforeEach(() => {
         cleanupServerlessDirStub = sinon.stub(aliyunPackage, 'cleanupServerlessDir')
-          .returns(Promise.resolve());
+          .returns();
         validateStub = sinon.stub(aliyunPackage, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunPackage, 'setDefaults')
