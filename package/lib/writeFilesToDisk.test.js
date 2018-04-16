@@ -48,12 +48,11 @@ describe('WriteFilesToDisk', () => {
         'configuration-template-create.json'
       );
 
-      return aliyunPackage.saveCreateTemplateFile().then(() => {
-        expect(writeFileSyncStub.calledWithExactly(
-          createFilePath,
-          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
-        )).toEqual(true);
-      });
+      aliyunPackage.saveCreateTemplateFile();
+      expect(writeFileSyncStub.calledWithExactly(
+        createFilePath,
+        aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
+      )).toEqual(true);
     });
   });
 
@@ -65,12 +64,11 @@ describe('WriteFilesToDisk', () => {
         'configuration-template-update.json'
       );
 
-      return aliyunPackage.saveUpdateTemplateFile().then(() => {
-        expect(writeFileSyncStub.calledWithExactly(
-          updateFilePath,
-          aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
-        )).toEqual(true);
-      });
+      aliyunPackage.saveUpdateTemplateFile();
+      expect(writeFileSyncStub.calledWithExactly(
+        updateFilePath,
+        aliyunPackage.serverless.service.provider.compiledConfigurationTemplate
+      )).toEqual(true);
     });
   });
 });

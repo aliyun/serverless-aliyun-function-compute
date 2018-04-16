@@ -38,9 +38,10 @@ class AliyunPackage {
         .then(this.validate)
         .then(this.setDefaults),
 
-      'package:initialize': () => BbPromise.bind(this)
-        .then(this.prepareDeployment)
-        .then(this.saveCreateTemplateFile),
+      'package:initialize': async () => {
+        await this.prepareDeployment();
+        this.saveCreateTemplateFile();
+      },
 
       'package:compileFunctions': async () => {
         this.compileFunctions();
