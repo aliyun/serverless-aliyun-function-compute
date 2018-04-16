@@ -2,8 +2,6 @@
 
 const _ = require('lodash');
 
-const BbPromise = require('bluebird');
-
 module.exports = {
   async setupEvents() {
     this.apis = _.filter(

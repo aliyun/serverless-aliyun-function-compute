@@ -1,7 +1,6 @@
 'use strict';
 
 const chalk = require('chalk');
-const BbPromise = require('bluebird');
 
 module.exports = {
   async displayServiceInfo() {

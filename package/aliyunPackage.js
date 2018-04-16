@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const cleanupServerlessDir = require('./lib/cleanupServerlessDir');
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
@@ -34,9 +32,10 @@ class AliyunPackage {
         this.cleanupServerlessDir();
       },
 
-      'before:package:initialize': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:package:initialize': async () => {
+        this.validate();
+        this.setDefaults();
+      },
 
       'package:initialize': async () => {
         await this.prepareDeployment();
