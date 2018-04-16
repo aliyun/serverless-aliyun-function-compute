@@ -68,7 +68,7 @@ describe('AliyunRemove', () => {
         validateStub = sinon.stub(aliyunRemove, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunRemove, 'setDefaults')
-          .returns(Promise.resolve());
+          .returns();
         getFunctionsAndServiceStub = sinon.stub(aliyunRemove, 'getFunctionsAndService')
           .returns(Promise.resolve());
         removeEventsStub = sinon.stub(aliyunRemove, 'removeEvents')
