@@ -20,7 +20,7 @@ class AliyunInfo {
     this.hooks = {
       'before:info:info': async () => {
         await this.validate();
-        await this.setDefaults();
+        this.setDefaults();
       },
 
       // 'deploy:deploy': () => BbPromise.bind(this)

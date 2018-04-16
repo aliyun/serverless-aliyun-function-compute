@@ -71,7 +71,7 @@ describe('AliyunDeploy', () => {
         validateStub = sinon.stub(aliyunDeploy, 'validate')
           .returns(Promise.resolve());
         setDefaultsStub = sinon.stub(aliyunDeploy, 'setDefaults')
-          .returns(Promise.resolve());
+          .returns();
         loadTemplatesStub = sinon.stub(aliyunDeploy, 'loadTemplates')
           .returns(Promise.resolve());
         setupServiceStub = sinon.stub(aliyunDeploy, 'setupService')

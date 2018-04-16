@@ -29,7 +29,7 @@ class AliyunDeploy {
     this.hooks = {
       'before:deploy:deploy': async () => {
         await this.validate();
-        await this.setDefaults();
+        this.setDefaults();
         await this.loadTemplates();
       },
 

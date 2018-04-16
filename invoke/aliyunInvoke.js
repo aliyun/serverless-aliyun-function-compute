@@ -1,7 +1,5 @@
 'use strict';
 
-const BbPromise = require('bluebird');
-
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const invokeFunction = require('./lib/invokeFunction');
@@ -20,12 +18,14 @@ class AliyunInvoke {
     );
 
     this.hooks = {
-      'before:invoke:invoke': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.setDefaults),
+      'before:invoke:invoke': async () => {
+        await this.validate();
+        this.setDefaults();
+      },
 
-      'invoke:invoke': () => BbPromise.bind(this)
-        .then(this.invokeFunction),
+      'invoke:invoke': async () => {
+        await this.invokeFunction();
+      },
     };
   }
 }

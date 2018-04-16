@@ -35,8 +35,8 @@ class AliyunDeployFunction {
     this.hooks = {
       'deploy:function:initialize': async () => {
         await this.validate();
-        await this.setDefaults();
-      // .then(this.setDefaults)  // TODO: verify this.options.function
+        this.setDefaults();
+        // TODO: verify this.options.function
       },
 
       'deploy:function:packageFunction': async () => {
