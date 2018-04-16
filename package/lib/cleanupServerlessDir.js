@@ -12,7 +12,5 @@ module.exports = {
         fse.removeSync(serverlessDirPath);
       }
     }
-
-    return Promise.resolve();
   },
 };
