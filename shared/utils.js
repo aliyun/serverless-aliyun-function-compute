@@ -8,7 +8,5 @@ module.exports = {
       || 'dev';
     this.options.region = _.get(this, 'options.region')
       || 'cn-shanghai';
-
-    return Promise.resolve();
   },
 };
