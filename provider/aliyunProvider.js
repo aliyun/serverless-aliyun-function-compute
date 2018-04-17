@@ -972,13 +972,14 @@ class AliyunProvider {
    * @return {TriggerResponse}
    */
   getTrigger(serviceName, functionName, triggerName) {
-    return this.fcClient.getTrigger(serviceName, functionName, triggerName)
-      .catch((err) => {
-        if (['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'].indexOf(err.code)) {
-          return undefined;
-        }
-        throw err;
-      });
+    try {
+      return await this.fcClient.getTrigger(serviceName, functionName, triggerName)
+    } catch (err) {
+      if (['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'].indexOf(err.code)) {
+        return undefined;
+      }
+      throw err;
+    }
   }
 
   async listTriggers(serviceName, functionName) {
