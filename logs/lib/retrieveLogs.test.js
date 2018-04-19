@@ -21,7 +21,7 @@ describe('DisplayServiceLogs', () => {
     serverless.service.functions = functionDefs;
     serverless.service.provider = {
       name: 'aliyun',
-      credentials: path.join(__dirname, '..', 'test', 'credentials'),
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
     };
     serverless.config = {
       servicePath: path.join(__dirname, '..', '..', 'test')
