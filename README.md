@@ -29,6 +29,8 @@ The structure of the project should look something like this:
 └── serverless.yml
 ```
 
+Install `serverless-aliyun-function-compute` plugin for your service.
+
 ```yaml
 $ serverless plugin install --name serverless-aliyun-function-compute
 ```
@@ -69,10 +71,7 @@ functions:
   "version": "0.1.0",
   "description": "Hello World example for aliyun provider with Serverless Framework.",
   "main": "index.js",
-  "license": "MIT",
-  "devDependencies": {
-    "serverless-aliyun-function-compute": "^1.0.0"
-  }
+  "license": "MIT"
 }
 ```
 
