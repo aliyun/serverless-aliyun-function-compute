@@ -20,6 +20,8 @@ module.exports = {
 };
 
 const mergeCustomizer = (objValue, srcValue) => {
-  if (_.isArray(objValue)) {return objValue.concat(srcValue);}
+  if (Array.isArray(objValue)) {
+    return [...objValue, ...srcValue];
+  }
   return objValue;
 };
