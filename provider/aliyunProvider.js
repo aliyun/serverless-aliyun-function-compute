@@ -16,9 +16,7 @@ const SLS = require('@alicloud/log');
 
 const utils = require('../shared/utils');
 
-const constants = {
-  providerName: 'aliyun',
-};
+const PROVIDER_NAME = 'aliyun';
 
 const keySym = Symbol('key');
 const fcClientSym = Symbol('fc-client');
@@ -30,13 +28,13 @@ const PROJECT_DELAY = 1500;
 
 class AliyunProvider {
   static getProviderName() {
-    return constants.providerName;
+    return PROVIDER_NAME;
   }
 
   constructor(serverless, options) {
     this.serverless = serverless;
     this.provider = this;
-    this.serverless.setProvider(constants.providerName, this);
+    this.serverless.setProvider(PROVIDER_NAME, this);
     this.options = options;
     utils.setDefaults.call(this);
   }
@@ -155,7 +153,7 @@ class AliyunProvider {
   }
 
   getStorageBucketId() {
-    return 'sls-storage-bucket';
+    return `sls-storage-bucket`;
   }
 
   getOssRegion(region) {
@@ -204,7 +202,7 @@ class AliyunProvider {
 
   getLogProjectName() {
     const service = this.serverless.service.service;
-    return `sls-${service}-logs`.replace(/_/g, '-');
+    return `sls-${this.key.aliyun_account_id}-logs`.replace(/_/g, '-');
   }
 
   getLogStoreName() {
@@ -213,8 +211,7 @@ class AliyunProvider {
   }
 
   getDeploymentBucketName() {
-    const service = this.serverless.service.service;
-    return `sls-${service}`;
+    return `sls-${this.key.aliyun_account_id}`;
   }
 
   // If a function is going to be reused by multiple endpoints,
@@ -717,7 +714,7 @@ class AliyunProvider {
 
   async getLogStore(projectName, storeName) {
     try {
-      return await this.slsClient.getLogStore(projectName, storeName)
+      return await this.slsClient.getLogStore(projectName, storeName);
     } catch (err) {
       if (err.code === 'LogStoreNotExist') {
         return undefined;
@@ -971,14 +968,15 @@ class AliyunProvider {
    * @param {string} triggerName
    * @return {TriggerResponse}
    */
-  getTrigger(serviceName, functionName, triggerName) {
-    return this.fcClient.getTrigger(serviceName, functionName, triggerName)
-      .catch((err) => {
-        if (['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'].indexOf(err.code)) {
-          return undefined;
-        }
-        throw err;
-      });
+  async getTrigger(serviceName, functionName, triggerName) {
+    try {
+      return await this.fcClient.getTrigger(serviceName, functionName, triggerName);
+    } catch (err) {
+      if (['ServiceNotFound', 'FunctionNotFound', 'TriggerNotFound'].indexOf(err.code)) {
+        return undefined;
+      }
+      throw err;
+    }
   }
 
   async listTriggers(serviceName, functionName) {

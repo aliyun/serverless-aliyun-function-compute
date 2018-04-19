@@ -65,7 +65,7 @@ describe('removeArtifacts', () => {
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(getBucketStub.calledOnce).toEqual(true);
-        expect(getBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
 
         expect(getObjectsStub.calledAfter(getBucketStub)).toEqual(true);
         expect(getObjectsStub.calledOnce).toEqual(true);
@@ -79,13 +79,13 @@ describe('removeArtifacts', () => {
 
         expect(deleteBucketStub.calledAfter(deleteObjectsStub)).toEqual(true);
         expect(deleteBucketStub.calledOnce).toEqual(true);
-        expect(deleteBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+        expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
 
         const logs = [
-          'Removing 3 artifacts in OSS bucket sls-my-service...',
-          'Removed 3 artifacts in OSS bucket sls-my-service',
-          'Removing OSS bucket sls-my-service...',
-          'Removed OSS bucket sls-my-service'
+          'Removing 3 artifacts in OSS bucket sls-accountid...',
+          'Removed 3 artifacts in OSS bucket sls-accountid',
+          'Removing OSS bucket sls-accountid...',
+          'Removed OSS bucket sls-accountid'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -105,13 +105,13 @@ describe('removeArtifacts', () => {
 
         expect(deleteBucketStub.calledAfter(deleteObjectsStub)).toEqual(true);
         expect(deleteBucketStub.calledOnce).toEqual(true);
-        expect(deleteBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+        expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
 
         const logs = [
-          'Removing 1 artifacts in OSS bucket sls-my-service...',
-          'Removed 1 artifacts in OSS bucket sls-my-service',
-          'Removing OSS bucket sls-my-service...',
-          'Removed OSS bucket sls-my-service'
+          'Removing 1 artifacts in OSS bucket sls-accountid...',
+          'Removed 1 artifacts in OSS bucket sls-accountid',
+          'Removing OSS bucket sls-accountid...',
+          'Removed OSS bucket sls-accountid'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -119,27 +119,26 @@ describe('removeArtifacts', () => {
       });
     });
 
-    it('should not remove any objects if there is none', () => {
+    it('should not remove any objects if there is none', async () => {
       getBucketStub.returns(Promise.resolve(bucket));
       getObjectsStub.returns(Promise.resolve([]));
       deleteObjectsStub.returns(Promise.resolve());
       deleteBucketStub.returns(Promise.resolve());
 
-      return aliyunRemove.removeArtifacts().then(() => {
-        expect(deleteObjectsStub.called).toEqual(false);
+      await aliyunRemove.removeArtifacts();
+      expect(deleteObjectsStub.called).toEqual(false);
 
-        expect(deleteBucketStub.calledOnce).toEqual(true);
-        expect(deleteBucketStub.calledWithExactly('sls-my-service')).toEqual(true);
+      expect(deleteBucketStub.calledOnce).toEqual(true);
+      expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
 
-        const logs = [
-          'No artifacts to remove.',
-          'Removing OSS bucket sls-my-service...',
-          'Removed OSS bucket sls-my-service'
-        ];
-        for (var i = 0; i < consoleLogStub.callCount; ++i) {
-          expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
-        }
-      });
+      const logs = [
+        'No artifacts to remove.',
+        'Removing OSS bucket sls-accountid...',
+        'Removed OSS bucket sls-accountid'
+      ];
+      for (var i = 0; i < consoleLogStub.callCount; ++i) {
+        expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
+      }
     });
 
     it('should not remove the bucket if there is not any', () => {

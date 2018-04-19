@@ -21,7 +21,7 @@ describe('DisplayServiceLogs', () => {
     serverless.service.functions = functionDefs;
     serverless.service.provider = {
       name: 'aliyun',
-      credentials: path.join(__dirname, '..', 'test', 'credentials'),
+      credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
     };
     serverless.config = {
       servicePath: path.join(__dirname, '..', '..', 'test')
@@ -50,7 +50,7 @@ describe('DisplayServiceLogs', () => {
       aliyunLogs.provider.getLogsIfAvailable.restore();
     });
 
-    it('should print relevant data on the console', () => {
+    it('should print relevant data on the console', async () => {
       getLogsIfAvailableStub.returns(Promise.resolve(logs));
 
       let expectedOutput = [
@@ -66,20 +66,19 @@ describe('DisplayServiceLogs', () => {
         '  - 2017-08-18T10:34:21.000Z: FC Invoke End RequestId: 25222ee9-41-143112-415219434',
         ''
       ];
-      return aliyunLogs.retrieveLogs().then(() => {
-        expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
-        expect(getLogsIfAvailableStub.calledOnce).toEqual(true);
-        expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
-          'sls-my-service-logs',
-          'my-service-dev',
-          1,
-          { functionName: 'my-service-dev-postTest' },
-          undefined
-        ]);
-      });
+      await aliyunLogs.retrieveLogs();
+      expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
+      expect(getLogsIfAvailableStub.calledOnce).toEqual(true);
+      expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
+        'sls-accountid-logs',
+        'my-service-dev',
+        1,
+        { functionName: 'my-service-dev-postTest' },
+        undefined
+      ]);
     });
 
-    it('should print logs if functions are not yet deployed', () => {
+    it('should print logs if functions are not yet deployed', async () => {
       getLogsIfAvailableStub.returns(Promise.resolve([]));
 
       let expectedOutput = [
@@ -92,9 +91,8 @@ describe('DisplayServiceLogs', () => {
         'There are no logs to show',
         ''
       ];
-      return aliyunLogs.retrieveLogs().then(() => {
-        expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
-      });
+      await aliyunLogs.retrieveLogs();
+      expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
     });
   });
 
@@ -121,7 +119,7 @@ describe('DisplayServiceLogs', () => {
       aliyunLogs.provider.getLogsIfAvailable.restore();
     });
 
-    it('should print relevant data on the console', () => {
+    it('should print relevant data on the console', async () => {
       getLogsIfAvailableStub.returns(Promise.resolve(logs.slice(0, 2)));
 
       let expectedOutput = [
@@ -136,16 +134,15 @@ describe('DisplayServiceLogs', () => {
         '  - 2017-08-18T10:18:26.000Z: FC Invoke Start RequestId: 332425-41-143112-415219434\r',
         ''
       ];
-      return aliyunLogs.retrieveLogs().then(() => {
-        expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
-        expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
-          'sls-my-service-logs',
-          'my-service-dev',
-          1,
-          { functionName: 'my-service-dev-postTest' },
-          2
-        ]);
-      });
+      await aliyunLogs.retrieveLogs();
+      expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
+      expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
+        'sls-accountid-logs',
+        'my-service-dev',
+        1,
+        { functionName: 'my-service-dev-postTest' },
+        2
+      ]);
     });
   });
 });

@@ -236,10 +236,10 @@ describe('AliyunRemove', () => {
         'Removing RAM role sls-my-service-dev-exec-role...',
         'Removed RAM role sls-my-service-dev-exec-role',
 
-        'Removing 3 artifacts in OSS bucket sls-my-service...',
-        'Removed 3 artifacts in OSS bucket sls-my-service',
-        'Removing OSS bucket sls-my-service...',
-        'Removed OSS bucket sls-my-service'
+        'Removing 3 artifacts in OSS bucket sls-accountid...',
+        'Removed 3 artifacts in OSS bucket sls-accountid',
+        'Removing OSS bucket sls-accountid...',
+        'Removed OSS bucket sls-accountid'
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
@@ -467,10 +467,10 @@ describe('AliyunRemove', () => {
         'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
         'Removing service my-service-dev...',
         'Removed service my-service-dev',
-        'Removing 3 artifacts in OSS bucket sls-my-service...',
-        'Removed 3 artifacts in OSS bucket sls-my-service',
-        'Removing OSS bucket sls-my-service...',
-        'Removed OSS bucket sls-my-service'
+        'Removing 3 artifacts in OSS bucket sls-accountid...',
+        'Removed 3 artifacts in OSS bucket sls-accountid',
+        'Removing OSS bucket sls-accountid...',
+        'Removed OSS bucket sls-accountid'
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
