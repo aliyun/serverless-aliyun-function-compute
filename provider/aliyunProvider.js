@@ -202,12 +202,12 @@ class AliyunProvider {
 
   getLogProjectName() {
     const service = this.serverless.service.service;
-    return `sls-${this.key.aliyun_account_id}-${service}-logs`.replace(/_/g, '-');
+    return `sls-${this.key.aliyun_account_id}-logs`.replace(/_/g, '-');
   }
 
   getLogStoreName() {
     const service = this.serverless.service.service;
-    return `sls-${this.key.aliyun_account_id}-${this.options.stage}`;
+    return `${service}-${this.options.stage}`;
   }
 
   getDeploymentBucketName() {

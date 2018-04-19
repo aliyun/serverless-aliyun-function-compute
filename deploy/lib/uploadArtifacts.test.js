@@ -65,8 +65,8 @@ describe('UploadArtifacts', () => {
             '/projects/.serverless/my-service.zip'
           )).toEqual(true);
           const logs = [
-            'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service...',
-            'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-my-service'
+            'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-accountid...',
+            'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-accountid'
           ];
           expect(consoleLogStub.callCount).toEqual(logs.length);
           for (var i = 0; i < consoleLogStub.callCount; ++i) {

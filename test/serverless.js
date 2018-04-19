@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const getFuncName = Symbol('getfuncname');
 
-process.env.ALIYUN_ACCOUNT = 'ttt';
+process.env.ALIYUN_ACCOUNT = 'accountid';
 
 // mock of the serverless instance
 class Serverless {
@@ -58,7 +58,7 @@ class Serverless {
         return `${service}-${stage}-${func}`;
       }
     };
-  }  
+  }
 
   setProvider(name, provider) {
     this.providers[name] = provider;

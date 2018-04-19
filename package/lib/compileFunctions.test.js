@@ -76,7 +76,7 @@ describe('CompileFunctions', () => {
             'timeout': 30,
             'runtime': 'nodejs6',
             'code': {
-              'ossBucketName': 'sls-my-service',
+              'ossBucketName': 'sls-accountid',
               'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
@@ -115,7 +115,7 @@ describe('CompileFunctions', () => {
             'timeout': 30,
             'runtime': 'nodejs6',
             'code': {
-              'ossBucketName': 'sls-my-service',
+              'ossBucketName': 'sls-accountid',
               'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
@@ -154,7 +154,7 @@ describe('CompileFunctions', () => {
             'timeout': 120,
             'runtime': 'nodejs6',
             'code': {
-              'ossBucketName': 'sls-my-service',
+              'ossBucketName': 'sls-accountid',
               'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
@@ -193,7 +193,7 @@ describe('CompileFunctions', () => {
             'timeout': 120,
             'runtime': 'nodejs6',
             'code': {
-              'ossBucketName': 'sls-my-service',
+              'ossBucketName': 'sls-accountid',
               'ossObjectName': 'serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip'
             }
           }
@@ -445,7 +445,7 @@ describe('CompileFunctions', () => {
           handler: 'index.ossTriggerHandler',
           events: [{
             oss: {
-              sourceArn: 'acs:oss:cn-shanghai:ttt:my-service-resource',
+              sourceArn: 'acs:oss:cn-shanghai:accountid:my-service-resource',
               triggerConfig: {
                 events: [
                   'oss:ObjectCreated:PostObject',
