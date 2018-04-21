@@ -271,6 +271,7 @@ exports.functionDefs = {
         path: '/baz',
         method: 'post',
         bodyFormat: 'form',
+        requestMode: 'mapping',
         parameters: [{
           name: 'foo',
           type: 'string',

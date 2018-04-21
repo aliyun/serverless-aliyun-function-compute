@@ -33,6 +33,7 @@ functions:
           path: /baz
           method: post
           bodyFormat: form
+          requestMode: mapping
           parameters:
             - name: foo
               type: string
@@ -41,7 +42,13 @@ functions:
               default: bar
               demo: bar
               description: foo
-
+  postTest2:
+      handler: index.postHandler
+      events:
+        - http:
+            path: /bar
+            method: post
+            requestMode: passthrough
   getTest:
     handler: index.getHandler
     events:
