@@ -374,7 +374,7 @@ class AliyunProvider {
       'RequestHttpMethod': (event.RequestHttpMethod || event.method || 'GET').toUpperCase(),
       'RequestPath': requestPath,
       'BodyFormat': (event.BodyFormat || event.bodyFormat || '').toUpperCase(),
-      'RequestMode': (event.RequestMode || event.requestMode || '').toUpperCase(),
+      'RequestMode': (event.RequestMode || event.requestMode || 'passthrough').toUpperCase(), //default pass through mode
       'PostBodyDescription': ''
     };
   }

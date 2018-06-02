@@ -1,8 +1,8 @@
-service: my-service-1
+service: my-service
 
 provider:
   name: aliyun
-  runtime: nodejs8
+  runtime: nodejs6
   credentials: ~/.aliyuncli/credentials # path must be absolute
   ramRoleStatements:
     - Effect: Allow
@@ -56,7 +56,6 @@ functions:
       - https:
           path: /baz2
           method: post
-          requestMode: passthrough
 
   getTest2:
     handler: index.getHandler
@@ -64,7 +63,6 @@ functions:
       - https:
           path: /quo2
           method: get
-          requestMode: passthrough
   ossTriggerTest:
     handler: index.ossTriggerHandler
     events:

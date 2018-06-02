@@ -23,6 +23,7 @@ exports.apis = [{
   'RequestConfig': {
     'RequestProtocol': 'HTTP',
     'RequestHttpMethod': 'POST',
+    'RequestMode': 'PASSTHROUGH',
     'RequestPath': '/baz',
     'BodyFormat': 'FORM',
     'PostBodyDescription': ''
@@ -75,6 +76,7 @@ exports.apis = [{
   'RequestConfig': {
     'RequestProtocol': 'HTTP',
     'RequestHttpMethod': 'GET',
+    'RequestMode': 'PASSTHROUGH',
     'RequestPath': '/quo',
     'BodyFormat': '',
     'PostBodyDescription': ''
