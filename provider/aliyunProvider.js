@@ -357,7 +357,7 @@ class AliyunProvider {
         'handler': funcObject.handler,
         'memorySize': memorySize,
         'timeout': timeout,
-        'runtime': 'nodejs6',
+        'runtime': service.provider.runtime,
         'code': {
           'ossBucketName': this.getDeploymentBucketName(),
           'ossObjectName': service.package.artifactFilePath
