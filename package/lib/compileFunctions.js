@@ -95,8 +95,8 @@ module.exports = {
     funcObject.events.forEach((event) => {
       const eventType = Object.keys(event)[0];
       // TODO: support more event types
-      if (eventType === 'http') {
-        const apiResource = this.provider.getHttpApiResource(event.http, funcObject);
+      if (eventType === 'http' || eventType === 'https' ) {
+        const apiResource = this.provider.getHttpApiResource(event.http || event.https, funcObject, eventType);
         const apiName = apiResource.Properties.ApiName;
         _.merge(resources, { [apiName]: apiResource });
       } else if (eventType === 'oss') {
@@ -109,7 +109,7 @@ module.exports = {
 };
 
 function needsApiGateway(event) {
-  return Object.keys(event)[0] === 'http';
+  return Object.keys(event)[0] === 'http' || Object.keys(event)[0] === 'https';
 }
 
 function needsOSSTrigger(event) {

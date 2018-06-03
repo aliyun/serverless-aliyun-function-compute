@@ -29,7 +29,8 @@ describe('CompileFunctions', () => {
     serverless.service.provider = {
       credentials: path.join(__dirname, '..', '..', 'test', 'credentials'),
       compiledConfigurationTemplate: _.cloneDeep(createTemplate),
-      ramRoleStatements
+      ramRoleStatements,
+      runtime: 'nodejs6'
     };
     const options = {
       stage: 'dev',
@@ -342,6 +343,7 @@ describe('CompileFunctions', () => {
               path: '/test/[id]',
               method: 'get',
               bodyFormat: 'form',
+              requestMode: 'mapping',
               parameters: [{
                 name: 'id',
                 type: 'number',
@@ -363,6 +365,7 @@ describe('CompileFunctions', () => {
           'RequestProtocol': 'HTTP',
           'RequestHttpMethod': 'GET',
           'RequestPath': '/test/[id]',
+          'RequestMode': 'MAPPING',
           'BodyFormat': 'FORM',
           'PostBodyDescription': ''
         },
@@ -419,6 +422,7 @@ describe('CompileFunctions', () => {
           'RequestProtocol': 'HTTP',
           'RequestHttpMethod': 'GET',
           'RequestPath': '/test',
+          'RequestMode': 'PASSTHROUGH',
           'BodyFormat': '',
           'PostBodyDescription': ''
         },
