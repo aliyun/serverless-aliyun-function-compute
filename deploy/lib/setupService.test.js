@@ -145,30 +145,30 @@ describe('setupServices', () => {
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);
-        expect(getLogProjectStub.calledWithExactly('sls-accountid-logs')).toEqual(true);
+        expect(getLogProjectStub.calledWithExactly('sls-accountid-cn-shanghai-logs')).toEqual(true);
 
         expect(createLogProjectStub.calledAfter(getLogProjectStub)).toEqual(true);
         expect(createLogProjectStub.calledOnce).toEqual(true);
         expect(createLogProjectStub.getCall(0).args)
-          .toEqual(['sls-accountid-logs', logProject]);
+          .toEqual(['sls-accountid-cn-shanghai-logs', logProject]);
 
         expect(getLogStoreStub.calledAfter(createLogProjectStub)).toEqual(true);
         expect(getLogStoreStub.calledOnce).toEqual(true);
-        expect(getLogStoreStub.calledWithExactly('sls-accountid-logs', 'my-service-dev')).toEqual(true);
+        expect(getLogStoreStub.calledWithExactly('sls-accountid-cn-shanghai-logs', 'my-service-dev')).toEqual(true);
 
         expect(createLogStoreStub.calledAfter(getLogStoreStub)).toEqual(true);
         expect(createLogStoreStub.calledOnce).toEqual(true);
         expect(createLogStoreStub.getCall(0).args)
-          .toEqual(['sls-accountid-logs', 'my-service-dev', logStore]);
+          .toEqual(['sls-accountid-cn-shanghai-logs', 'my-service-dev', logStore]);
 
         expect(getLogIndexStub.calledAfter(createLogStoreStub)).toEqual(true);
         expect(getLogIndexStub.calledOnce).toEqual(true);
-        expect(getLogIndexStub.calledWithExactly('sls-accountid-logs', 'my-service-dev')).toEqual(true);
+        expect(getLogIndexStub.calledWithExactly('sls-accountid-cn-shanghai-logs', 'my-service-dev')).toEqual(true);
 
         expect(createLogIndexStub.calledAfter(getLogIndexStub)).toEqual(true);
         expect(createLogIndexStub.calledOnce).toEqual(true);
         expect(createLogIndexStub.getCall(0).args)
-          .toEqual(['sls-accountid-logs', 'my-service-dev', logIndex]);
+          .toEqual(['sls-accountid-cn-shanghai-logs', 'my-service-dev', logIndex]);
 
         expect(setupRoleStub.calledAfter(createLogIndexStub)).toEqual(true);
         expect(setupRoleStub.calledOnce).toEqual(true);
@@ -186,27 +186,27 @@ describe('setupServices', () => {
 
         expect(getBucketStub.calledAfter(createServiceStub)).toEqual(true);
         expect(getBucketStub.calledOnce).toEqual(true);
-        expect(getBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         expect(createBucketStub.calledAfter(getBucketStub)).toEqual(true);
         expect(createBucketStub.calledOnce).toEqual(true);
-        expect(createBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(createBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         expect(resetOssClientStub.calledAfter(createBucketStub)).toEqual(true);
         expect(resetOssClientStub.calledOnce).toEqual(true);
-        expect(resetOssClientStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(resetOssClientStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         const logs = [
-          'Creating log project sls-accountid-logs...',
-          'Created log project sls-accountid-logs',
-          'Creating log store sls-accountid-logs/my-service-dev...',
-          'Created log store sls-accountid-logs/my-service-dev',
-          'Creating log index for sls-accountid-logs/my-service-dev...',
-          'Created log index for sls-accountid-logs/my-service-dev',
+          'Creating log project sls-accountid-cn-shanghai-logs...',
+          'Created log project sls-accountid-cn-shanghai-logs',
+          'Creating log store sls-accountid-cn-shanghai-logs/my-service-dev...',
+          'Created log store sls-accountid-cn-shanghai-logs/my-service-dev',
+          'Creating log index for sls-accountid-cn-shanghai-logs/my-service-dev...',
+          'Created log index for sls-accountid-cn-shanghai-logs/my-service-dev',
           'Creating service my-service-dev...',
           'Created service my-service-dev',
-          'Creating bucket sls-accountid...',
-          'Created bucket sls-accountid'
+          'Creating bucket sls-accountid-cn-shanghai...',
+          'Created bucket sls-accountid-cn-shanghai'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -234,19 +234,19 @@ describe('setupServices', () => {
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);
-        expect(getLogProjectStub.calledWithExactly('sls-accountid-logs')).toEqual(true);
+        expect(getLogProjectStub.calledWithExactly('sls-accountid-cn-shanghai-logs')).toEqual(true);
 
         expect(createLogProjectStub.called).toEqual(false);
 
         expect(getLogStoreStub.calledAfter(getLogProjectStub)).toEqual(true);
         expect(getLogStoreStub.calledOnce).toEqual(true);
-        expect(getLogStoreStub.calledWithExactly('sls-accountid-logs', 'my-service-dev')).toEqual(true);
+        expect(getLogStoreStub.calledWithExactly('sls-accountid-cn-shanghai-logs', 'my-service-dev')).toEqual(true);
 
         expect(createLogStoreStub.called).toEqual(false);
 
         expect(getLogIndexStub.calledAfter(getLogStoreStub)).toEqual(true);
         expect(getLogIndexStub.calledOnce).toEqual(true);
-        expect(getLogIndexStub.calledWithExactly('sls-accountid-logs', 'my-service-dev')).toEqual(true);
+        expect(getLogIndexStub.calledWithExactly('sls-accountid-cn-shanghai-logs', 'my-service-dev')).toEqual(true);
 
         expect(createLogIndexStub.called).toEqual(false);
 
@@ -261,20 +261,20 @@ describe('setupServices', () => {
 
         expect(getBucketStub.calledAfter(getServiceStub)).toEqual(true);
         expect(getBucketStub.calledOnce).toEqual(true);
-        expect(getBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         expect(createBucketStub.calledOnce).toEqual(false);
 
         expect(resetOssClientStub.calledAfter(getBucketStub)).toEqual(true);
         expect(resetOssClientStub.calledOnce).toEqual(true);
-        expect(resetOssClientStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(resetOssClientStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         const logs = [
-          'Log project sls-accountid-logs already exists.',
-          'Log store sls-accountid-logs/my-service-dev already exists.',
-          'Log store sls-accountid-logs/my-service-dev already has an index.',
+          'Log project sls-accountid-cn-shanghai-logs already exists.',
+          'Log store sls-accountid-cn-shanghai-logs/my-service-dev already exists.',
+          'Log store sls-accountid-cn-shanghai-logs/my-service-dev already has an index.',
           'Service my-service-dev already exists.',
-          'Bucket sls-accountid already exists.'
+          'Bucket sls-accountid-cn-shanghai already exists.'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
