@@ -203,8 +203,7 @@ class AliyunProvider {
   }
 
   getLogProjectName() {
-    const service = this.serverless.service.service;
-    return `sls-${this.key.aliyun_account_id}-logs`.replace(/_/g, '-');
+    return `sls-${this.key.aliyun_account_id}-${this.options.region}-logs`.replace(/_/g, '-');
   }
 
   getLogStoreName() {
@@ -213,7 +212,7 @@ class AliyunProvider {
   }
 
   getDeploymentBucketName() {
-    return `sls-${this.key.aliyun_account_id}`;
+    return `sls-${this.key.aliyun_account_id}-${this.options.region}`;
   }
 
   // If a function is going to be reused by multiple endpoints,
