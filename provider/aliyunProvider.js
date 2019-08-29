@@ -25,6 +25,8 @@ const ossClientSym = Symbol('oss-client');
 const ramClientSym = Symbol('ram-client');
 const slsClientSym = Symbol('sls-client');
 const PROJECT_DELAY = 1500;
+const STORE_DELAY = 1500;
+
 
 class AliyunProvider {
   static getProviderName() {
@@ -724,7 +726,8 @@ class AliyunProvider {
   }
 
   async createLogStore(projectName, storeName, store) {
-    await this.slsClient.createLogStore(projectName, storeName, store);
+    await this.slsClient.createLogStore(projectName, storeName, store);   
+    await this.sleep(STORE_DELAY);
     return this.getLogStore(projectName, storeName);
   }
 
