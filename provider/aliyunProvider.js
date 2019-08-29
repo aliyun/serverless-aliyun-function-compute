@@ -1258,9 +1258,7 @@ class AliyunProvider {
     if (res.TotalCount > apis.length) {
       // TODO(joyeecheung): pagination
     }
-    return apis.filter((item) => {
-      item.RegionId === this.options.region;
-    });
+    return apis.filter((item) => item.RegionId === this.options.region);
   }
 
   abolishApi(group, api) {
