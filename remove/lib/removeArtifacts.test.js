@@ -65,7 +65,7 @@ describe('removeArtifacts', () => {
 
       return aliyunRemove.removeArtifacts().then(() => {
         expect(getBucketStub.calledOnce).toEqual(true);
-        expect(getBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(getBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         expect(getObjectsStub.calledAfter(getBucketStub)).toEqual(true);
         expect(getObjectsStub.calledOnce).toEqual(true);
@@ -79,13 +79,13 @@ describe('removeArtifacts', () => {
 
         expect(deleteBucketStub.calledAfter(deleteObjectsStub)).toEqual(true);
         expect(deleteBucketStub.calledOnce).toEqual(true);
-        expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(deleteBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         const logs = [
-          'Removing 3 artifacts in OSS bucket sls-accountid...',
-          'Removed 3 artifacts in OSS bucket sls-accountid',
-          'Removing OSS bucket sls-accountid...',
-          'Removed OSS bucket sls-accountid'
+          'Removing 3 artifacts in OSS bucket sls-accountid-cn-shanghai...',
+          'Removed 3 artifacts in OSS bucket sls-accountid-cn-shanghai',
+          'Removing OSS bucket sls-accountid-cn-shanghai...',
+          'Removed OSS bucket sls-accountid-cn-shanghai'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -105,13 +105,13 @@ describe('removeArtifacts', () => {
 
         expect(deleteBucketStub.calledAfter(deleteObjectsStub)).toEqual(true);
         expect(deleteBucketStub.calledOnce).toEqual(true);
-        expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+        expect(deleteBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
         const logs = [
-          'Removing 1 artifacts in OSS bucket sls-accountid...',
-          'Removed 1 artifacts in OSS bucket sls-accountid',
-          'Removing OSS bucket sls-accountid...',
-          'Removed OSS bucket sls-accountid'
+          'Removing 1 artifacts in OSS bucket sls-accountid-cn-shanghai...',
+          'Removed 1 artifacts in OSS bucket sls-accountid-cn-shanghai',
+          'Removing OSS bucket sls-accountid-cn-shanghai...',
+          'Removed OSS bucket sls-accountid-cn-shanghai'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
@@ -129,12 +129,12 @@ describe('removeArtifacts', () => {
       expect(deleteObjectsStub.called).toEqual(false);
 
       expect(deleteBucketStub.calledOnce).toEqual(true);
-      expect(deleteBucketStub.calledWithExactly('sls-accountid')).toEqual(true);
+      expect(deleteBucketStub.calledWithExactly('sls-accountid-cn-shanghai')).toEqual(true);
 
       const logs = [
         'No artifacts to remove.',
-        'Removing OSS bucket sls-accountid...',
-        'Removed OSS bucket sls-accountid'
+        'Removing OSS bucket sls-accountid-cn-shanghai...',
+        'Removed OSS bucket sls-accountid-cn-shanghai'
       ];
       for (var i = 0; i < consoleLogStub.callCount; ++i) {
         expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);

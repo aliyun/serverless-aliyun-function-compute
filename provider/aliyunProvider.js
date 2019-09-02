@@ -25,6 +25,8 @@ const ossClientSym = Symbol('oss-client');
 const ramClientSym = Symbol('ram-client');
 const slsClientSym = Symbol('sls-client');
 const PROJECT_DELAY = 1500;
+const STORE_DELAY = 1500;
+
 
 class AliyunProvider {
   static getProviderName() {
@@ -201,8 +203,7 @@ class AliyunProvider {
   }
 
   getLogProjectName() {
-    const service = this.serverless.service.service;
-    return `sls-${this.key.aliyun_account_id}-logs`.replace(/_/g, '-');
+    return `sls-${this.key.aliyun_account_id}-${this.options.region}-logs`.replace(/_/g, '-');
   }
 
   getLogStoreName() {
@@ -211,7 +212,7 @@ class AliyunProvider {
   }
 
   getDeploymentBucketName() {
-    return `sls-${this.key.aliyun_account_id}`;
+    return `sls-${this.key.aliyun_account_id}-${this.options.region}`;
   }
 
   // If a function is going to be reused by multiple endpoints,
@@ -724,7 +725,8 @@ class AliyunProvider {
   }
 
   async createLogStore(projectName, storeName, store) {
-    await this.slsClient.createLogStore(projectName, storeName, store);
+    await this.slsClient.createLogStore(projectName, storeName, store);   
+    await this.sleep(STORE_DELAY);
     return this.getLogStore(projectName, storeName);
   }
 
@@ -1256,9 +1258,7 @@ class AliyunProvider {
     if (res.TotalCount > apis.length) {
       // TODO(joyeecheung): pagination
     }
-    return apis.filter((item) => {
-      item.RegionId === this.options.region;
-    });
+    return apis.filter((item) => item.RegionId === this.options.region);
   }
 
   abolishApi(group, api) {

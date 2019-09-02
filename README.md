@@ -107,6 +107,8 @@ See [test/project](./test/project) for a more detailed example (including how to
 
 ### Workflow
 
+Make sure that you have activated Function Compute and any other dependent services such as RAM, Log Service, API Gateway and OSS before attempting to deploy your function.
+
 * Deploy your service to Aliyun:
 
   ```sh

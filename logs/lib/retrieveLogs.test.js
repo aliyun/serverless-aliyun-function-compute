@@ -70,7 +70,7 @@ describe('DisplayServiceLogs', () => {
       expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
       expect(getLogsIfAvailableStub.calledOnce).toEqual(true);
       expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
-        'sls-accountid-logs',
+        'sls-accountid-cn-shanghai-logs',
         'my-service-dev',
         1,
         { functionName: 'my-service-dev-postTest' },
@@ -137,7 +137,7 @@ describe('DisplayServiceLogs', () => {
       await aliyunLogs.retrieveLogs();
       expect(consoleLogStub.getCall(0).args[0].split('\n')).toEqual(expectedOutput);
       expect(getLogsIfAvailableStub.getCall(0).args).toEqual([
-        'sls-accountid-logs',
+        'sls-accountid-cn-shanghai-logs',
         'my-service-dev',
         1,
         { functionName: 'my-service-dev-postTest' },
