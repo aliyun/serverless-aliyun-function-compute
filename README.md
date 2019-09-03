@@ -141,6 +141,22 @@ Make sure that you have activated Function Compute and any other dependent servi
 
   Note: by default RAM roles and policies created during the deployment are not removed. You can use `serverless remove --remove-roles` if you do want to remove them.
 
+#### Change Region
+
+* Changing the region in provider of serverless.yml:
+  ```yaml
+  provider:
+    name: aliyun
+    region: cn-hongkong
+  ```
+
+* Changing the region in CLI parameters:
+  ```sh
+  $ serverless deploy --region cn-hongkong
+  ```
+
+  Note: CLI parameter `--region` has higher priority than provider, But you have to add this parameter to all the invocations, not only `deploy`.
+
 ## Develop
 
 ```sh
