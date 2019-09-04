@@ -14,7 +14,7 @@ This plugin enables Aliyun Function Compute support within the Serverless Framew
 
 ### Example
 
-You can install the following example via:
+You can install the following example from GitHub:
 
 ```sh
 $ serverless install --url https://github.com/aliyun/serverless-function-compute-examples/tree/master/aliyun-nodejs
@@ -29,7 +29,7 @@ The structure of the project should look something like this:
 └── serverless.yml
 ```
 
-Install `serverless-aliyun-function-compute` plugin for your service.
+Install `serverless-aliyun-function-compute` plugin to your service.
 
 ```yaml
 $ serverless plugin install --name serverless-aliyun-function-compute
@@ -90,18 +90,20 @@ exports.hello = (event, context, callback) => {
 };
 ```
 
-You can just create a file with following informations:
+In order to deploy this function, we need the credentials with permissions to access Aliyun Function Compute. 
+Please create a `credentials` file and configure the credentials in it. 
+Here is an example `credentials` file:
 
 ```ini
 [default]
-aliyun_access_key_id = nA5hjMhbg9BOoVo
-aliyun_access_key_secret = 098f6bcd4621d373cade4e832627b4f6
-aliyun_account_id = 1504163990726
+aliyun_access_key_id = xxxxxxxx
+aliyun_access_key_secret = xxxxxxxxxxxxxxxxxxxx
+aliyun_account_id = 1234567890
 ```
 
-The `aliyun_access_key_secret` and `aliyun_access_key_id` you can found at https://ak-console.aliyun.com/?#/accesskey . If no any Access Key, you can create a Access Key or use subaccount Access Key. And `aliyun_account_id` can be found at https://account-intl.console.aliyun.com/?#/secure .
-
-After create the credentials file, please make sure pointing the value of the `credentials` field in `serverless.yml` to it.
+You can find the `aliyun_access_key_secret` and `aliyun_access_key_id` from https://ak-console.aliyun.com/?#/accesskey. You can also chose to create an Access Key or use sub-account Access Key.
+You can find the `aliyun_account_id` from https://account-intl.console.aliyun.com/?#/secure .
+After creating the `credentials` file, please make sure to change the `credentials` field value in `serverless.yml` to the absolute file path.
 
 See [test/project](./test/project) for a more detailed example (including how to access other Aliyun services, how to set up a HTTP POST endpoint, how to set up OSS triggers, etc.).
 
