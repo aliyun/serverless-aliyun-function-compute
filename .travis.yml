@@ -10,5 +10,5 @@ before_script:
   - nvm install 6
 
 script:
-  - npm test
-  - nvm run 6 npm test-lib
+  - nvm run 8 npm test
+  - nvm run 6 npm run test-lib
