@@ -2,6 +2,13 @@ language: node_js
 node_js:
   - "8"
 
+cache:
+  directories:
+    - /home/travis/.nvm/
+
+before_script:
+  - nvm install 6
+
 script:
   - npm test
   - nvm run 6 npm test-lib
