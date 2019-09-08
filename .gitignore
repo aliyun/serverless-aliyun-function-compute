@@ -1,6 +1,6 @@
 node_modules
 coverage
 package-lock.json
-test/project/.serverless
+src/test/project/.serverless
 .idea
 /lib
