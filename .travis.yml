@@ -5,7 +5,7 @@ node_js:
   - "10"
 
 script:
-  - if [ $TRAVIS_NODE_VERSION == "6"]; then
+  - if [ $TRAVIS_NODE_VERSION == "6" ]; then
       npm run build && jest lib ;
     else
       npm test ;
