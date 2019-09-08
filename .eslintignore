@@ -2,4 +2,5 @@
 *.min.js
 node_modules/*
 assets/scripts/lib/*
-test/project/node_modules/*
+src/test/project/node_modules/*
+lib

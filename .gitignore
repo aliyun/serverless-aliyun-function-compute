@@ -3,3 +3,4 @@ coverage
 package-lock.json
 test/project/.serverless
 .idea
+lib

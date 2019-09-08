@@ -16,7 +16,10 @@ node_modules
 
 package-lock.json
 
+# ignore source
+src
+
 # tests
-test
+lib/test
 
 **/*.test.js
