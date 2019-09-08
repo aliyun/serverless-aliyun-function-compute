@@ -67,7 +67,7 @@ describe('setupServices', () => {
       aliyunDeploy.createBucketIfNotExists.restore();
     });
 
-    it('should run promise chain', () => {
+    it('should run promise chain', (done) => {
       aliyunDeploy
         .setupService().then(() => {
           expect(createLogConfigIfNotExistsStub.calledOnce).toEqual(true);
@@ -75,6 +75,7 @@ describe('setupServices', () => {
           expect(checkForExistingServiceStub.calledAfter(setupExecRoleStub)).toEqual(true);
           expect(createServiceIfNotExistsStub.calledAfter(checkForExistingServiceStub));
           expect(createBucketIfNotExistsStub.calledAfter(createServiceIfNotExistsStub));
+          done();
         });
     });
   });
