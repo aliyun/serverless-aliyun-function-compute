@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('util');
+const fs = require('fs-extra');
 
 module.exports = {
   async invokeFunction() {
@@ -49,6 +50,6 @@ module.exports = {
   },
 
   getDataFromPath(path) {
-    return this.serverless.utils.readFileSync(path);
+    return fs.readFileSync(path);
   }
 };
