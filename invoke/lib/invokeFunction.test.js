@@ -158,7 +158,7 @@ describe('InvokeFunction', () => {
       });
     });
 
-    it('should invoke the provided function with data in path', () => {
+    it.only('should invoke the provided function with data in path', () => {
       aliyunInvoke.options.function = 'getTest';
       aliyunInvoke.options.path = path.join(__dirname, '..', '..',  'test', 'invokeData.json');
       invokeFunctionStub.returns(Promise.resolve(response));
@@ -169,7 +169,7 @@ describe('InvokeFunction', () => {
           invokeFunctionStub.calledWithExactly(
             'my-service-dev',
             'my-service-dev-getTest',
-            { foo: 'bar' })
+            Buffer.from('{\n  "foo": "bar"\n}', 'utf8'))
         ).toEqual(true);
         const logs = [
           'Invoking my-service-dev-getTest of my-service-dev with { foo: \'bar\' }',

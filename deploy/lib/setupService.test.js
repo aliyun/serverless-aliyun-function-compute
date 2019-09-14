@@ -67,7 +67,7 @@ describe('setupServices', () => {
       aliyunDeploy.createBucketIfNotExists.restore();
     });
 
-    it('should run promise chain', () => {
+    it('should run promise chain', (done) => {
       aliyunDeploy
         .setupService().then(() => {
           expect(createLogConfigIfNotExistsStub.calledOnce).toEqual(true);
@@ -75,6 +75,7 @@ describe('setupServices', () => {
           expect(checkForExistingServiceStub.calledAfter(setupExecRoleStub)).toEqual(true);
           expect(createServiceIfNotExistsStub.calledAfter(checkForExistingServiceStub));
           expect(createBucketIfNotExistsStub.calledAfter(createServiceIfNotExistsStub));
+          done();
         });
     });
   });
@@ -128,7 +129,7 @@ describe('setupServices', () => {
       aliyunDeploy.provider.createLogIndex.restore();
     });
 
-    it('should set up service from scratch', () => {
+    it('should set up service from scratch', (done) => {
       setupRoleStub.returns(Promise.resolve(fullExecRole));
       getServiceStub.returns(Promise.resolve(undefined));
       createServiceStub.returns(Promise.resolve(fullService));
@@ -212,10 +213,11 @@ describe('setupServices', () => {
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
         }
+        done();
       });
     });
 
-    it('should handle existing service ', () => {
+    it('should handle existing service ', (done) => {
       setupRoleStub.returns(Promise.resolve(fullExecRole));
       getServiceStub.returns(Promise.resolve(fullService));
       createServiceStub.returns(Promise.resolve(fullService));
@@ -280,6 +282,7 @@ describe('setupServices', () => {
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);
         }
+        done();
       });
     });
   });
