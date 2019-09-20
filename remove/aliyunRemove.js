@@ -7,6 +7,7 @@ const removeEvents = require('./lib/removeEvents');
 const removeFunctionsAndService = require('./lib/removeFunctionsAndService');
 const removeArtifacts = require('./lib/removeArtifacts');
 const removeRoleAndPolicies = require('./lib/removeRoleAndPolicies');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunRemove {
   constructor(serverless, options) {
@@ -25,7 +26,7 @@ class AliyunRemove {
       removeRoleAndPolicies
     );
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'before:remove:remove': async () => {
         this.validate();
         this.setDefaults();
@@ -37,7 +38,7 @@ class AliyunRemove {
         await this.removeFunctionsAndService();
         await this.removeArtifacts();
       }
-    };
+    }, 'remove');
   }
 }
 

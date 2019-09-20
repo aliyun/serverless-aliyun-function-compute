@@ -3,6 +3,7 @@
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const retrieveLogs = require('./lib/retrieveLogs');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunLogs {
   constructor(serverless, options) {
@@ -17,7 +18,7 @@ class AliyunLogs {
       retrieveLogs
     );
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'before:logs:logs': async () => {
         this.validate();
         this.setDefaults();
@@ -26,7 +27,7 @@ class AliyunLogs {
       'logs:logs': async () => {
         await this.retrieveLogs();
       },
-    };
+    }, 'logs');
   }
 }
 

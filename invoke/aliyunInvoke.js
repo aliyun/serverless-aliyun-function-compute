@@ -3,6 +3,7 @@
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const invokeFunction = require('./lib/invokeFunction');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunInvoke {
   constructor(serverless, options) {
@@ -17,7 +18,7 @@ class AliyunInvoke {
       invokeFunction
     );
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'before:invoke:invoke': async () => {
         await this.validate();
         this.setDefaults();
@@ -26,7 +27,7 @@ class AliyunInvoke {
       'invoke:invoke': async () => {
         await this.invokeFunction();
       },
-    };
+    }, 'invoke');
   }
 }
 

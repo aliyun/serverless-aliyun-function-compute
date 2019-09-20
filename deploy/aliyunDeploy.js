@@ -8,6 +8,7 @@ const uploadArtifacts = require('./lib/uploadArtifacts');
 const setupFunctions = require('./lib/setupFunctions');
 const setupEvents = require('./lib/setupEvents');
 const setupRole = require('./lib/setupRole');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunDeploy {
   constructor(serverless, options) {
@@ -26,7 +27,7 @@ class AliyunDeploy {
       setupEvents,
       setupRole);
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'before:deploy:deploy': async () => {
         await this.validate();
         this.setDefaults();
@@ -39,7 +40,7 @@ class AliyunDeploy {
         await this.setupFunctions();
         await this.setupEvents();
       }
-    };
+    }, 'deploy');
   }
 }
 

@@ -3,6 +3,7 @@
 const validate = require('../shared/validate');
 const utils = require('../shared/utils');
 const displayServiceInfo = require('./lib/displayServiceInfo');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunInfo {
   constructor(serverless, options) {
@@ -17,7 +18,7 @@ class AliyunInfo {
       displayServiceInfo
     );
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'before:info:info': async () => {
         await this.validate();
         this.setDefaults();
@@ -29,7 +30,7 @@ class AliyunInfo {
       'info:info': async () => {
         await this.displayServiceInfo();
       },
-    };
+    }, 'info');
   }
 }
 
