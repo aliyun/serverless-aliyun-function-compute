@@ -1,5 +1,3 @@
 #!/usr/bin/env node
 
-const visitor = require('../shared/visitor').getVisitor();
-
-visitor.pageview('/downloaded').send();
+require('../shared/visitor').sendDownloaded();

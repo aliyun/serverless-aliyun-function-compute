@@ -53,7 +53,7 @@ real.set('cd1', os);
 real.set('cd2', nodeVersion);
 real.set('cd3', appVersion);
 
-let visitor, ciSended = false;
+let visitor;
 
 function getVisitor() {
 
@@ -64,10 +64,6 @@ function getVisitor() {
     }
 
     if (ci.isCI) {
-      if (!ciSended) {
-        real.pageview(`/downloaded/ci/${ci.name}`).send();
-        ciSended = true;
-      }
       return fake;
     }
 
@@ -75,6 +71,13 @@ function getVisitor() {
   }
 
   return visitor;
+}
+
+function sendDownloaded() {
+    real.pageview('/downloaded').send();
+    if (ci.isCI) {
+      real.pageview(`/downloaded/ci/${ci.name}`).send();
+    }
 }
 
 function visitorWrap(category) {
@@ -115,4 +118,4 @@ function hooksWrap(hooks, category) {
   return Object.keys(hooks).reduce(reducer, {});
 }
 
-module.exports = { getVisitor, visitorWrap, hooksWrap };
+module.exports = { getVisitor, visitorWrap, hooksWrap, sendDownloaded };
