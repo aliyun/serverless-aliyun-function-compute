@@ -19,9 +19,12 @@ module.exports = {
   },
 
   async setupInvokeRole() {
-    const role = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()].Properties;
-    // TODO: update if needed
-    this.invokeRole = await this.setupRole(role);
+    const invokeRoleResource = this.templates.update.Resources[this.provider.getInvokeRoleLogicalId()];
+    if(invokeRoleResource){
+      const role = invokeRoleResource.Properties;
+      // TODO: update if needed
+      this.invokeRole = await this.setupRole(role);
+    }
   },
 
   async createApisIfNeeded() {
