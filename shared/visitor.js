@@ -94,7 +94,7 @@ function visitorWrap(category) {
             ea: action,
             el: 'error',
             dp: `/${category}`
-          });
+          }).send();
           throw e;
         }
       };
