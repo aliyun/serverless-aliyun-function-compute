@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+const visitor = require('../shared/visitor');
+
+visitor.pageview('/downloaded').send();

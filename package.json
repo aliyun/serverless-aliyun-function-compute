@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint --fix deploy info invoke logs package provider remove shared test index.js"
+    "lint": "eslint --fix deploy info invoke logs package provider remove shared test index.js",
+    "postinstall": "node bin/npm-postinstall"
   },
   "keywords": [
     "serverless",
