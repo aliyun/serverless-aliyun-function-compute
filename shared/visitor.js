@@ -80,6 +80,7 @@ function visitorWrap(category) {
     return (action, func) => {
       return async () => {
         try {
+          visitor.pageview(`/${category}`).send();
           const result = await func();
           visitor.event({
             ec: category,
