@@ -53,7 +53,7 @@ real.set('cd1', os);
 real.set('cd2', nodeVersion);
 real.set('cd3', appVersion);
 
-let visitor;
+let visitor, ciSended = false;
 
 function getVisitor() {
 
@@ -64,7 +64,10 @@ function getVisitor() {
     }
 
     if (ci.isCI) {
-      real.pageview(`/downloaded/ci/${ci.name}`).send();
+      if (!ciSended) {
+        real.pageview(`/downloaded/ci/${ci.name}`).send();
+        ciSended = true;
+      }
       return fake;
     }
 
