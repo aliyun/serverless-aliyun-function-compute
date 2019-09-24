@@ -8,6 +8,7 @@ const saveCreateTemplateFile = require('./lib/writeFilesToDisk');
 const mergeServiceResources = require('./lib/mergeServiceResources');
 const compileFunctions = require('./lib/compileFunctions');
 const saveUpdateTemplateFile = require('./lib/writeFilesToDisk');
+const { hooksWrap } = require('../shared/visitor');
 
 class AliyunPackage {
   constructor(serverless, options) {
@@ -26,7 +27,7 @@ class AliyunPackage {
       mergeServiceResources,
       saveUpdateTemplateFile);
 
-    this.hooks = {
+    this.hooks = hooksWrap({
       'package:cleanup': async () => {
         // TODO: change to async method
         this.cleanupServerlessDir();
@@ -53,7 +54,7 @@ class AliyunPackage {
         // specified by --package
         this.serverless.cli.log('Finished Packaging.');
       },
-    };
+    }, 'package');
   }
 }
 
