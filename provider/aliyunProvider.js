@@ -24,8 +24,8 @@ const agClientSym = Symbol('ag-client');
 const ossClientSym = Symbol('oss-client');
 const ramClientSym = Symbol('ram-client');
 const slsClientSym = Symbol('sls-client');
-const PROJECT_DELAY = 1500;
-const STORE_DELAY = 1500;
+const PROJECT_DELAY = 45000;
+const STORE_DELAY = 45000;
 
 
 class AliyunProvider {
@@ -543,13 +543,13 @@ class AliyunProvider {
 
   getInvokeRoleName() {
     const service = this.getServiceName();
-    const roleName = `sls-${service}-invoke-role`.replace(/_/g, '-');
+    const roleName = `sls-${service}-${this.options.region}-invoke-role`.replace(/_/g, '-');
     return roleName;
   }
 
   getExecRoleName() {
     const service = this.getServiceName();
-    const roleName = `sls-${service}-exec-role`.replace(/_/g, '-');
+    const roleName = `sls-${service}-${this.options.region}-exec-role`.replace(/_/g, '-');
     return roleName;
   }
 
@@ -612,7 +612,7 @@ class AliyunProvider {
 
   getExecRolePolicyName() {
     const service = this.getServiceName();
-    return `fc-${service}-access`;
+    return `fc-${service}-${this.options.region}-access`;
   }
 
   getExecRoleResource() {
@@ -812,6 +812,7 @@ class AliyunProvider {
 
   uploadObject(objectName, filePath) {
     const ossClient = this.ossClient;
+    console.log(filePath)
     return co(function* uploadObject() {
       return yield ossClient.put(objectName, filePath);
     });
