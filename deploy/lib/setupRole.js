@@ -6,6 +6,8 @@ module.exports = {
 
     await this.createRoleIfNotExists(role, roleSym);
     await this.createPoliciesIfNeeded(role, roleSym);
+    // HACK: must wait for a while for the ram role to take effect
+    await this.provider.sleep(5000)
     await this.attachPoliciesIfNeeded(role, roleSym);
     return this[roleSym];
   },
