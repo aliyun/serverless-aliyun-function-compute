@@ -13,7 +13,7 @@ const { role, fullRole } = require('../../test/data');
 describe('removeRoleAndPolicies', () => {
   let serverless;
   let aliyunRemove;
-  const roleName = 'sls-my-service-dev-invoke-role';
+  const roleName = 'sls-my-service-dev-cn-shanghai-invoke-role';
 
   beforeEach(() => {
     serverless = new Serverless();
@@ -77,10 +77,10 @@ describe('removeRoleAndPolicies', () => {
         expect(deleteRoleStub.calledWithExactly(roleName)).toEqual(true);
 
         const logs = [
-          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role...',
-          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-invoke-role',
-          'Removing RAM role sls-my-service-dev-invoke-role...',
-          'Removed RAM role sls-my-service-dev-invoke-role'
+          'Detaching RAM policy AliyunFCInvocationAccess from sls-my-service-dev-cn-shanghai-invoke-role...',
+          'Detached RAM policy AliyunFCInvocationAccess from sls-my-service-dev-cn-shanghai-invoke-role',
+          'Removing RAM role sls-my-service-dev-cn-shanghai-invoke-role...',
+          'Removed RAM role sls-my-service-dev-cn-shanghai-invoke-role'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);

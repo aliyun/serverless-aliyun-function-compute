@@ -147,6 +147,9 @@ describe('AliyunDeploy', () => {
     let updateTriggerStub;
     let createTriggerStub;
 
+    let projectDelayStub;
+    let storeDelayStub;
+
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -190,6 +193,9 @@ describe('AliyunDeploy', () => {
       updateApiStub = sinon.stub(aliyunDeploy.provider, 'updateApi');
       createApiStub = sinon.stub(aliyunDeploy.provider, 'createApi');
       deployApiStub = sinon.stub(aliyunDeploy.provider, 'deployApi');
+
+      projectDelayStub = sinon.stub(aliyunDeploy.provider, 'projectDelay');
+      storeDelayStub = sinon.stub(aliyunDeploy.provider, 'storeDelay');
     });
 
     afterEach(() => {
@@ -227,6 +233,9 @@ describe('AliyunDeploy', () => {
       aliyunDeploy.provider.updateApi.restore();
       aliyunDeploy.provider.createApi.restore();
       aliyunDeploy.provider.deployApi.restore();
+
+      projectDelayStub.restore();
+      storeDelayStub.restore();
     });
 
     it('should set up service from scratch', () => {
@@ -266,6 +275,9 @@ describe('AliyunDeploy', () => {
       createApiStub.onCall(1).returns(Promise.resolve(fullApis[1]));
       deployApiStub.returns(Promise.resolve());
 
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
+
       return aliyunDeploy.hooks['before:deploy:deploy']()
         .then(() => aliyunDeploy.hooks['deploy:deploy']())
         .then(() => {
@@ -276,12 +288,12 @@ describe('AliyunDeploy', () => {
             'Created log store sls-accountid-cn-shanghai-logs/my-service-dev',
             'Creating log index for sls-accountid-cn-shanghai-logs/my-service-dev...',
             'Created log index for sls-accountid-cn-shanghai-logs/my-service-dev',
-            'Creating RAM role sls-my-service-dev-exec-role...',
-            'Created RAM role sls-my-service-dev-exec-role',
-            'Creating RAM policy fc-my-service-dev-access...',
-            'Created RAM policy fc-my-service-dev-access',
-            'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
-            'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role',
+            'Creating RAM role sls-my-service-dev-cn-shanghai-exec-role...',
+            'Created RAM role sls-my-service-dev-cn-shanghai-exec-role',
+            'Creating RAM policy fc-my-service-dev-cn-shanghai-access...',
+            'Created RAM policy fc-my-service-dev-cn-shanghai-access',
+            'Attaching RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role...',
+            'Attached RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role',
             'Creating service my-service-dev...',
             'Created service my-service-dev',
             'Creating bucket sls-accountid-cn-shanghai...',
@@ -294,10 +306,10 @@ describe('AliyunDeploy', () => {
             'Created function my-service-dev-getTest',
             'Creating function my-service-dev-ossTriggerTest...',
             'Created function my-service-dev-ossTriggerTest',
-            'Creating RAM role sls-my-service-dev-invoke-role...',
-            'Created RAM role sls-my-service-dev-invoke-role',
-            'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
-            'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role',
+            'Creating RAM role sls-my-service-dev-cn-shanghai-invoke-role...',
+            'Created RAM role sls-my-service-dev-cn-shanghai-invoke-role',
+            'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role...',
+            'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role',
             'Creating API group my_service_dev_api...',
             'Created API group my_service_dev_api',
             'Creating API sls_http_my_service_dev_postTest...',
@@ -371,13 +383,16 @@ describe('AliyunDeploy', () => {
       updateApiStub.onCall(1).returns(Promise.resolve(fullApis[1]));
       deployApiStub.returns(Promise.resolve());
 
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
+
       const logs = [
         'Log project sls-accountid-cn-shanghai-logs already exists.',
         'Log store sls-accountid-cn-shanghai-logs/my-service-dev already exists.',
         'Log store sls-accountid-cn-shanghai-logs/my-service-dev already has an index.',
-        'RAM role sls-my-service-dev-exec-role exists.',
-        'RAM policy fc-my-service-dev-access exists.',
-        'RAM policy fc-my-service-dev-access has been attached to sls-my-service-dev-exec-role.',
+        'RAM role sls-my-service-dev-cn-shanghai-exec-role exists.',
+        'RAM policy fc-my-service-dev-cn-shanghai-access exists.',
+        'RAM policy fc-my-service-dev-cn-shanghai-access has been attached to sls-my-service-dev-cn-shanghai-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-accountid-cn-shanghai already exists.',
         'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/my-service.zip to OSS bucket sls-accountid-cn-shanghai...',
@@ -388,8 +403,8 @@ describe('AliyunDeploy', () => {
         'Updated function my-service-dev-getTest',
         'Updating function my-service-dev-ossTriggerTest...',
         'Updated function my-service-dev-ossTriggerTest',
-        'RAM role sls-my-service-dev-invoke-role exists.',
-        'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-invoke-role.',
+        'RAM role sls-my-service-dev-cn-shanghai-invoke-role exists.',
+        'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-cn-shanghai-invoke-role.',
         'API group my_service_dev_api exists.',
         'Updating API sls_http_my_service_dev_postTest...',
         'Updated API sls_http_my_service_dev_postTest',

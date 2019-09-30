@@ -41,8 +41,12 @@ class AliyunProvider {
     utils.setDefaults.call(this);
   }
 
-  get PROJECT_DELAY() {
+  get projectDelay() {
     return PROJECT_DELAY;
+  }
+
+  get storeDelay() {
+    return STORE_DELAY;
   }
 
   get key() {
@@ -700,7 +704,7 @@ class AliyunProvider {
     await this.slsClient.createProject(projectName, {
       description: project.description
     });
-    await this.sleep(PROJECT_DELAY);
+    await this.sleep(this.projectDelay);
     return this.getLogProject(projectName);
   }
 
@@ -726,7 +730,7 @@ class AliyunProvider {
 
   async createLogStore(projectName, storeName, store) {
     await this.slsClient.createLogStore(projectName, storeName, store);   
-    await this.sleep(STORE_DELAY);
+    await this.sleep(this.storeDelay);
     return this.getLogStore(projectName, storeName);
   }
 

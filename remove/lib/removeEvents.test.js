@@ -87,7 +87,7 @@ describe('removeApisIfNeeded', () => {
     it('should remove invoke role', () => {
       return aliyunRemove.removeInvokeRole().then(() => {
         expect(removeRoleAndPoliciesStub.calledOnce).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-invoke-role')).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-cn-shanghai-invoke-role')).toEqual(true);
       });
     });
   });

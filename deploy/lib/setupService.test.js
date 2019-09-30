@@ -46,6 +46,9 @@ describe('setupServices', () => {
     let createServiceIfNotExistsStub;
     let createBucketIfNotExistsStub;
 
+    let projectDelayStub;
+    let storeDelayStub;
+
     beforeEach(() => {
       createLogConfigIfNotExistsStub = sinon.stub(aliyunDeploy, 'createLogConfigIfNotExists')
         .returns(Promise.resolve());
@@ -57,6 +60,9 @@ describe('setupServices', () => {
         .returns(Promise.resolve());
       createBucketIfNotExistsStub = sinon.stub(aliyunDeploy, 'createBucketIfNotExists')
         .returns(Promise.resolve());
+
+      projectDelayStub = sinon.stub(aliyunDeploy.provider, 'projectDelay');
+      storeDelayStub = sinon.stub(aliyunDeploy.provider, 'storeDelay');
     });
 
     afterEach(() => {
@@ -65,9 +71,16 @@ describe('setupServices', () => {
       aliyunDeploy.checkForExistingService.restore();
       aliyunDeploy.createServiceIfNotExists.restore();
       aliyunDeploy.createBucketIfNotExists.restore();
+
+      projectDelayStub.restore();
+      storeDelayStub.restore();
     });
 
     it('should run promise chain', (done) => {
+
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
+
       aliyunDeploy
         .setupService().then(() => {
           expect(createLogConfigIfNotExistsStub.calledOnce).toEqual(true);
@@ -95,6 +108,9 @@ describe('setupServices', () => {
     let getLogIndexStub;
     let createLogIndexStub;
 
+    let projectDelayStub;
+    let storeDelayStub;
+
     beforeEach(() => {
       setupRoleStub = sinon.stub(aliyunDeploy, 'setupRole');
       getServiceStub = sinon.stub(aliyunDeploy.provider, 'getService');
@@ -110,6 +126,9 @@ describe('setupServices', () => {
       createLogStoreStub = sinon.stub(aliyunDeploy.provider, 'createLogStore');
       getLogIndexStub = sinon.stub(aliyunDeploy.provider, 'getLogIndex');
       createLogIndexStub = sinon.stub(aliyunDeploy.provider, 'createLogIndex');
+
+      projectDelayStub = sinon.stub(aliyunDeploy.provider, 'projectDelay');
+      storeDelayStub = sinon.stub(aliyunDeploy.provider, 'storeDelay');
     });
 
     afterEach(() => {
@@ -127,6 +146,9 @@ describe('setupServices', () => {
       aliyunDeploy.provider.createLogStore.restore();
       aliyunDeploy.provider.getLogIndex.restore();
       aliyunDeploy.provider.createLogIndex.restore();
+
+      projectDelayStub.restore();
+      storeDelayStub.restore();
     });
 
     it('should set up service from scratch', (done) => {
@@ -143,6 +165,9 @@ describe('setupServices', () => {
       createLogStoreStub.returns(Promise.resolve(fullLogStore));
       getLogIndexStub.returns(Promise.resolve(undefined));
       createLogIndexStub.returns(Promise.resolve(fullLogIndex));
+
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);
@@ -233,6 +258,9 @@ describe('setupServices', () => {
       createLogStoreStub.returns(Promise.resolve());
       getLogIndexStub.returns(Promise.resolve(fullLogIndex));
       createLogIndexStub.returns(Promise.resolve());
+
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
 
       return aliyunDeploy.setupService().then(() => {
         expect(getLogProjectStub.calledOnce).toEqual(true);
