@@ -87,7 +87,7 @@ describe('removeFunctionsAndService', () => {
         expect(deleteServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
 
         expect(removeRoleAndPoliciesStub.calledAfter(deleteServiceStub)).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-cn-shanghai-exec-role')).toEqual(true);
 
         const logs = [
           'Removing functions...',
@@ -126,7 +126,7 @@ describe('removeFunctionsAndService', () => {
         expect(deleteServiceStub.calledWithExactly('my-service-dev')).toEqual(true);
 
         expect(removeRoleAndPoliciesStub.calledAfter(deleteServiceStub)).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-cn-shanghai-exec-role')).toEqual(true);
 
         const logs = [
           'Removing functions...',
@@ -152,7 +152,7 @@ describe('removeFunctionsAndService', () => {
         expect(deleteFunctionStub.called).toEqual(false);
         expect(deleteServiceStub.called).toEqual(false);
         expect(removeRoleAndPoliciesStub.calledOnce).toEqual(true);
-        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-exec-role')).toEqual(true);
+        expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-cn-shanghai-exec-role')).toEqual(true);
 
         const logs = [
           'Removing functions...',

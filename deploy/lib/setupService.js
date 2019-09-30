@@ -13,7 +13,7 @@ module.exports = {
     await this.createLogConfigIfNotExists();
     await this.setupExecRole();
     // HACK: must wait for a while for the ram policy to take effect
-    await this.provider.sleep(this.provider.PROJECT_DELAY);
+    await this.provider.sleep(this.provider.projectDelay);
     const foundService = await this.checkForExistingService();
     await this.createServiceIfNotExists(foundService);
     await this.createBucketIfNotExists();
