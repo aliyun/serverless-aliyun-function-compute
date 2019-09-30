@@ -44,6 +44,7 @@ describe('setupRole', () => {
     let getPolicyStub;
     let createPolicyStub;
     let attachPolicyToRoleStub;
+    let roleDelayStub;
 
     beforeEach(() => {
       getRoleStub = sinon.stub(aliyunDeploy.provider, 'getRole');
@@ -53,6 +54,7 @@ describe('setupRole', () => {
       getPoliciesForRoleStub = sinon.stub(aliyunDeploy.provider, 'getPoliciesForRole');
       attachPolicyToRoleStub = sinon.stub(aliyunDeploy.provider, 'attachPolicyToRole');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
+      roleDelayStub = sinon.stub(aliyunDeploy, 'roleDelay');
     });
 
     afterEach(() => {
@@ -62,6 +64,7 @@ describe('setupRole', () => {
       aliyunDeploy.provider.getPolicy.restore();
       aliyunDeploy.provider.createPolicy.restore();
       aliyunDeploy.serverless.cli.log.restore();
+      roleDelayStub.restore();
     });
 
     it('should set up role with system policies', () => {
@@ -71,6 +74,7 @@ describe('setupRole', () => {
       createPolicyStub.returns(Promise.resolve({}));
       getPoliciesForRoleStub.returns(Promise.resolve([]));
       attachPolicyToRoleStub.returns(Promise.resolve());
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -115,6 +119,7 @@ describe('setupRole', () => {
       createPolicyStub.returns(Promise.resolve({}));
       getPoliciesForRoleStub.returns(Promise.resolve([]));
       attachPolicyToRoleStub.returns(Promise.resolve());
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -155,6 +160,7 @@ describe('setupRole', () => {
       createPolicyStub.returns(Promise.resolve({}));
       getPoliciesForRoleStub.returns(Promise.resolve(role.Policies));
       attachPolicyToRoleStub.returns(Promise.resolve());
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.setupRole(role).then((completedRole) => {
         expect(completedRole).toEqual(fullRole);
@@ -189,6 +195,7 @@ describe('setupRole', () => {
       createPolicyStub.returns(Promise.resolve({}));
       getPoliciesForRoleStub.returns(Promise.resolve([]));
       attachPolicyToRoleStub.returns(Promise.resolve());
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.setupRole(execRole).then((completedRole) => {
         expect(completedRole).toEqual(fullExecRole);
@@ -243,6 +250,7 @@ describe('setupRole', () => {
       createPolicyStub.returns(Promise.resolve({}));
       getPoliciesForRoleStub.returns(Promise.resolve([]));
       attachPolicyToRoleStub.returns(Promise.resolve());
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.setupRole(execRole).then((completedRole) => {
         expect(completedRole).toEqual(fullExecRole);
