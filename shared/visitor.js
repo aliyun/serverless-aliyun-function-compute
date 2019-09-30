@@ -74,10 +74,10 @@ function getVisitor() {
 }
 
 function sendDownloaded() {
-    real.pageview('/downloaded').send();
-    if (ci.isCI) {
-      real.pageview(`/downloaded/ci/${ci.name}`).send();
-    }
+  real.pageview('/downloaded').send();
+  if (ci.isCI) {
+    real.pageview(`/downloaded/ci/${ci.name}`).send();
+  }
 }
 
 function visitorWrap(category) {

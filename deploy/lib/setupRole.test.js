@@ -96,10 +96,10 @@ describe('setupRole', () => {
         }]);
 
         const logs = [
-          'Creating RAM role sls-my-service-dev-invoke-role...',
-          'Created RAM role sls-my-service-dev-invoke-role',
-          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
-          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role'
+          'Creating RAM role sls-my-service-dev-cn-shanghai-invoke-role...',
+          'Created RAM role sls-my-service-dev-cn-shanghai-invoke-role',
+          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role...',
+          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -137,9 +137,9 @@ describe('setupRole', () => {
         }]);
 
         const logs = [
-          'RAM role sls-my-service-dev-invoke-role exists.',
-          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
-          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role'
+          'RAM role sls-my-service-dev-cn-shanghai-invoke-role exists.',
+          'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role...',
+          'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -172,8 +172,8 @@ describe('setupRole', () => {
         expect(attachPolicyToRoleStub.called).toEqual(false);
 
         const logs = [
-          'RAM role sls-my-service-dev-invoke-role exists.',
-          'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-invoke-role.',
+          'RAM role sls-my-service-dev-cn-shanghai-invoke-role exists.',
+          'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-cn-shanghai-invoke-role.',
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -219,12 +219,12 @@ describe('setupRole', () => {
         }]);
 
         const logs = [
-          'Creating RAM role sls-my-service-dev-exec-role...',
-          'Created RAM role sls-my-service-dev-exec-role',
-          'Creating RAM policy fc-my-service-dev-access...',
-          'Created RAM policy fc-my-service-dev-access',
-          'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
-          'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role'
+          'Creating RAM role sls-my-service-dev-cn-shanghai-exec-role...',
+          'Created RAM role sls-my-service-dev-cn-shanghai-exec-role',
+          'Creating RAM policy fc-my-service-dev-cn-shanghai-access...',
+          'Created RAM policy fc-my-service-dev-cn-shanghai-access',
+          'Attaching RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role...',
+          'Attached RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
@@ -271,11 +271,11 @@ describe('setupRole', () => {
         }]);
 
         const logs = [
-          'Creating RAM role sls-my-service-dev-exec-role...',
-          'Created RAM role sls-my-service-dev-exec-role',
-          'RAM policy fc-my-service-dev-access exists.',
-          'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
-          'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role'
+          'Creating RAM role sls-my-service-dev-cn-shanghai-exec-role...',
+          'Created RAM role sls-my-service-dev-cn-shanghai-exec-role',
+          'RAM policy fc-my-service-dev-cn-shanghai-access exists.',
+          'Attaching RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role...',
+          'Attached RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role'
         ];
         expect(consoleLogStub.callCount).toEqual(logs.length);
         for (var i = 0; i < consoleLogStub.callCount; ++i) {

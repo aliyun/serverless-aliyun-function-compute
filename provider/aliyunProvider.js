@@ -24,8 +24,8 @@ const agClientSym = Symbol('ag-client');
 const ossClientSym = Symbol('oss-client');
 const ramClientSym = Symbol('ram-client');
 const slsClientSym = Symbol('sls-client');
-const PROJECT_DELAY = 1500;
-const STORE_DELAY = 1500;
+const PROJECT_DELAY = 45000;
+const STORE_DELAY = 45000;
 
 
 class AliyunProvider {
@@ -41,8 +41,12 @@ class AliyunProvider {
     utils.setDefaults.call(this);
   }
 
-  get PROJECT_DELAY() {
+  get projectDelay() {
     return PROJECT_DELAY;
+  }
+
+  get storeDelay() {
+    return STORE_DELAY;
   }
 
   get key() {
@@ -543,13 +547,13 @@ class AliyunProvider {
 
   getInvokeRoleName() {
     const service = this.getServiceName();
-    const roleName = `sls-${service}-invoke-role`.replace(/_/g, '-');
+    const roleName = `sls-${service}-${this.options.region}-invoke-role`.replace(/_/g, '-');
     return roleName;
   }
 
   getExecRoleName() {
     const service = this.getServiceName();
-    const roleName = `sls-${service}-exec-role`.replace(/_/g, '-');
+    const roleName = `sls-${service}-${this.options.region}-exec-role`.replace(/_/g, '-');
     return roleName;
   }
 
@@ -612,7 +616,7 @@ class AliyunProvider {
 
   getExecRolePolicyName() {
     const service = this.getServiceName();
-    return `fc-${service}-access`;
+    return `fc-${service}-${this.options.region}-access`;
   }
 
   getExecRoleResource() {
@@ -700,7 +704,7 @@ class AliyunProvider {
     await this.slsClient.createProject(projectName, {
       description: project.description
     });
-    await this.sleep(PROJECT_DELAY);
+    await this.sleep(this.projectDelay);
     return this.getLogProject(projectName);
   }
 
@@ -726,7 +730,7 @@ class AliyunProvider {
 
   async createLogStore(projectName, storeName, store) {
     await this.slsClient.createLogStore(projectName, storeName, store);   
-    await this.sleep(STORE_DELAY);
+    await this.sleep(this.storeDelay);
     return this.getLogStore(projectName, storeName);
   }
 

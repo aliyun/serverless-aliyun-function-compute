@@ -155,6 +155,9 @@ describe('AliyunDeployFunction', () => {
 
     let getTriggerStub;
 
+    let projectDelayStub;
+    let storeDelayStub;
+
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
@@ -202,6 +205,9 @@ describe('AliyunDeployFunction', () => {
       sinon.stub(aliyunDeployFunction.provider, 'createTrigger');
 
       sinon.stub(aliyunDeployFunction.provider, 'getArtifactDirectoryName').returns(directory);
+
+      projectDelayStub = sinon.stub(aliyunDeployFunction.provider, 'projectDelay');
+      storeDelayStub = sinon.stub(aliyunDeployFunction.provider, 'storeDelay');
     });
 
     afterEach(() => {
@@ -241,6 +247,9 @@ describe('AliyunDeployFunction', () => {
       aliyunDeployFunction.provider.createTrigger.restore();
 
       aliyunDeployFunction.provider.getArtifactDirectoryName.restore();
+
+      projectDelayStub.restore();
+      storeDelayStub.restore();
     });
 
     it('should set up service from scratch', () => {
@@ -277,6 +286,9 @@ describe('AliyunDeployFunction', () => {
 
       getTriggerStub.returns(Promise.resolve());
 
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
+
       const logs = [
         'Packaging function: postTest...',
         'Compiling function "postTest"...',
@@ -286,12 +298,12 @@ describe('AliyunDeployFunction', () => {
         'Created log store sls-accountid-cn-shanghai-logs/my-service-dev',
         'Creating log index for sls-accountid-cn-shanghai-logs/my-service-dev...',
         'Created log index for sls-accountid-cn-shanghai-logs/my-service-dev',
-        'Creating RAM role sls-my-service-dev-exec-role...',
-        'Created RAM role sls-my-service-dev-exec-role',
-        'Creating RAM policy fc-my-service-dev-access...',
-        'Created RAM policy fc-my-service-dev-access',
-        'Attaching RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role...',
-        'Attached RAM policy fc-my-service-dev-access to sls-my-service-dev-exec-role',
+        'Creating RAM role sls-my-service-dev-cn-shanghai-exec-role...',
+        'Created RAM role sls-my-service-dev-cn-shanghai-exec-role',
+        'Creating RAM policy fc-my-service-dev-cn-shanghai-access...',
+        'Created RAM policy fc-my-service-dev-cn-shanghai-access',
+        'Attaching RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role...',
+        'Attached RAM policy fc-my-service-dev-cn-shanghai-access to sls-my-service-dev-cn-shanghai-exec-role',
         'Creating service my-service-dev...',
         'Created service my-service-dev',
         'Creating bucket sls-accountid-cn-shanghai...',
@@ -300,10 +312,10 @@ describe('AliyunDeployFunction', () => {
         'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-accountid-cn-shanghai',
         'Creating function my-service-dev-postTest...',
         'Created function my-service-dev-postTest',
-        'Creating RAM role sls-my-service-dev-invoke-role...',
-        'Created RAM role sls-my-service-dev-invoke-role',
-        'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role...',
-        'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-invoke-role',
+        'Creating RAM role sls-my-service-dev-cn-shanghai-invoke-role...',
+        'Created RAM role sls-my-service-dev-cn-shanghai-invoke-role',
+        'Attaching RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role...',
+        'Attached RAM policy AliyunFCInvocationAccess to sls-my-service-dev-cn-shanghai-invoke-role',
         'Creating API group my_service_dev_api...',
         'Created API group my_service_dev_api',
         'Creating API sls_http_my_service_dev_postTest...',
@@ -368,23 +380,26 @@ describe('AliyunDeployFunction', () => {
 
       getTriggerStub.returns(Promise.resolve());
 
+      projectDelayStub.get(() => 0);
+      storeDelayStub.get(() => 0);
+
       const logs = [
         'Packaging function: postTest...',
         'Compiling function "postTest"...',
         'Log project sls-accountid-cn-shanghai-logs already exists.',
         'Log store sls-accountid-cn-shanghai-logs/my-service-dev already exists.',
         'Log store sls-accountid-cn-shanghai-logs/my-service-dev already has an index.',
-        'RAM role sls-my-service-dev-exec-role exists.',
-        'RAM policy fc-my-service-dev-access exists.',
-        'RAM policy fc-my-service-dev-access has been attached to sls-my-service-dev-exec-role.',
+        'RAM role sls-my-service-dev-cn-shanghai-exec-role exists.',
+        'RAM policy fc-my-service-dev-cn-shanghai-access exists.',
+        'RAM policy fc-my-service-dev-cn-shanghai-access has been attached to sls-my-service-dev-cn-shanghai-exec-role.',
         'Service my-service-dev already exists.',
         'Bucket sls-accountid-cn-shanghai already exists.',
         'Uploading serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-accountid-cn-shanghai...',
         'Uploaded serverless/my-service/dev/1500622721413-2017-07-21T07:38:41.413Z/postTest.zip to OSS bucket sls-accountid-cn-shanghai',
         'Updating function my-service-dev-postTest...',
         'Updated function my-service-dev-postTest',
-        'RAM role sls-my-service-dev-invoke-role exists.',
-        'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-invoke-role.',
+        'RAM role sls-my-service-dev-cn-shanghai-invoke-role exists.',
+        'RAM policy AliyunFCInvocationAccess has been attached to sls-my-service-dev-cn-shanghai-invoke-role.',
         'API group my_service_dev_api exists.',
         'Updating API sls_http_my_service_dev_postTest...',
         'Updated API sls_http_my_service_dev_postTest',
