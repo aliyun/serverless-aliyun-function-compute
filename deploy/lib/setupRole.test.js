@@ -54,7 +54,7 @@ describe('setupRole', () => {
       getPoliciesForRoleStub = sinon.stub(aliyunDeploy.provider, 'getPoliciesForRole');
       attachPolicyToRoleStub = sinon.stub(aliyunDeploy.provider, 'attachPolicyToRole');
       consoleLogStub = sinon.stub(aliyunDeploy.serverless.cli, 'log').returns();
-      roleDelayStub = sinon.stub(aliyunDeploy, 'roleDelay');
+      roleDelayStub = sinon.stub(aliyunDeploy.provider, 'roleDelay');
     });
 
     afterEach(() => {

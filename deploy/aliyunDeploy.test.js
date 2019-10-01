@@ -149,6 +149,7 @@ describe('AliyunDeploy', () => {
 
     let projectDelayStub;
     let storeDelayStub;
+    let roleDelayStub;
 
     const options = {
       stage: 'dev',
@@ -196,6 +197,7 @@ describe('AliyunDeploy', () => {
 
       projectDelayStub = sinon.stub(aliyunDeploy.provider, 'projectDelay');
       storeDelayStub = sinon.stub(aliyunDeploy.provider, 'storeDelay');
+      roleDelayStub = sinon.stub(aliyunDeploy.provider, 'roleDelay');
     });
 
     afterEach(() => {
@@ -236,6 +238,7 @@ describe('AliyunDeploy', () => {
 
       projectDelayStub.restore();
       storeDelayStub.restore();
+      roleDelayStub.restore();
     });
 
     it('should set up service from scratch', () => {
@@ -277,6 +280,7 @@ describe('AliyunDeploy', () => {
 
       projectDelayStub.get(() => 0);
       storeDelayStub.get(() => 0);
+      roleDelayStub.get(() => 0);
 
       return aliyunDeploy.hooks['before:deploy:deploy']()
         .then(() => aliyunDeploy.hooks['deploy:deploy']())
@@ -385,6 +389,7 @@ describe('AliyunDeploy', () => {
 
       projectDelayStub.get(() => 0);
       storeDelayStub.get(() => 0);
+      roleDelayStub.get(() => 0);
 
       const logs = [
         'Log project sls-accountid-cn-shanghai-logs already exists.',

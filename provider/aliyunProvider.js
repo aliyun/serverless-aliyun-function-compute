@@ -26,6 +26,7 @@ const ramClientSym = Symbol('ram-client');
 const slsClientSym = Symbol('sls-client');
 const PROJECT_DELAY = 45000;
 const STORE_DELAY = 45000;
+const ROLE_DELAY = 5000;
 
 
 class AliyunProvider {
@@ -47,6 +48,10 @@ class AliyunProvider {
 
   get storeDelay() {
     return STORE_DELAY;
+  }
+
+  get roleDelay() {
+    return ROLE_DELAY;
   }
 
   get key() {
