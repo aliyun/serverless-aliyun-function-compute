@@ -157,6 +157,7 @@ describe('AliyunDeployFunction', () => {
 
     let projectDelayStub;
     let storeDelayStub;
+    let roleDelayStub;
 
     const options = {
       stage: 'dev',
@@ -208,6 +209,7 @@ describe('AliyunDeployFunction', () => {
 
       projectDelayStub = sinon.stub(aliyunDeployFunction.provider, 'projectDelay');
       storeDelayStub = sinon.stub(aliyunDeployFunction.provider, 'storeDelay');
+      roleDelayStub = sinon.stub(aliyunDeployFunction.provider, 'roleDelay');
     });
 
     afterEach(() => {
@@ -250,6 +252,7 @@ describe('AliyunDeployFunction', () => {
 
       projectDelayStub.restore();
       storeDelayStub.restore();
+      roleDelayStub.restore();
     });
 
     it('should set up service from scratch', () => {
@@ -288,6 +291,7 @@ describe('AliyunDeployFunction', () => {
 
       projectDelayStub.get(() => 0);
       storeDelayStub.get(() => 0);
+      roleDelayStub.get(() => 0);
 
       const logs = [
         'Packaging function: postTest...',
@@ -382,6 +386,7 @@ describe('AliyunDeployFunction', () => {
 
       projectDelayStub.get(() => 0);
       storeDelayStub.get(() => 0);
+      roleDelayStub.get(() => 0);
 
       const logs = [
         'Packaging function: postTest...',
