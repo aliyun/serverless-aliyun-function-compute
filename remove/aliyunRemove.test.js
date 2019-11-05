@@ -11,7 +11,7 @@ const Serverless = require('../test/serverless');
 const {
   fullGroup, role, fullRole, execRole,
   fullExecRole, fullApis, fullFunctions, bucket,
-  objects, functionDefs, fullService, fullTriggers
+  objects, functionDefs, fullService, fullTriggers, logStore
 } = require('../test/data');
 
 describe('AliyunRemove', () => {
@@ -24,7 +24,8 @@ describe('AliyunRemove', () => {
     options = {
       stage: 'my-stage',
       region: 'my-region',
-      'remove-roles': true
+      'remove-roles': true,
+      'remove-logstore': true
     };
     serverless.service.service = 'my-service';
     serverless.service.package = {
@@ -41,6 +42,10 @@ describe('AliyunRemove', () => {
     serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
     serverless.pluginManager.setCliOptions(options);
     aliyunRemove = new AliyunRemove(serverless, options);
+    aliyunRemove.templates = {
+      create: require(path.join(__dirname, '..', 'test', '.serverless', 'configuration-template-create.json')),
+      update: require(path.join(__dirname, '..', 'test', '.serverless', 'configuration-template-update.json')),
+    };
   });
 
   describe('#constructor()', () => {
@@ -104,7 +109,7 @@ describe('AliyunRemove', () => {
     });
   });
 
-  describe('remove --remove-roles', () => {
+  describe('remove --remove-roles --remove-logstore', () => {
     let consoleLogStub;
 
     let getServiceStub;
@@ -127,6 +132,11 @@ describe('AliyunRemove', () => {
 
     let deleteFunctionStub;
     let deleteServiceStub;
+    let getLogProjectStub;
+    let getLogStoreStub;
+    let deleteLogProjectStub;
+    let deleteLogStoreStub;
+    let deleteLogIndexStub;
 
     let getBucketStub;
     let getObjectsStub;
@@ -136,12 +146,14 @@ describe('AliyunRemove', () => {
     const options = {
       stage: 'dev',
       region: 'cn-shanghai',
-      'remove-roles': true
+      'remove-roles': true,
+      'remove-logstore': true
     };
 
     beforeEach(() => {
       serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
       aliyunRemove = new AliyunRemove(serverless, options);
+
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
 
       getServiceStub = sinon.stub(aliyunRemove.provider, 'getService');
@@ -161,6 +173,12 @@ describe('AliyunRemove', () => {
       getPoliciesForRoleStub = sinon.stub(aliyunRemove.provider, 'getPoliciesForRole');
       detachPolicyFromRoleStub = sinon.stub(aliyunRemove.provider, 'detachPolicyFromRole');
       deleteRoleStub = sinon.stub(aliyunRemove.provider, 'deleteRole');
+
+      getLogProjectStub = sinon.stub(aliyunRemove.provider, 'getLogProject');
+      getLogStoreStub = sinon.stub(aliyunRemove.provider, 'getLogStore');
+      deleteLogProjectStub = sinon.stub(aliyunRemove.provider, 'deleteLogProject');
+      deleteLogStoreStub = sinon.stub(aliyunRemove.provider, 'deleteLogStore');
+      deleteLogIndexStub = sinon.stub(aliyunRemove.provider, 'deleteLogIndex');
 
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
@@ -191,6 +209,12 @@ describe('AliyunRemove', () => {
       aliyunRemove.provider.getPoliciesForRole.restore();
       aliyunRemove.provider.detachPolicyFromRole.restore();
       aliyunRemove.provider.deleteRole.restore();
+
+      aliyunRemove.provider.getLogProject.restore();
+      aliyunRemove.provider.getLogStore.restore();
+      aliyunRemove.provider.deleteLogProject.restore();
+      aliyunRemove.provider.deleteLogStore.restore();
+      aliyunRemove.provider.deleteLogIndex.restore();
 
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
@@ -236,6 +260,13 @@ describe('AliyunRemove', () => {
         'Removing RAM role sls-my-service-dev-cn-shanghai-exec-role...',
         'Removed RAM role sls-my-service-dev-cn-shanghai-exec-role',
 
+        'Removing index from log project sls-accountid-cn-shanghai-logs log store my-service-dev...',
+        'Removed index from log project sls-accountid-cn-shanghai-logs log store my-service-dev',
+        'Removing log store from log project sls-accountid-cn-shanghai-logs...',
+        'Removed log store from log project sls-accountid-cn-shanghai-logs',
+        'Removing log project sls-accountid-cn-shanghai-logs...',
+        'Removed log project sls-accountid-cn-shanghai-logs',
+
         'Removing 3 artifacts in OSS bucket sls-accountid-cn-shanghai...',
         'Removed 3 artifacts in OSS bucket sls-accountid-cn-shanghai',
         'Removing OSS bucket sls-accountid-cn-shanghai...',
@@ -243,7 +274,10 @@ describe('AliyunRemove', () => {
       ];
 
       aliyunRemove.serverless.service.functions = functionDefs;
-
+      aliyunRemove.templates = {
+        create: require(path.join(__dirname, '..', 'test', '.serverless', 'configuration-template-create.json')),
+        update: require(path.join(__dirname, '..', 'test', '.serverless', 'configuration-template-update.json')),
+      };
       getServiceStub.returns(Promise.resolve(fullService));
       getFunctionsStub.returns(Promise.resolve(fullFunctions));
 
@@ -273,6 +307,12 @@ describe('AliyunRemove', () => {
 
       detachPolicyFromRoleStub.returns(Promise.resolve());
       deleteRoleStub.returns(Promise.resolve());
+
+      getLogProjectStub.returns(Promise.resolve({}));
+      getLogStoreStub.returns(Promise.resolve({}));
+      deleteLogProjectStub.returns(Promise.resolve());
+      deleteLogStoreStub.returns(Promise.resolve());
+      deleteLogIndexStub.returns(Promise.resolve());
 
       deleteFunctionStub.returns(Promise.resolve());
       deleteServiceStub.returns(Promise.resolve());
@@ -304,6 +344,8 @@ describe('AliyunRemove', () => {
         'No functions to remove.',
         'No services to remove.',
 
+        "No log project to remove",
+
         'No artifacts to remove.',
         'No buckets to remove.'
       ];
@@ -330,6 +372,12 @@ describe('AliyunRemove', () => {
 
       deleteFunctionStub.returns(Promise.resolve());
       deleteServiceStub.returns(Promise.resolve());
+
+      getLogProjectStub.returns(Promise.resolve(undefined));
+      getLogStoreStub.returns(Promise.resolve(undefined));
+      deleteLogProjectStub.returns(Promise.resolve());
+      deleteLogStoreStub.returns(Promise.resolve());
+      deleteLogIndexStub.returns(Promise.resolve());
 
       getBucketStub.returns(Promise.resolve(undefined));
       getObjectsStub.returns(Promise.resolve([]));
@@ -467,6 +515,8 @@ describe('AliyunRemove', () => {
         'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
         'Removing service my-service-dev...',
         'Removed service my-service-dev',
+
+        'Skip removing log project',
         'Removing 3 artifacts in OSS bucket sls-accountid-cn-shanghai...',
         'Removed 3 artifacts in OSS bucket sls-accountid-cn-shanghai',
         'Removing OSS bucket sls-accountid-cn-shanghai...',
@@ -535,6 +585,7 @@ describe('AliyunRemove', () => {
         'No functions to remove.',
         'No services to remove.',
 
+        'Skip removing log project',
         'No artifacts to remove.',
         'No buckets to remove.'
       ];
