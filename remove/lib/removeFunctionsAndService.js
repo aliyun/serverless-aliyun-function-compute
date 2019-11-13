@@ -4,9 +4,15 @@ module.exports = {
   async removeFunctionsAndService() {
     this.serverless.cli.log('Removing functions...');
     const execRoleName = this.provider.getExecRoleName();
+    this.logProjectSpec = this.templates.create.Resources[this.provider.getLogProjectId()].Properties;
+    this.logStoreSpec = this.templates.create.Resources[this.provider.getLogStoreId()].Properties;
+    this.logIndexSpec = this.templates.create.Resources[this.provider.getLogIndexId()].Properties;
+    const slsProjectName = this.logProjectSpec.projectName;
+    const slsLogStoreName = this.logStoreSpec.storeName;
     await this.removeFunctions();
     await this.removeServiceIfExists();
     await this.removeRoleAndPolicies(execRoleName);
+    await this.removeLogProject(slsProjectName, slsLogStoreName);
   },
 
   async removeFunctions() {

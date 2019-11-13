@@ -35,17 +35,34 @@ describe('removeFunctionsAndService', () => {
   });
 
   describe('#removeFunctionsAndService()', () => {
+
     let consoleLogStub;
     let deleteFunctionStub;
     let deleteServiceStub;
     let removeRoleAndPoliciesStub;
+    let removeLogProjectStub;
 
     beforeEach(() => {
+
+      const options = {
+        stage: 'dev',
+        region: 'cn-shanghai',
+        'remove-logstore': true
+      };
+      serverless.setProvider('aliyun', new AliyunProvider(serverless, options));
+      serverless.pluginManager.setCliOptions(options);
+
+      aliyunRemove = new AliyunRemove(serverless, options);
+      aliyunRemove.templates = {
+        create: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-create.json')),
+        update: require(path.join(__dirname, '..', '..', 'test', '.serverless', 'configuration-template-update.json')),
+      };
       aliyunRemove.serverless.service.functions = {};
       consoleLogStub = sinon.stub(aliyunRemove.serverless.cli, 'log').returns();
       deleteFunctionStub = sinon.stub(aliyunRemove.provider, 'deleteFunction');
       deleteServiceStub = sinon.stub(aliyunRemove.provider, 'deleteService');
       removeRoleAndPoliciesStub = sinon.stub(aliyunRemove, 'removeRoleAndPolicies').returns(Promise.resolve());
+      removeLogProjectStub = sinon.stub(aliyunRemove, 'removeLogProject').returns(Promise.resolve());
       aliyunRemove.fcService = undefined;
       aliyunRemove.fcFunctions = [];
     });
@@ -55,6 +72,7 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.provider.deleteFunction.restore();
       aliyunRemove.provider.deleteService.restore();
       aliyunRemove.removeRoleAndPolicies.restore();
+      aliyunRemove.removeLogProject.restore();
     });
 
     it('should remove existing functions and service', () => {
@@ -63,6 +81,7 @@ describe('removeFunctionsAndService', () => {
       aliyunRemove.fcFunctions = fullFunctions;
       deleteFunctionStub.returns(Promise.resolve());
       deleteServiceStub.returns(Promise.resolve());
+      removeLogProjectStub.returns(Promise.resolve());
 
       return aliyunRemove.removeFunctionsAndService().then(() => {
         expect(deleteFunctionStub.callCount).toEqual(3);
@@ -89,6 +108,9 @@ describe('removeFunctionsAndService', () => {
         expect(removeRoleAndPoliciesStub.calledAfter(deleteServiceStub)).toEqual(true);
         expect(removeRoleAndPoliciesStub.calledWithExactly('sls-my-service-dev-cn-shanghai-exec-role')).toEqual(true);
 
+        expect(removeLogProjectStub.calledAfter(removeRoleAndPoliciesStub)).toEqual(true);
+        expect(removeLogProjectStub.calledWithExactly('sls-accountid-cn-shanghai-logs', 'my-service-dev')).toEqual(true);
+
         const logs = [
           'Removing functions...',
           'Removing function my-service-dev-postTest of service my-service-dev...',
@@ -98,7 +120,13 @@ describe('removeFunctionsAndService', () => {
           'Removing function my-service-dev-ossTriggerTest of service my-service-dev...',
           'Removed function my-service-dev-ossTriggerTest of service my-service-dev',
           'Removing service my-service-dev...',
-          'Removed service my-service-dev'
+          'Removed service my-service-dev',
+          'Removing index from log project sls-accountid-cn-shanghai-logs log store my-service-dev...',
+          'Removed index from log project sls-accountid-cn-shanghai-logs log store my-service-dev',
+          'Removing log store from log project sls-accountid-cn-shanghai-logs...',
+          'Removed log store from log project sls-accountid-cn-shanghai-logs',
+          'Removing log project sls-accountid-cn-shanghai-logs...',
+          'Removed log project sls-accountid-cn-shanghai-logs'
         ];
         for (var i = 0; i < consoleLogStub.callCount; ++i) {
           expect(consoleLogStub.getCall(i).args[0]).toEqual(logs[i]);

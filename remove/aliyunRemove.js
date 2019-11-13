@@ -7,6 +7,8 @@ const removeEvents = require('./lib/removeEvents');
 const removeFunctionsAndService = require('./lib/removeFunctionsAndService');
 const removeArtifacts = require('./lib/removeArtifacts');
 const removeRoleAndPolicies = require('./lib/removeRoleAndPolicies');
+const serviceTemplate = require('./lib/loadTemplates');
+const removeLogProject = require('./lib/removeLogProject');
 const { hooksWrap } = require('../shared/visitor');
 
 class AliyunRemove {
@@ -21,6 +23,7 @@ class AliyunRemove {
       utils,
       getFunctionsAndService,
       removeEvents,
+      removeLogProject,
       removeFunctionsAndService,
       removeArtifacts,
       removeRoleAndPolicies
@@ -30,6 +33,7 @@ class AliyunRemove {
       'before:remove:remove': async () => {
         this.validate();
         this.setDefaults();
+        await serviceTemplate.loadTemplates(this);
       },
 
       'remove:remove': async () => {

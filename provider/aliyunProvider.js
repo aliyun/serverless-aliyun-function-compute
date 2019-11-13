@@ -713,6 +713,10 @@ class AliyunProvider {
     return this.getLogProject(projectName);
   }
 
+ deleteLogProject(projectName, options){
+    return this.slsClient.deleteProject(projectName, options);
+  }
+
   /**
    * @param {string} projectName
    * @return {logstores: [], total: number, count: number}
@@ -739,6 +743,9 @@ class AliyunProvider {
     return this.getLogStore(projectName, storeName);
   }
 
+deleteLogStore(projectName, logstoreName, options) {
+    return this.slsClient.deleteLogStore(projectName, logstoreName, options);
+  }
   async getLogIndex(projectName, storeName) {
     try {
       return await this.slsClient.getIndexConfig(projectName, storeName);
@@ -757,6 +764,10 @@ class AliyunProvider {
       line: index.line
     });
     await this.getLogIndex(projectName, storeName);
+  }
+
+deleteLogIndex(projectName, logstoreName, options) {
+    return this.slsClient.deleteIndex(projectName, logstoreName, options);
   }
 
   async getLogsIfAvailable(projectName, storeName, days, query, count) {
