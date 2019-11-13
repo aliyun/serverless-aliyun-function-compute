@@ -3,15 +3,15 @@
 const path = require('path');
 
 module.exports = {
-  async loadTemplates() {
-    const createFilePath = path.join(this.serverless.config.servicePath,
+  async loadTemplates(provider) {
+    const createFilePath = path.join(provider.serverless.config.servicePath,
       '.serverless', 'configuration-template-create.json');
-    const updateFilePath = path.join(this.serverless.config.servicePath,
+    const updateFilePath = path.join(provider.serverless.config.servicePath,
       '.serverless', 'configuration-template-update.json');
 
-    this.templates = {
-      create: this.serverless.utils.readFileSync(createFilePath),
-      update: this.serverless.utils.readFileSync(updateFilePath)
+      provider.templates = {
+      create: provider.serverless.utils.readFileSync(createFilePath),
+      update: provider.serverless.utils.readFileSync(updateFilePath)
     };
   }
 };

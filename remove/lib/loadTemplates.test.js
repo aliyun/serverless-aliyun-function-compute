@@ -8,6 +8,7 @@ const path = require('path');
 const AliyunProvider = require('../../provider/aliyunProvider');
 const AliyunRemove = require('../aliyunRemove');
 const Serverless = require('../../test/serverless');
+const serviceTemplate = require('./loadTemplates')
 
 describe('UploadArtifacts', () => {
   let serverless;
@@ -40,7 +41,7 @@ describe('UploadArtifacts', () => {
         create: JSON.parse(create),
         update: JSON.parse(update)
       };
-      return aliyunRemove.loadTemplates().then(() => {
+      return serviceTemplate.loadTemplates(aliyunRemove).then(() => {
         expect(aliyunRemove.templates).toEqual(templates);
       });
     });
