@@ -10,7 +10,6 @@ module.exports = {
   compileFunctions() {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
     if (!this.serverless.service.package.individually) {
-      console.log(this.serverless.service.package);
       this.compileStorage(this.serverless.service.package.artifact);
     }
     this.serverless.service.getAllFunctions().forEach((functionName) => {
