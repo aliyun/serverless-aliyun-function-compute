@@ -9,10 +9,16 @@ const _ = require('lodash');
 module.exports = {
   compileFunctions() {
     this.resources = this.serverless.service.provider.compiledConfigurationTemplate.Resources;
-    this.compileStorage(this.serverless.service.package.artifact);
+    if (!this.serverless.service.package.individually) {
+      this.compileStorage(this.serverless.service.package.artifact);
+    }
     this.serverless.service.getAllFunctions().forEach((functionName) => {
       const funcObject = this.serverless.service.getFunction(functionName);
-      this.compileFunctionAndEvent(functionName, funcObject);
+      if (this.serverless.service.package.individually) {
+        this.compileFunction(functionName, funcObject);
+      } else {
+        this.compileFunctionAndEvent(functionName, funcObject);
+      }
     });
   },
 
