@@ -39,7 +39,8 @@ class AliyunProvider {
     this.provider = this;
     this.serverless.setProvider(PROVIDER_NAME, this);
     this.options = options;
-    utils.setDefaults.call(this);
+    // FIXME: this method breaks if `provider.stage` is using a variable
+    // utils.setDefaults.call(this);
   }
 
   get projectDelay() {
@@ -358,16 +359,21 @@ class AliyunProvider {
       || service.provider.timeout
       || 30;
 
-    // TODO(joyeecheung): description
+    // https://help.aliyun.com/document_detail/52877.html?spm=a2c4g.11186623.6.781.78c911a0x2vF8D#createfunction
+    const env = funcObject.environment;
+
     return {
       'Type': 'ALIYUN::FC::Function',
       'Properties': {
         'name': funcObject.name,
+        // https://help.aliyun.com/document_detail/52877.html?spm=a2c4g.11186623.6.781.78c911a0x2vF8D#createfunction
+        'description': funcObject.description,
         'service': this.getServiceName(),
         'handler': funcObject.handler,
         'memorySize': memorySize,
         'timeout': timeout,
         'runtime': service.provider.runtime,
+        'EnvironmentVariables': env,
         'code': {
           'ossBucketName': this.getDeploymentBucketName(),
           'ossObjectName': service.package.artifactFilePath
@@ -713,7 +719,7 @@ class AliyunProvider {
     return this.getLogProject(projectName);
   }
 
- deleteLogProject(projectName, options){
+  deleteLogProject(projectName, options){
     return this.slsClient.deleteProject(projectName, options);
   }
 
@@ -738,12 +744,12 @@ class AliyunProvider {
   }
 
   async createLogStore(projectName, storeName, store) {
-    await this.slsClient.createLogStore(projectName, storeName, store);   
+    await this.slsClient.createLogStore(projectName, storeName, store);
     await this.sleep(this.storeDelay);
     return this.getLogStore(projectName, storeName);
   }
 
-deleteLogStore(projectName, logstoreName, options) {
+  deleteLogStore(projectName, logstoreName, options) {
     return this.slsClient.deleteLogStore(projectName, logstoreName, options);
   }
   async getLogIndex(projectName, storeName) {
@@ -766,7 +772,7 @@ deleteLogStore(projectName, logstoreName, options) {
     await this.getLogIndex(projectName, storeName);
   }
 
-deleteLogIndex(projectName, logstoreName, options) {
+  deleteLogIndex(projectName, logstoreName, options) {
     return this.slsClient.deleteIndex(projectName, logstoreName, options);
   }
 
@@ -832,7 +838,7 @@ deleteLogIndex(projectName, logstoreName, options) {
 
   uploadObject(objectName, filePath) {
     const ossClient = this.ossClient;
-    console.log(filePath)
+    console.log(filePath);
     return co(function* uploadObject() {
       return yield ossClient.put(objectName, filePath);
     });
