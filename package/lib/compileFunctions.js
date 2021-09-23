@@ -103,6 +103,13 @@ module.exports = {
         const triggerResource = this.provider.getOSSTriggerResource(event.oss, funcObject);
         const triggerName = triggerResource.Properties.triggerName;
         _.merge(resources, { [triggerName]: triggerResource });
+      } else if (eventType === 'timer') {
+        const triggerResource = this.provider.getTimerTriggerResource(
+          event.timer,
+          funcObject
+        );
+        const triggerName = triggerResource.Properties.triggerName;
+        _.merge(resources, { [triggerName]: triggerResource });
       }
     });
   }

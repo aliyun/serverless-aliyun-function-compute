@@ -522,6 +522,20 @@ class AliyunProvider {
     };
   }
 
+  getTimerTriggerResource(event, funcObject) {
+    const eventType = 'timer';
+    return {
+      'Type': 'ALIYUN::FC::Trigger',
+      'Properties': {
+        'triggerConfig': event.triggerConfig,
+        'triggerName': this.getEventName(eventType, funcObject.name),
+        'triggerType': eventType,
+        'functionName': funcObject.name,
+        'serviceName': this.getServiceName()
+      }
+    };
+  }
+
   getServiceResource() {
     // TODO(joyeecheung): description
     return {
@@ -979,9 +993,12 @@ deleteLogIndex(projectName, logstoreName, options) {
    * https://help.aliyun.com/document_detail/52877.html#triggerresponse
    */
   createTrigger(serviceName, functionName, trigger, role) {
-    const triggerProps = Object.assign({}, trigger, {
-      invocationRole: role.Arn
-    });
+    const triggerProps = Object.assign({}, trigger);
+    if (trigger.triggerType !== 'timer') {
+      Object.assign(triggerProps, {
+        invocationRole: role.Arn
+      });
+    }
     return this.fcClient.createTrigger(serviceName, functionName, triggerProps);
   }
 
@@ -1015,9 +1032,12 @@ deleteLogIndex(projectName, logstoreName, options) {
    * @return {TriggerResponse}
    */
   updateTrigger(serviceName, functionName, triggerName, trigger, role) {
-    const triggerProps = Object.assign({}, trigger, {
-      invocationRole: role.Arn
-    });
+    const triggerProps = Object.assign({}, trigger);
+    if (trigger.triggerType !== 'timer') {
+      Object.assign(triggerProps, {
+        invocationRole: role.Arn
+      });
+    }
     return this.fcClient.updateTrigger(
       serviceName, functionName, triggerName, triggerProps);
   }
