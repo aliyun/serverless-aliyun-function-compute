@@ -371,7 +371,8 @@ class AliyunProvider {
         'code': {
           'ossBucketName': this.getDeploymentBucketName(),
           'ossObjectName': service.package.artifactFilePath
-        }
+        },
+        'environmentVariables': funcObject.environmentVariables
       }
     };
   }
