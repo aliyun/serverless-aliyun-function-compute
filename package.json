@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "eslint": "^4.6.1",
-    "jest": "^20.0.4",
+    "jest": "^29.3.1",
     "sinon": "^2.4.1"
   }
 }
